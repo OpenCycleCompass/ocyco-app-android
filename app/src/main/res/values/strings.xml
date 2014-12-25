@@ -3,5 +3,7 @@
 
     <string name="app_name">iBis - intelligent bike information system</string>
     <string name="action_settings">Settings</string>
+    <string name="welcome_headline">Wilkommen bei iBis!</string>
+    <string name="welcome">Bevor Sie mit der Navigation beginen können, müssen sie noch einige Einstellungen vornehmen.</string>
 
 </resources>
