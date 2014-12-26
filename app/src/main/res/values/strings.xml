@@ -5,5 +5,7 @@
     <string name="action_settings">Settings</string>
     <string name="welcome_headline">Wilkommen bei iBis!</string>
     <string name="welcome">Bevor Sie mit der Navigation beginen können, müssen sie noch einige Einstellungen vornehmen.</string>
+    <string name="ButtonOpenSettings">Einstellungen</string>
+    <string name="title_activity_settings">Einstellungen</string>
 
 </resources>
