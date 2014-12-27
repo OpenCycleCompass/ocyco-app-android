@@ -10,7 +10,6 @@ import android.view.View;
 
 public class MainActivity extends ActionBarActivity {
 
-
     public void openSettings(View view) {
         Intent intent = new Intent(this, SettingsActivity.class);
         startActivity(intent);
