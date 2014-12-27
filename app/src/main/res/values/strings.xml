@@ -10,5 +10,7 @@
     <string name="generalSettings">Allgemeine Einstellungen</string>
     <string name="CBCollectData">Meine Routendaten dürfen anonymisiert gespeichert und für Routenberechnungen anderer Nutzer verwendet werden.</string>
     <string name="specificSettings">Routenspezifische Einstellungen</string>
+    <string name="distance">Wie lange ist die Strecke, die Sie fahren möchten?</string>
+    <string name="save">Speichern</string>
 
 </resources>

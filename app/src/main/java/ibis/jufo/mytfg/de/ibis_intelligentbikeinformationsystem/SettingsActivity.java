@@ -5,12 +5,14 @@ import android.os.Bundle;
 import android.view.Menu;
 import android.view.View;
 import android.widget.CheckBox;
+import android.widget.EditText;
 
 
 public class SettingsActivity extends ActionBarActivity {
 
     //Variables declaration
     public boolean CollectData = false;
+    public float FloatDistStartDest;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -38,4 +40,12 @@ public class SettingsActivity extends ActionBarActivity {
         }
     }
 
+    //called when save Button is clicked
+    public void saveSettings(View view) {
+        //read text from EditText
+        EditText editDistance = (EditText) findViewById(R.id.enterDistance);
+        //convert EditText to Float
+        FloatDistStartDest = Float.parseFloat(editDistance.getText().toString());
+
+    }
 }

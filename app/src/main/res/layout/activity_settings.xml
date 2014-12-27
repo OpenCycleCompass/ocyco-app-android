@@ -7,7 +7,8 @@
     <TextView
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:paddingBottom="10px"
+        android:layout_marginTop="5px"
+        android:layout_marginBottom="10px"
         android:text="@string/generalSettings"
         android:textSize="20sp" />
 
@@ -15,7 +16,49 @@
         android:id="@+id/CBCollectData"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:text="@string/CBCollectData"
-        android:onClick="onCheckboxClicked"/>
+        android:onClick="onCheckboxClicked"
+        android:text="@string/CBCollectData" />
+
+    <TextView
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginBottom="10px"
+        android:layout_marginTop="50px"
+        android:text="@string/specificSettings"
+        android:textSize="20sp" />
+
+    <TextView
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginBottom="10px"
+        android:text="@string/distance" />
+
+    <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="horizontal"
+        android:layout_marginTop="10px"
+        android:layout_marginBottom="10px" >
+
+        <EditText
+            android:id="@+id/enterDistance"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_weight="1"/>
+
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_weight="1"
+            android:text="km"/>
+
+    </LinearLayout>
+
+    <Button
+        android:layout_marginTop="50px"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:text="@string/save"
+        android:onClick="saveSettings"/>
 
 </LinearLayout>
