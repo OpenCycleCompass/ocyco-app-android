@@ -22,7 +22,7 @@
         <Button
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:text="@string/ButtonOpenSettings"
+            android:text="@string/button_open_settings"
             android:onClick="openSettings"/>
 
 </LinearLayout>

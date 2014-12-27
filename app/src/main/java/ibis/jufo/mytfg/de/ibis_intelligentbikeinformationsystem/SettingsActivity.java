@@ -1,7 +1,6 @@
 package ibis.jufo.mytfg.de.ibis_intelligentbikeinformationsystem;
 
 import android.app.AlertDialog;
-import android.content.Context;
 import android.content.DialogInterface;
 import android.support.v7.app.ActionBarActivity;
 import android.os.Bundle;

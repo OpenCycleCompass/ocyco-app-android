@@ -5,11 +5,11 @@
     <string name="action_settings">Einstellungen</string>
     <string name="welcome_headline">Wilkommen bei iBis!</string>
     <string name="welcome">Bevor Sie mit der Navigation beginen können, müssen sie noch einige Einstellungen vornehmen.</string>
-    <string name="ButtonOpenSettings">Einstellungen</string>
+    <string name="button_open_settings">Einstellungen</string>
     <string name="title_activity_settings">Einstellungen</string>
-    <string name="generalSettings">Allgemeine Einstellungen</string>
-    <string name="CBCollectData">Meine Routendaten dürfen anonymisiert gespeichert und für Routenberechnungen anderer Nutzer verwendet werden.</string>
-    <string name="specificSettings">Routenspezifische Einstellungen</string>
+    <string name="general_settings">Allgemeine Einstellungen</string>
+    <string name="CB_collect_data">Meine Routendaten dürfen anonymisiert gespeichert und für Routenberechnungen anderer Nutzer verwendet werden.</string>
+    <string name="specific_settings">Routenspezifische Einstellungen</string>
     <string name="distance">Wie lange ist die Strecke, die Sie fahren möchten?</string>
     <string name="save">Speichern</string>
 
