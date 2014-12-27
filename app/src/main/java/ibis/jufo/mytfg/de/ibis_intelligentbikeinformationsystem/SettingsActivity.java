@@ -1,5 +1,8 @@
 package ibis.jufo.mytfg.de.ibis_intelligentbikeinformationsystem;
 
+import android.app.AlertDialog;
+import android.content.Context;
+import android.content.DialogInterface;
 import android.support.v7.app.ActionBarActivity;
 import android.os.Bundle;
 import android.view.Menu;
@@ -42,10 +45,32 @@ public class SettingsActivity extends ActionBarActivity {
 
     //called when save Button is clicked
     public void saveSettings(View view) {
-        //read text from EditText
+        //read text from EditText and convert to String
         EditText editDistance = (EditText) findViewById(R.id.enterDistance);
-        //convert EditText to Float
-        FloatDistStartDest = Float.parseFloat(editDistance.getText().toString());
+        String StrEditText = editDistance.getText().toString();
+        //try to convert String to Float
+        try {
+            FloatDistStartDest = Float.parseFloat(StrEditText);
+        } catch (java.lang.NumberFormatException e) {
+            openAlert(StrEditText);
+        }
+    }
 
+    private void openAlert(String StrEditText) {
+        //set up a new alert dialog
+        AlertDialog.Builder alertDialogBuilder = new AlertDialog.Builder(SettingsActivity.this);
+        alertDialogBuilder.setTitle("Bitte geben sie eine Zahl ein!");
+        alertDialogBuilder.setMessage("\""+StrEditText+"\""+" ist keine Zahl! ");
+
+        //create the OK Button and onClickListener
+        alertDialogBuilder.setPositiveButton("OK",new DialogInterface.OnClickListener() {
+            //close dialog when clicked
+            public void onClick(DialogInterface dialog, int id) {
+            dialog.cancel();
+            }
+        });
+        //create and show alert dialog
+        AlertDialog alertDialog = alertDialogBuilder.create();
+        alertDialog.show();
     }
 }
