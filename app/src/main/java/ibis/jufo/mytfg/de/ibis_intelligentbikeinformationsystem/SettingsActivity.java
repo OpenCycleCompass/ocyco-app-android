@@ -45,7 +45,7 @@ public class SettingsActivity extends ActionBarActivity {
     //called when save Button is clicked
     public void saveSettings(View view) {
         //read text from EditText and convert to String
-        EditText editDistance = (EditText) findViewById(R.id.enterDistance);
+        EditText editDistance = (EditText) findViewById(R.id.enter_distance);
         String StrEditText = editDistance.getText().toString();
         //try to convert String to Float
         try {
