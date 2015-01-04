@@ -46,6 +46,7 @@ public class SettingsActivity extends ActionBarActivity {
 
     //called when save Button is clicked
     public void saveSettings(View view) {
+        boolean exception = false;
         //read text from EditText and convert to String
         EditText editDistance = (EditText) findViewById(R.id.enter_distance);
         String StrEditText = editDistance.getText().toString();
@@ -53,11 +54,14 @@ public class SettingsActivity extends ActionBarActivity {
         try {
             FloatDistStartDest = Float.parseFloat(StrEditText);
         } catch (java.lang.NumberFormatException e) {
+            exception = true;
             openAlert(StrEditText);
         }
 
-        Intent intent = new Intent(this, ShowDataActivity.class);
-        startActivity(intent);
+        if (!exception) {
+            Intent intent = new Intent(this, ShowDataActivity.class);
+            startActivity(intent);
+        }
     }
 
     private void openAlert(String StrEditText) {
