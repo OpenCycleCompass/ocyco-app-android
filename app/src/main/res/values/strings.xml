@@ -13,5 +13,6 @@
     <string name="distance">Wie lange ist die Strecke, die Sie fahren möchten?</string>
     <string name="save">Speichern</string>
     <string name="title_activity_show_data">iBis</string>
+    <string name="action_show_data_activity">Hauptseite</string>
 
 </resources>

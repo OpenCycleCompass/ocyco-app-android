@@ -37,6 +37,10 @@ public class MainActivity extends ActionBarActivity {
                 Intent intent = new Intent(this, SettingsActivity.class);
                 startActivity(intent);
                 return true;
+            case R.id.action_show_data:
+                Intent intent2 = new Intent(this, ShowDataActivity.class);
+                startActivity(intent2);
+                return true;
             default:
                 return super.onOptionsItemSelected(item);
         }
