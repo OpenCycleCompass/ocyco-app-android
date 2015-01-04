@@ -1,8 +1,10 @@
 package ibis.jufo.mytfg.de.ibis_intelligentbikeinformationsystem;
 
 import android.app.AlertDialog;
+import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
+import android.content.SharedPreferences;
 import android.support.v7.app.ActionBarActivity;
 import android.os.Bundle;
 import android.view.Menu;
@@ -22,7 +24,20 @@ public class SettingsActivity extends ActionBarActivity {
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_settings);
-    }
+
+        // Restore preferences
+        SharedPreferences settings = getSharedPreferences(getString(R.string.preference_file_key), Context.MODE_PRIVATE);
+        //get variables
+        CollectData = settings.getBoolean("CollectData", false);
+        FloatDistStartDest = settings.getFloat("FloatDistStartDest", 0);
+        //setting check box
+        final CheckBox checkBox = (CheckBox) findViewById(R.id.CBCollectData);
+        checkBox.setChecked(CollectData);
+        //set Text to enter_distance
+        EditText editDistance = (EditText) findViewById(R.id.enter_distance);
+        editDistance.setText(Float.toString(FloatDistStartDest));
+
+        }
 
 
     @Override
@@ -30,6 +45,20 @@ public class SettingsActivity extends ActionBarActivity {
         // Inflate the menu; this adds items to the action bar if it is present.
         getMenuInflater().inflate(R.menu.menu_settings, menu);
         return true;
+    }
+
+    @Override
+    protected void onStop(){
+        super.onStop();
+
+        //saving settings
+        SharedPreferences settings = getSharedPreferences(getString(R.string.preference_file_key), Context.MODE_PRIVATE);
+        //creating a editor
+        SharedPreferences.Editor editor = settings.edit();
+        editor.putBoolean("CollectData", CollectData);
+        editor.putFloat("FloatDistStartDest", FloatDistStartDest);
+        // Commit the edits!
+        editor.commit();
     }
 
     public void onCheckboxClicked(View view) {

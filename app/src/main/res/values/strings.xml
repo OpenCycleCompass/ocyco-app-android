@@ -14,5 +14,6 @@
     <string name="save">Speichern</string>
     <string name="title_activity_show_data">iBis</string>
     <string name="action_show_data_activity">Hauptseite</string>
+    <string name="preference_file_key">pref_file_key</string>
 
 </resources>
