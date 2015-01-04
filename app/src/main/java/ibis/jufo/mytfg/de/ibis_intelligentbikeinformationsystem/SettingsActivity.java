@@ -2,6 +2,7 @@ package ibis.jufo.mytfg.de.ibis_intelligentbikeinformationsystem;
 
 import android.app.AlertDialog;
 import android.content.DialogInterface;
+import android.content.Intent;
 import android.support.v7.app.ActionBarActivity;
 import android.os.Bundle;
 import android.view.Menu;
@@ -53,6 +54,9 @@ public class SettingsActivity extends ActionBarActivity {
         } catch (java.lang.NumberFormatException e) {
             openAlert(StrEditText);
         }
+
+        Intent intent = new Intent(this, ShowDataActivity.class);
+        startActivity(intent);
     }
 
     private void openAlert(String StrEditText) {
