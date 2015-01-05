@@ -23,6 +23,9 @@ import com.google.android.gms.location.LocationListener;
 import com.google.android.gms.location.LocationRequest;
 import com.google.android.gms.location.LocationServices;
 
+import java.text.DateFormat;
+import java.util.Date;
+
 
 public class Tracking extends Service implements LocationListener, OnConnectionFailedListener, ConnectionCallbacks {
 
@@ -34,9 +37,9 @@ public class Tracking extends Service implements LocationListener, OnConnectionF
 
     //The desired interval for location updates. Inexact. Updates may be more or less frequent.
     public static final long UPDATE_INTERVAL_IN_MILLISECONDS = 5000;
-     /* The fastest rate for active location updates. Exact. Updates will never be more frequent
-     * than this value.
-     */
+    /* The fastest rate for active location updates. Exact. Updates will never be more frequent
+    * than this value.
+    */
     public static final long FASTEST_UPDATE_INTERVAL_IN_MILLISECONDS =
             UPDATE_INTERVAL_IN_MILLISECONDS / 2;
 
@@ -49,6 +52,8 @@ public class Tracking extends Service implements LocationListener, OnConnectionF
     //Represents a geographical location.
     protected Location mCurrentLocation;
 
+    protected String mLastUpdateTime;
+
 
     @Override
     //Very mystical code...
@@ -60,13 +65,12 @@ public class Tracking extends Service implements LocationListener, OnConnectionF
         Log.i(TAG, "checkOnline()");
         if (CollectData) {
             startOnlineTracking();
-        }
-        else {
+        } else {
             stopOnlineTracking();
         }
     }
 
-    public void startOnlineTracking () {
+    public void startOnlineTracking() {
         Log.i(TAG, "startOnlineTracking()");
         // Create Notification with track info
         // TODO: funktioniert so nicht :(
@@ -97,7 +101,7 @@ public class Tracking extends Service implements LocationListener, OnConnectionF
         //TODO: start uploading track data
     }
 
-    public void stopOnlineTracking () {
+    public void stopOnlineTracking() {
         //TODO: stop uploading track data
 
         Log.i(TAG, "stopOnlineTracking()");
@@ -109,7 +113,7 @@ public class Tracking extends Service implements LocationListener, OnConnectionF
         mNotifyMgr.cancel(mNotificationId);
     }
 
-    public void stopTracking() {
+    public void stopLocationUpdates() {
         Log.i(TAG, "stopTracking()");
         // Stop LocationListener
         LocationServices.FusedLocationApi.removeLocationUpdates(mGoogleApiClient, this);
@@ -139,20 +143,21 @@ public class Tracking extends Service implements LocationListener, OnConnectionF
     protected void createLocationRequest() {
         Log.i(TAG, "createLocationRequest()");
         mLocationRequest = new LocationRequest();
-        mLocationRequest.setInterval(UPDATE_INTERVAL_IN_MILLISECONDS);         // Positionsbestimmung mindestens ca. alle 5 Sekunden (5000ms)
-        mLocationRequest.setFastestInterval(FASTEST_UPDATE_INTERVAL_IN_MILLISECONDS);  // Positionsbestimmung höchstens jede Sekunde (1000ms)
-        mLocationRequest.setPriority(LocationRequest.PRIORITY_HIGH_ACCURACY);   // Hohe Genauigkeit
+        // Positionsbestimmung mindestens ca. alle 5 Sekunden (5000ms)
+        mLocationRequest.setInterval(UPDATE_INTERVAL_IN_MILLISECONDS);
+        // Positionsbestimmung höchstens jede Sekunde (1000ms)
+        mLocationRequest.setFastestInterval(FASTEST_UPDATE_INTERVAL_IN_MILLISECONDS);
+        // Hohe Genauigkeit
+        mLocationRequest.setPriority(LocationRequest.PRIORITY_HIGH_ACCURACY);
     }
 
     @Override
     public void onLocationChanged(Location location) {
         Log.i(TAG, "onLocationChanged()");
         mCurrentLocation = location;
-        // TODO: Save location to SQlite DB
+        mLastUpdateTime = DateFormat.getTimeInstance().format(new Date());
 
-        // Google Sample:
-        //mLastUpdateTime = DateFormat.getTimeInstance().format(new Date());
-        //updateUI();
+    // TODO: Save location to SQlite DB
     }
 
     @Override
@@ -168,7 +173,7 @@ public class Tracking extends Service implements LocationListener, OnConnectionF
     public int onStartCommand(Intent intent, int flags, int startId) {
         Log.i(TAG, "onStartCommand()");
         //read extra and write to CollectData
-        CollectData=intent.getBooleanExtra("Key", false);
+        CollectData = intent.getBooleanExtra("Key", false);
         checkOnline();
         return super.onStartCommand(intent, flags, startId);
     }
@@ -176,9 +181,9 @@ public class Tracking extends Service implements LocationListener, OnConnectionF
     @Override
     public void onDestroy() {
         Log.i(TAG, "onDestroy()");
-        stopTracking();
-        // Save Data (?)
         super.onDestroy();
+        stopLocationUpdates();
+        // Save Data (?)
     }
 
     @Override
