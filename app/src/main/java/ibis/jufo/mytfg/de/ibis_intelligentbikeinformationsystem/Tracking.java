@@ -80,11 +80,11 @@ public class Tracking extends Service implements LocationListener, OnConnectionF
         Log.i(TAG, "startTracking()");
         // Create Notification with track info
         // TODO: funktioniert so nicht :(
-        Intent tracking_showIntent = new Intent(this, MainActivity.class);
+        Intent tracking_showIntent = new Intent(this, ShowDataActivity.class);
         tracking_showIntent.putExtra("methodName", "showTrackInfo");
         PendingIntent tracking_showPendingIntent = PendingIntent.getActivity(this, 0, tracking_showIntent, 0);
 
-        Intent tracking_stopIntent = new Intent(this, MainActivity.class);
+        Intent tracking_stopIntent = new Intent(this, SettingsActivity.class);
         tracking_showIntent.putExtra("methodName", "stopTracking");
         PendingIntent tracking_stopPendingIntent = PendingIntent.getActivity(this, 0, tracking_stopIntent, 0);
 
@@ -109,6 +109,11 @@ public class Tracking extends Service implements LocationListener, OnConnectionF
 
     public void stopOnlineTracking () {
         //TODO: stop uploading track data
+
+        //cancle notification
+        String ns = Context.NOTIFICATION_SERVICE;
+        NotificationManager nMgr = (NotificationManager) getApplicationContext().getSystemService(ns);
+        nMgr.cancel(0);
     }
 
     public void stopTracking() {

@@ -125,4 +125,8 @@ public class SettingsActivity extends ActionBarActivity {
                 return super.onOptionsItemSelected(item);
         }
     }
+
+    public void stopOnlineTracking () {
+        Tracking.stopOnlineTracking();
+    }
 }
