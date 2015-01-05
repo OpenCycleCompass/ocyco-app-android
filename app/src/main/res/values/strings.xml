@@ -16,4 +16,9 @@
     <string name="action_show_data_activity">Hauptseite</string>
     <string name="preference_file_key">pref_file_key</string>
 
+    <string name="tracking_start">Tracking starten</string>
+    <string name="tracking_stop">Tracking beenden</string>
+    <string name="tracking_status_inactive">Tracking läuft nicht</string>
+    <string name="tracking_status_active">Tracking läuft</string>
+    <string name="tracking_show_tracking">Anzeigen</string>
 </resources>

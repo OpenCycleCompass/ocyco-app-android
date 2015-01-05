@@ -42,7 +42,6 @@ public class SettingsActivity extends ActionBarActivity {
 
     @Override
     public boolean onCreateOptionsMenu(Menu menu) {
-        // Inflate the menu; this adds items to the action bar if it is present.
         getMenuInflater().inflate(R.menu.menu_settings, menu);
         return true;
     }
@@ -86,7 +85,6 @@ public class SettingsActivity extends ActionBarActivity {
             exception = true;
             openAlert(StrEditText);
         }
-
         if (!exception) {
             Intent intent = new Intent(this, ShowDataActivity.class);
             startActivity(intent);

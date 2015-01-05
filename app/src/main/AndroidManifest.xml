@@ -24,6 +24,16 @@
             android:name=".ShowDataActivity"
             android:label="@string/title_activity_show_data" >
         </activity>
+        <service
+            android:name="Tracking"
+            android:label="iBis Tracking GPS" />
+        <meta-data
+            android:name="com.google.android.gms.version"
+            android:value="@integer/google_play_services_version" />
+        <!-- TODO: Ensure Devices Have the Google Play services APK
+         (https://developer.android.com/google/play-services/setup.html#ensure) -->
     </application>
+
+    <uses-permission android:name="android.permission.ACCESS_FINE_LOCATION" />
 
 </manifest>

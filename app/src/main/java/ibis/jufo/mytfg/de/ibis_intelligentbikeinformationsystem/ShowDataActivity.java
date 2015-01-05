@@ -13,7 +13,11 @@ public class ShowDataActivity extends ActionBarActivity {
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_show_data);
+        // Start tracking Service
+        Intent intent = new Intent(this, Tracking.class);
+        startService(intent);
     }
+
 
 
     @Override
