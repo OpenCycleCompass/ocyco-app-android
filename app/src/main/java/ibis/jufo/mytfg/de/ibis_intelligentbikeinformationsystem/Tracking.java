@@ -156,14 +156,30 @@ public class Tracking extends Service implements LocationListener, OnConnectionF
         Log.i(TAG, "onLocationChanged()");
         mCurrentLocation = location;
         mLastUpdateTime = DateFormat.getTimeInstance().format(new Date());
+        updateDatabase();
 
-    // TODO: Save location to SQlite DB
     }
+
+    public void updateDatabase(){
+        Log.i(TAG, "updateDatabase()");
+        GPSDatabase myDatabase=new GPSDatabase(this.getApplicationContext());
+        //Convert to String for Database
+        String lat = mCurrentLocation.getLatitude() + "";
+        String lon = mCurrentLocation.getLongitude() + "";
+        String alt = mCurrentLocation.getAltitude() + "";
+        String tst = mLastUpdateTime + "";
+        myDatabase.open();
+        myDatabase.insertRows(lat.substring(0,7),lon.substring(0,7), alt.substring(0,7), tst);
+        myDatabase.close();
+    }
+
 
     @Override
     public void onCreate() {
         Log.i(TAG, "onCreate()");
         super.onCreate();
+        //build SQLite database
+
         //build and connect Api Client
         buildGoogleApiClient();
         mGoogleApiClient.connect();
