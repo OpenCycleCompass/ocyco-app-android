@@ -51,6 +51,8 @@ public class SettingsActivity extends ActionBarActivity {
         super.onStop();
 
         //saving settings
+        //ATTENTION! onStop() is executed AFTER onCreate(), with onStop() saved data
+        //can NOT be read by the next Activity's onCreate()!!!
         SharedPreferences settings = getSharedPreferences(getString(R.string.preference_file_key), Context.MODE_PRIVATE);
         //creating a editor
         SharedPreferences.Editor editor = settings.edit();
@@ -86,8 +88,16 @@ public class SettingsActivity extends ActionBarActivity {
             openAlert(StrEditText);
         }
         if (!exception) {
-            Intent intent = new Intent(this, ShowDataActivity.class);
-            startActivity(intent);
+            //restart Tracking Service starts it's onStartCommand (NOT onCreate),
+            //so checkOnline will be executed again
+            Intent intent = new Intent(this, Tracking.class);
+            intent.putExtra("Key", CollectData);
+            startService(intent);
+
+            //start ShowDataActivity
+            Intent intent2 = new Intent(this, ShowDataActivity.class);
+            intent2.putExtra("Key", CollectData);
+            startActivity(intent2);
         }
     }
 
@@ -126,7 +136,15 @@ public class SettingsActivity extends ActionBarActivity {
         }
     }
 
-    public void stopOnlineTracking () {
-        Tracking.stopOnlineTracking();
+    public void stopOnlineTracking (View view) {
+        //set collect data false
+        CollectData=false;
+        final CheckBox checkBox = (CheckBox) findViewById(R.id.CBCollectData);
+        checkBox.setChecked(CollectData);
+        //restart Tracking Service starts it's onStartCommand (NOT onCreate),
+        //so checkOnline will be executed again
+        Intent intent = new Intent(this, Tracking.class);
+        intent.putExtra("Key", CollectData);
+        startService(intent);
     }
 }

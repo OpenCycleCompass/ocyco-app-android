@@ -9,12 +9,20 @@ import android.view.MenuItem;
 
 public class ShowDataActivity extends ActionBarActivity {
 
+    boolean CollectData;
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_show_data);
+
+        //receiving intent
+        Intent incomingIntent = getIntent();
+        CollectData = incomingIntent.getBooleanExtra("Key", false);
+
         // Start tracking Service
         Intent intent = new Intent(this, Tracking.class);
+        intent.putExtra("Key", CollectData);
         startService(intent);
     }
 

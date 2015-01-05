@@ -8,9 +8,7 @@ package ibis.jufo.mytfg.de.ibis_intelligentbikeinformationsystem;
 import android.app.NotificationManager;
 import android.app.PendingIntent;
 import android.app.Service;
-import android.content.Context;
 import android.content.Intent;
-import android.content.SharedPreferences;
 import android.location.Location;
 import android.os.Bundle;
 import android.os.IBinder;
@@ -58,16 +56,8 @@ public class Tracking extends Service implements LocationListener, OnConnectionF
         return null;
     }
 
-    public void startTracking() {
-        Log.i(TAG, "startTracking()");
-
-        // Start LocationListener to periodically (constant interval) save Location to SQlite DB
-        // Start GoogleApiClient: startLocationUpdates(); ist called by onConnected()
-        mGoogleApiClient.connect();
-        checkOnline();
-    }
-
     public void checkOnline() {
+        Log.i(TAG, "checkOnline()");
         if (CollectData) {
             startOnlineTracking();
         }
@@ -77,7 +67,7 @@ public class Tracking extends Service implements LocationListener, OnConnectionF
     }
 
     public void startOnlineTracking () {
-        Log.i(TAG, "startTracking()");
+        Log.i(TAG, "startOnlineTracking()");
         // Create Notification with track info
         // TODO: funktioniert so nicht :(
         Intent tracking_showIntent = new Intent(this, ShowDataActivity.class);
@@ -110,10 +100,13 @@ public class Tracking extends Service implements LocationListener, OnConnectionF
     public void stopOnlineTracking () {
         //TODO: stop uploading track data
 
-        //cancle notification
-        String ns = Context.NOTIFICATION_SERVICE;
-        NotificationManager nMgr = (NotificationManager) getApplicationContext().getSystemService(ns);
-        nMgr.cancel(0);
+        Log.i(TAG, "stopOnlineTracking()");
+
+        //cancel notification
+        // Remove Notification
+        int mNotificationId = 42;
+        NotificationManager mNotifyMgr = (NotificationManager) getSystemService(NOTIFICATION_SERVICE);
+        mNotifyMgr.cancel(mNotificationId);
     }
 
     public void stopTracking() {
@@ -121,10 +114,7 @@ public class Tracking extends Service implements LocationListener, OnConnectionF
         // Stop LocationListener
         LocationServices.FusedLocationApi.removeLocationUpdates(mGoogleApiClient, this);
 
-        // Remove Notification
-        int mNotificationId = 42;
-        NotificationManager mNotifyMgr = (NotificationManager) getSystemService(NOTIFICATION_SERVICE);
-        mNotifyMgr.cancel(mNotificationId);
+
     }
 
     protected void startLocationUpdates() {
@@ -169,18 +159,17 @@ public class Tracking extends Service implements LocationListener, OnConnectionF
     public void onCreate() {
         Log.i(TAG, "onCreate()");
         super.onCreate();
+        //build and connect Api Client
         buildGoogleApiClient();
-
-        // Restore preferences
-        SharedPreferences settings = getSharedPreferences(getString(R.string.preference_file_key), Context.MODE_PRIVATE);
-        //get variables
-        CollectData = settings.getBoolean("CollectData", false);
+        mGoogleApiClient.connect();
     }
 
     @Override
     public int onStartCommand(Intent intent, int flags, int startId) {
         Log.i(TAG, "onStartCommand()");
-        startTracking();
+        //read extra and write to CollectData
+        CollectData=intent.getBooleanExtra("Key", false);
+        checkOnline();
         return super.onStartCommand(intent, flags, startId);
     }
 
