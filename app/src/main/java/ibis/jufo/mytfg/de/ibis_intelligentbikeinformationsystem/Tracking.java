@@ -174,7 +174,9 @@ public class Tracking extends Service implements LocationListener, OnConnectionF
         Cursor cursor = mGPSDb.getAllRows();
         cursor.moveToFirst();
         Log.i (TAG, cursor.getString(1));
-        mGPSDb.close();*/
+        cursor.close()
+        */
+        mGPSDb.close();
 
     }
 
