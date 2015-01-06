@@ -8,6 +8,16 @@ import android.database.sqlite.SQLiteDatabase;
 import android.database.sqlite.SQLiteOpenHelper;
 import android.util.Log;
 
+import org.apache.http.HttpResponse;
+import org.apache.http.client.HttpClient;
+import org.apache.http.client.methods.HttpGet;
+import org.apache.http.impl.client.DefaultHttpClient;
+import org.json.JSONArray;
+import org.json.JSONException;
+import org.json.JSONObject;
+
+import java.io.InputStream;
+
 public class GPSDatabase {
     private Context context;
     private DbHelper dbHelper;
@@ -71,5 +81,36 @@ public class GPSDatabase {
         Log.i(TAG, "close()");
         dbHelper.close();
         //return true;
+    }
+    public int sendToServer(){
+        Log.i(TAG, "sendToServer()");
+        JSONArray data = new JSONArray();
+        Cursor cursor = getAllRows();
+        cursor.moveToFirst();
+        while (!cursor.isAfterLast()) {
+            JSONObject point = new JSONObject();
+            try {
+                point.put("lat", cursor.getString(1));
+                point.put("lon", cursor.getString(2));
+                //point.put("alt", cursor.getString(4));
+                point.put("time", cursor.getString(3));
+            } catch (JSONException e) {
+                e.printStackTrace();
+            }
+            data.put(point);
+            cursor.moveToNext();
+        }
+        String http_get_string = data.toString();
+        Log.i(TAG, http_get_string);
+        /*String url = "https://ibis.jufo.mytfg.de/api1/pushtrack.php?data="+http_get_string+"&";
+        InputStream content = null;
+        try {
+            HttpClient httpclient = new DefaultHttpClient();
+            HttpResponse response = httpclient.execute(new HttpGet(url));
+        } catch (Exception e) {
+            Log.i(TAG, "Network exception", e);
+        }
+        */
+        return 0;
     }
 }

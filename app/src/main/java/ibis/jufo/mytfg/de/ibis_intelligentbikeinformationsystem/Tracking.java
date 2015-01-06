@@ -156,7 +156,6 @@ public class Tracking extends Service implements LocationListener, OnConnectionF
         mCurrentLocation = location;
         mLastUpdateTime = Long.toString(System.currentTimeMillis()/1000L);
         updateDatabase();
-
     }
 
     public void updateDatabase(){
@@ -173,8 +172,8 @@ public class Tracking extends Service implements LocationListener, OnConnectionF
         FOR DEBUGGING
         Cursor cursor = mGPSDb.getAllRows();
         cursor.moveToFirst();
-        Log.i (TAG, cursor.getString(1));
-        mGPSDb.close();*/
+        Log.i (TAG, cursor.getString(1));*/
+        mGPSDb.close();
 
     }
 
@@ -205,9 +204,14 @@ public class Tracking extends Service implements LocationListener, OnConnectionF
     @Override
     public void onDestroy() {
         Log.i(TAG, "onDestroy()");
-        super.onDestroy();
+        // Save Data: sendToServer()
+        if(CollectData){
+            mGPSDb.open();
+            Log.i(TAG, mGPSDb.sendToServer()+"");
+            mGPSDb.close();
+        }
         stopLocationUpdates();
-        // Save Data (?)
+        super.onDestroy();
     }
 
     @Override
