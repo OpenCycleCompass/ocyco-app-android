@@ -13,7 +13,6 @@ import android.view.View;
 import android.widget.CheckBox;
 import android.widget.EditText;
 
-
 public class SettingsActivity extends ActionBarActivity {
 
     //Variables declaration
@@ -146,5 +145,9 @@ public class SettingsActivity extends ActionBarActivity {
         Intent intent = new Intent(this, Tracking.class);
         intent.putExtra("Key", CollectData);
         startService(intent);
+    }
+
+    public void showGPSData (View view) {
+
     }
 }

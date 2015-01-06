@@ -68,4 +68,16 @@
         android:text="@string/tracking_stop"
         android:onClick="stopOnlineTracking"/>
 
+    <Button
+        android:layout_marginTop="50px"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:text="@string/GPSData_Debug"
+        android:onClick="showGPSData"/>
+
+    <TextView
+        android:id="@+id/DEBUG_TextView"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"/>
+
 </LinearLayout>

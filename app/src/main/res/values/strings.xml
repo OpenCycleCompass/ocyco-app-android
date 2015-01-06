@@ -21,4 +21,5 @@
     <string name="tracking_status_inactive">Tracking läuft nicht</string>
     <string name="tracking_status_active">Tracking läuft</string>
     <string name="tracking_show_tracking">Anzeigen</string>
+    <string name="GPSData_Debug">Inhalt aus GPS Datenbank anzeigen (DEBUGGING)</string>
 </resources>

@@ -23,9 +23,6 @@ import com.google.android.gms.location.LocationListener;
 import com.google.android.gms.location.LocationRequest;
 import com.google.android.gms.location.LocationServices;
 
-import java.text.DateFormat;
-import java.util.Date;
-
 
 public class Tracking extends Service implements LocationListener, OnConnectionFailedListener, ConnectionCallbacks {
 
@@ -53,6 +50,8 @@ public class Tracking extends Service implements LocationListener, OnConnectionF
     protected Location mCurrentLocation;
 
     protected String mLastUpdateTime;
+
+    public GPSDatabase mGPSDb;
 
 
     @Override
@@ -155,22 +154,28 @@ public class Tracking extends Service implements LocationListener, OnConnectionF
     public void onLocationChanged(Location location) {
         Log.i(TAG, "onLocationChanged()");
         mCurrentLocation = location;
-        mLastUpdateTime = DateFormat.getTimeInstance().format(new Date());
+        mLastUpdateTime = Long.toString(System.currentTimeMillis()/1000L);
         updateDatabase();
 
     }
 
     public void updateDatabase(){
         Log.i(TAG, "updateDatabase()");
-        GPSDatabase myDatabase=new GPSDatabase(this.getApplicationContext());
         //Convert to String for Database
         String lat = mCurrentLocation.getLatitude() + "";
         String lon = mCurrentLocation.getLongitude() + "";
         String alt = mCurrentLocation.getAltitude() + "";
         String tst = mLastUpdateTime + "";
-        myDatabase.open();
-        myDatabase.insertRows(lat.substring(0,7),lon.substring(0,7), alt.substring(0,7), tst);
-        myDatabase.close();
+        mGPSDb.open();
+        mGPSDb.insertRows(lat, lon, tst);
+
+        /*
+        FOR DEBUGGING
+        Cursor cursor = mGPSDb.getAllRows();
+        cursor.moveToFirst();
+        Log.i (TAG, cursor.getString(1));
+        mGPSDb.close();*/
+
     }
 
 
@@ -183,6 +188,9 @@ public class Tracking extends Service implements LocationListener, OnConnectionF
         //build and connect Api Client
         buildGoogleApiClient();
         mGoogleApiClient.connect();
+
+        //create Database
+        mGPSDb = new GPSDatabase(this.getApplicationContext());
     }
 
     @Override
