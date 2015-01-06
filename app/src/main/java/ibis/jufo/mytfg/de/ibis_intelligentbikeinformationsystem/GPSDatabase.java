@@ -12,14 +12,15 @@ public class GPSDatabase {
     private Context context;
     private DbHelper dbHelper;
     public final String DBNAME="GPSDatabase";
-    public final int DBVERSION=3;
+    public final int DBVERSION=5;
     public SQLiteDatabase db;
     public final String COLUMN1="Id";
     public final String COLUMN2="latitude";
     public final String COLUMN3="longitude";
-    public final String COLUMN4="timestamp";
+    public final String COLUMN4="altitude";
+    public final String COLUMN5="timestamp";
     public final String TABLENAME="GPSData";
-    public final String CREATERDB="create table GPSData(Id integer primary key autoincrement,latitude text not null, longitude text not null, timestamp text not null);";
+    public final String CREATERDB="create table GPSData(Id integer primary key autoincrement, latitude text not null, longitude text not null, altitude test null, timestamp text not null);";
 
     // Log TAG
     protected static final String TAG = "GPSDatabase-class";
@@ -36,7 +37,7 @@ public class GPSDatabase {
         //DbHelper constructor
         public DbHelper(Context context){
             super(context,DBNAME,null,DBVERSION);
-            Log.i(TAG, "DbHelper");
+            Log.i(TAG, DBVERSION+"");
         }
 
         @Override
@@ -50,16 +51,17 @@ public class GPSDatabase {
         }
     }
 
-    public long insertRows(String column2, String column3, String column4){
+    public long insertRows(String column2, String column3, String column4, String column5){
         Log.i(TAG, "insertRows()");
         ContentValues value=new ContentValues();
         value.put(COLUMN2, column2);
         value.put(COLUMN3, column3);
         value.put(COLUMN4, column4);
+        value.put(COLUMN5, column5);
         return db.insert(TABLENAME, null, value);
     }
     public Cursor getAllRows(){
-        Cursor cursor=db.query(TABLENAME, new String[]{COLUMN1, COLUMN2, COLUMN3, COLUMN4}, null, null, null, null, null);
+        Cursor cursor=db.query(TABLENAME, new String[]{COLUMN1, COLUMN2, COLUMN3, COLUMN4, COLUMN5}, null, null, null, null, null);
         return cursor;
     }
     public void open() throws SQLException {
