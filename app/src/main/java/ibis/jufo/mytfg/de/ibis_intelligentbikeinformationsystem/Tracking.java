@@ -173,13 +173,7 @@ public class Tracking extends Service implements LocationListener, OnConnectionF
         String alt = mCurrentLocation.getAltitude() + "";
         String tst = mLastUpdateTime + "";
         mGPSDb.open();
-        mGPSDb.insertRows(lat, lon, tst);
-
-        /*
-        FOR DEBUGGING
-        Cursor cursor = mGPSDb.getAllRows();
-        cursor.moveToFirst();
-        Log.i (TAG, cursor.getString(1));*/
+        mGPSDb.insertRows(lat, lon, alt, tst);
         mGPSDb.close();
 
     }
