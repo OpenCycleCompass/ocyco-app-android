@@ -2,6 +2,7 @@
 <resources>
 
     <string name="app_name">iBis - intelligent bike information system</string>
+    <string name="app_name_short">iBis</string>
     <string name="action_settings">Einstellungen</string>
     <string name="welcome_headline">Wilkommen bei iBis!</string>
     <string name="welcome">Bevor Sie mit der Navigation beginen können, müssen sie noch einige Einstellungen vornehmen.</string>
@@ -22,4 +23,9 @@
     <string name="tracking_status_active">Tracking läuft</string>
     <string name="tracking_show_tracking">Anzeigen</string>
     <string name="GPSData_Debug">Inhalt aus GPS Datenbank anzeigen (DEBUGGING)</string>
+    <string name="httpJsonReturnNotificationNoField">Keine gültige Antwort vom Server empfangen</string>
+    <string name="httpJsonReturnNotificationErrTryCatchHttpJson">Fehler beim Kommunizieren mit dem Server</string>
+    <string name="unknownError">Es ist ein unbekannter Fehler aufgetreten.</string>
+    <string name="UrlPushTrackData">https://ibis.jufo.mytfg.de/api1/pushtrack.php?data=</string>
+    <string name="trackUploaded">Track hochgeladen</string>
 </resources>

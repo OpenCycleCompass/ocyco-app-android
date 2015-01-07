@@ -13,6 +13,7 @@ import android.location.Location;
 import android.os.Bundle;
 import android.os.IBinder;
 import android.support.v4.app.NotificationCompat;
+import android.text.format.DateFormat;
 import android.util.Log;
 
 import com.google.android.gms.common.ConnectionResult;
@@ -22,6 +23,9 @@ import com.google.android.gms.common.api.GoogleApiClient.OnConnectionFailedListe
 import com.google.android.gms.location.LocationListener;
 import com.google.android.gms.location.LocationRequest;
 import com.google.android.gms.location.LocationServices;
+
+import java.util.Calendar;
+import java.util.Locale;
 
 
 public class Tracking extends Service implements LocationListener, OnConnectionFailedListener, ConnectionCallbacks {
@@ -96,8 +100,6 @@ public class Tracking extends Service implements LocationListener, OnConnectionF
                 (NotificationManager) getSystemService(NOTIFICATION_SERVICE);
         // Builds the notification and issues it.
         mNotifyMgr.notify(mNotificationId, mBuilder.build());
-
-        //TODO: start uploading track data
     }
 
     public void stopOnlineTracking() {
@@ -152,11 +154,15 @@ public class Tracking extends Service implements LocationListener, OnConnectionF
 
     @Override
     public void onLocationChanged(Location location) {
+        // Nur zum testen
+        if(!CollectData){
+            stopSelf();
+        }
+
         Log.i(TAG, "onLocationChanged()");
         mCurrentLocation = location;
         mLastUpdateTime = Long.toString(System.currentTimeMillis()/1000L);
         updateDatabase();
-
     }
 
     public void updateDatabase(){
@@ -168,14 +174,6 @@ public class Tracking extends Service implements LocationListener, OnConnectionF
         String tst = mLastUpdateTime + "";
         mGPSDb.open();
         mGPSDb.insertRows(lat, lon, alt, tst);
-
-        /*
-        FOR DEBUGGING
-        Cursor cursor = mGPSDb.getAllRows();
-        cursor.moveToFirst();
-        Log.i (TAG, cursor.getString(1));
-        cursor.close()
-        */
         mGPSDb.close();
 
     }
@@ -204,12 +202,54 @@ public class Tracking extends Service implements LocationListener, OnConnectionF
         return super.onStartCommand(intent, flags, startId);
     }
 
+    private String getDate(long timestamp) {
+        Calendar calendar = Calendar.getInstance(Locale.ENGLISH);
+        calendar.setTimeInMillis(timestamp*1000);
+        return DateFormat.format("dd. MM. yyyy, HH:mm", calendar).toString()+"h";
+    }
     @Override
     public void onDestroy() {
         Log.i(TAG, "onDestroy()");
-        super.onDestroy();
+        // Save Data: sendToServer()
+        if(true){
+            mGPSDb.open();
+            int returnCode = mGPSDb.sendToServer();
+            String notification;
+            Log.i(TAG, returnCode+"");
+            switch (returnCode){
+                case 1: // json has error
+                    notification = mGPSDb.serverTrack_id;
+                    break;
+                case 2: // no known json field
+                    notification = getString(R.string.httpJsonReturnNotificationNoField);
+                    break;
+                case 3: // http communication or json failed
+                    notification = getString(R.string.httpJsonReturnNotificationErrTryCatchHttpJson);
+                    break;
+                case 0: // success
+                    notification = "Track \""+mGPSDb.serverTrack_id + "\" mit " + mGPSDb.serverNodes + " GPS-Koordinaten erstellt am " + getDate(mGPSDb.serverCreated);
+                    break;
+                default:
+                    notification = getString(R.string.unknownError);
+                    break;
+            }
+            NotificationCompat.Builder mBuilder =
+                    new NotificationCompat.Builder(this)
+                            .setSmallIcon(R.drawable.ic_launcher)
+                            .setContentTitle(getString(R.string.app_name_short) + getString(R.string.trackUploaded))
+                            .setContentText(notification)
+                            .setStyle(new NotificationCompat.BigTextStyle().bigText(notification));
+            // Sets an ID for the notification
+            int mNotificationId = 43;
+            // Gets an instance of the NotificationManager service
+            NotificationManager mNotifyMgr =
+                    (NotificationManager) getSystemService(NOTIFICATION_SERVICE);
+            // Builds the notification and issues it.
+            mNotifyMgr.notify(mNotificationId, mBuilder.build());
+            mGPSDb.close();
+        }
         stopLocationUpdates();
-        // Save Data (?)
+        super.onDestroy();
     }
 
     @Override
