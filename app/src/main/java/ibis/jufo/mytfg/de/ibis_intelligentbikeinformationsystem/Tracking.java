@@ -210,8 +210,8 @@ public class Tracking extends Service implements LocationListener, OnConnectionF
 
     private String getDate(long timestamp) {
         Calendar calendar = Calendar.getInstance(Locale.ENGLISH);
-        calendar.setTimeInMillis(timestamp);
-        return DateFormat.format("dd-MM-yyyy", calendar).toString();
+        calendar.setTimeInMillis(timestamp*1000);
+        return DateFormat.format("dd. MM. yyyy, HH:mm", calendar).toString()+"h";
     }
     @Override
     public void onDestroy() {
@@ -233,7 +233,7 @@ public class Tracking extends Service implements LocationListener, OnConnectionF
                     notification = getString(R.string.httpJsonReturnNotificationErrTryCatchHttpJson);
                     break;
                 case 0: // success
-                    notification = mGPSDb.serverTrack_id + " \nmit " + mGPSDb.serverNodes + " Nodes erstellt am " + getDate(mGPSDb.serverCreated);
+                    notification = "Track \""+mGPSDb.serverTrack_id + "\" mit " + mGPSDb.serverNodes + " GPS-Koordinaten erstellt am " + getDate(mGPSDb.serverCreated);
                     break;
                 default:
                     notification = getString(R.string.unknownError);
@@ -243,7 +243,8 @@ public class Tracking extends Service implements LocationListener, OnConnectionF
                     new NotificationCompat.Builder(this)
                             .setSmallIcon(R.drawable.ic_launcher)
                             .setContentTitle(getString(R.string.app_name_short) + getString(R.string.trackUploaded))
-                            .setContentText(notification);
+                            .setContentText(notification)
+                            .setStyle(new NotificationCompat.BigTextStyle().bigText(notification));
             // Sets an ID for the notification
             int mNotificationId = 43;
             // Gets an instance of the NotificationManager service
