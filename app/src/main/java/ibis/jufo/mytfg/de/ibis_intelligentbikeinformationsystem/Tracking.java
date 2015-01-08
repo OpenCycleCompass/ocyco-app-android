@@ -119,7 +119,6 @@ public class Tracking extends Service implements LocationListener, OnConnectionF
         // Stop LocationListener
         LocationServices.FusedLocationApi.removeLocationUpdates(mGoogleApiClient, this);
 
-
     }
 
     protected void startLocationUpdates() {
@@ -197,7 +196,13 @@ public class Tracking extends Service implements LocationListener, OnConnectionF
     public int onStartCommand(Intent intent, int flags, int startId) {
         Log.i(TAG, "onStartCommand()");
         //read extra and write to CollectData
-        CollectData = intent.getBooleanExtra("Key", false);
+        try {
+            CollectData = intent.getBooleanExtra("Key", false);
+        }
+        catch (java.lang.NullPointerException e) {
+            stopSelf();
+        }
+
         checkOnline();
         return super.onStartCommand(intent, flags, startId);
     }
@@ -249,6 +254,7 @@ public class Tracking extends Service implements LocationListener, OnConnectionF
             mGPSDb.close();
         }
         stopLocationUpdates();
+        mGPSDb.deleteDatabase();
         super.onDestroy();
     }
 

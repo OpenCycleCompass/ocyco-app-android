@@ -165,4 +165,10 @@ public class GPSDatabase {
         reader.close();
         return builder.toString();
     }
+
+    public void deleteDatabase() {
+        //delete database
+        context.deleteDatabase(DBNAME);
+        Log.i(TAG, "database deleted");
+    }
 }
