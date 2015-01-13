@@ -10,11 +10,14 @@ import android.view.Menu;
 import android.view.MenuItem;
 
 
+
 public class ShowDataActivity extends ActionBarActivity {
 
     boolean CollectData;
     boolean doNotRestart;
     float accuracy;
+
+
 
     // Log TAG
     protected static final String TAG = "IBisShowDataActivity-class";
@@ -48,6 +51,7 @@ public class ShowDataActivity extends ActionBarActivity {
             startService(intent);
         }
     }
+
 
     private void openAccuracyAlert(Float accuracy) {
         Log.i(TAG, "Err");

@@ -5,12 +5,14 @@
     android:orientation="vertical"
     tools:context="ibis.jufo.mytfg.de.ibis_intelligentbikeinformationsystem.ShowDataActivity">
 
-    <TextView
+    <fragment
+        android:id="@+id/article_fragment"
+        android:layout_weight="1"
         android:layout_width="match_parent"
         android:layout_height="match_parent"
-        android:layout_weight="1"
-        android:gravity="center"
-        android:text="placeholder for the map" />
+        android:name="ibis.jufo.mytfg.de.ibis_intelligentbikeinformationsystem.MapFragment"
+        tools:layout="@layout/fragment_map" />
+
 
     <TableLayout xmlns:android="http://schemas.android.com/apk/res/android"
         android:layout_width="match_parent"
