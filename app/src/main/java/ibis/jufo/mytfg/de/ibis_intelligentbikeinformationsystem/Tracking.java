@@ -57,6 +57,10 @@ public class Tracking extends Service implements LocationListener, OnConnectionF
 
     public GPSDatabase mGPSDb;
 
+    boolean sendErrorAccuracy = false;
+    boolean sendConfirmAccuracy = false;
+    boolean saveData=true;
+
 
     @Override
     //Very mystical code...
@@ -154,17 +158,49 @@ public class Tracking extends Service implements LocationListener, OnConnectionF
     @Override
     public void onLocationChanged(Location location) {
         // Nur zum testen
-        if(!CollectData){
+        if (!CollectData) {
             stopSelf();
         }
 
         Log.i(TAG, "onLocationChanged()");
         mCurrentLocation = location;
-        mLastUpdateTime = Long.toString(System.currentTimeMillis()/1000L);
-        updateDatabase();
+        mLastUpdateTime = Long.toString(System.currentTimeMillis() / 1000L);
+        checkAccuracy(location.getAccuracy());
+        //only save data, if accuracy is ok
+        if (saveData) {
+            updateDatabase();
+        }
+
     }
 
-    public void updateDatabase(){
+    public void checkAccuracy(Float accuracy) {
+        Log.i(TAG,"checkAccuracy "+accuracy);
+        Log.i(TAG, accuracy + " Accuracy");
+        if (accuracy > 20 && !sendErrorAccuracy) {
+            saveData=false;
+            Intent intent = new Intent(this, ShowDataActivity.class);
+            intent.putExtra("KeyAccuracy", accuracy);
+            intent.putExtra("KeyDoNotRestart", true);
+            intent.putExtra("KeyErrOrConfirm", 1);
+            intent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
+            startActivity(intent);
+            //sendErrorAccuracy ist to avoid, that ShowDataActivity is recreated at every Location update
+            sendErrorAccuracy = true;
+        } else if (accuracy < 20 && !sendConfirmAccuracy) {
+            saveData=true;
+            Intent intent = new Intent(this, ShowDataActivity.class);
+            intent.putExtra("KeyAccuracy", accuracy);
+            intent.putExtra("KeyDoNotRestart", true);
+            intent.putExtra("KeyErrOrConfirm", 0);
+            intent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
+            startActivity(intent);
+            //sendConfirmAccuracy ist to avoid, that ShowDataActivity is recreated at every Location update
+            sendConfirmAccuracy = true;
+
+        }
+    }
+
+    public void updateDatabase() {
         Log.i(TAG, "updateDatabase()");
         //Convert to String for Database
         String lat = mCurrentLocation.getLatitude() + "";
@@ -198,8 +234,7 @@ public class Tracking extends Service implements LocationListener, OnConnectionF
         //read extra and write to CollectData
         try {
             CollectData = intent.getBooleanExtra("Key", false);
-        }
-        catch (java.lang.NullPointerException e) {
+        } catch (java.lang.NullPointerException e) {
             stopSelf();
         }
 
@@ -209,19 +244,20 @@ public class Tracking extends Service implements LocationListener, OnConnectionF
 
     private String getDate(long timestamp) {
         Calendar calendar = Calendar.getInstance(Locale.ENGLISH);
-        calendar.setTimeInMillis(timestamp*1000);
-        return DateFormat.format("dd. MM. yyyy, HH:mm", calendar).toString()+"h";
+        calendar.setTimeInMillis(timestamp * 1000);
+        return DateFormat.format("dd. MM. yyyy, HH:mm", calendar).toString() + "h";
     }
+
     @Override
     public void onDestroy() {
         Log.i(TAG, "onDestroy()");
         // Save Data: sendToServer()
-        if(true){
+        if (true) {
             mGPSDb.open();
             int returnCode = mGPSDb.sendToServer();
             String notification;
-            Log.i(TAG, returnCode+"");
-            switch (returnCode){
+            Log.i(TAG, returnCode + "");
+            switch (returnCode) {
                 case 1: // json has error
                     notification = mGPSDb.serverTrack_id;
                     break;
@@ -232,7 +268,7 @@ public class Tracking extends Service implements LocationListener, OnConnectionF
                     notification = getString(R.string.httpJsonReturnNotificationErrTryCatchHttpJson);
                     break;
                 case 0: // success
-                    notification = "Track \""+mGPSDb.serverTrack_id + "\" mit " + mGPSDb.serverNodes + " GPS-Koordinaten erstellt am " + getDate(mGPSDb.serverCreated);
+                    notification = "Track \"" + mGPSDb.serverTrack_id + "\" mit " + mGPSDb.serverNodes + " GPS-Koordinaten erstellt am " + getDate(mGPSDb.serverCreated);
                     break;
                 default:
                     notification = getString(R.string.unknownError);

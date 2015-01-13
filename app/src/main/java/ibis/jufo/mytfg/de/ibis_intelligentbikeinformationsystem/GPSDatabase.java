@@ -101,8 +101,8 @@ public class GPSDatabase {
             try {
                 point.put("lat", cursor.getString(1));
                 point.put("lon", cursor.getString(2));
-                //point.put("alt", cursor.getString(4));
-                point.put("time", cursor.getString(3));
+                point.put("alt", cursor.getString(4));
+                point.put("tst", cursor.getString(3));
             } catch (JSONException e) {
                 e.printStackTrace();
             }
