@@ -167,6 +167,7 @@ public class Tracking extends Service implements LocationListener, OnConnectionF
         mLastUpdateTime = Long.toString(System.currentTimeMillis() / 1000L);
         checkAccuracy(location.getAccuracy());
         //only save data, if accuracy is ok
+        Log.i(TAG, saveData+"saveData");
         if (saveData) {
             updateDatabase();
         }
@@ -187,6 +188,7 @@ public class Tracking extends Service implements LocationListener, OnConnectionF
             //sendErrorAccuracy ist to avoid, that ShowDataActivity is recreated at every Location update
             sendErrorAccuracy = true;
         } else if (accuracy < 20 && !sendConfirmAccuracy) {
+            Log.i(TAG, saveData+"saveData && blabla");
             saveData=true;
             Intent intent = new Intent(this, ShowDataActivity.class);
             intent.putExtra("KeyAccuracy", accuracy);
@@ -206,9 +208,10 @@ public class Tracking extends Service implements LocationListener, OnConnectionF
         String lat = mCurrentLocation.getLatitude() + "";
         String lon = mCurrentLocation.getLongitude() + "";
         String alt = mCurrentLocation.getAltitude() + "";
+        String spe = mCurrentLocation.getSpeed() + "";
         String tst = mLastUpdateTime + "";
         mGPSDb.open();
-        mGPSDb.insertRows(lat, lon, alt, tst);
+        mGPSDb.insertRows(lat, lon, alt, spe, tst);
         mGPSDb.close();
 
     }

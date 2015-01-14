@@ -24,15 +24,16 @@ public class GPSDatabase {
     private Context context;
     private DbHelper dbHelper;
     public final String DBNAME="GPSDatabase";
-    public final int DBVERSION=5;
+    public final int DBVERSION=13;
     public SQLiteDatabase db;
-    public final String COLUMN1="Id";
-    public final String COLUMN2="latitude";
-    public final String COLUMN3="longitude";
-    public final String COLUMN4="altitude";
-    public final String COLUMN5="timestamp";
+    public final String COLUMN_ID="Id";
+    public final String COLUMN_LAT="latitude";
+    public final String COLUMN_LON="longitude";
+    public final String COLUMN_ALT="altitude";
+    public final String COLUMN_SPE="speed";
+    public final String COLUMN_TST="timestamp";
     public final String TABLENAME="GPSData";
-    public final String CREATERDB="create table GPSData(Id integer primary key autoincrement, latitude text not null, longitude text not null, altitude test null, timestamp text not null);";
+    public final String CREATERDB="create table GPSData(Id integer primary key autoincrement, latitude text not null, longitude text not null, altitude text, speed text, timestamp text not null);";
 
     public String serverTrack_id = "";
     public int serverNodes = -1;
@@ -67,18 +68,22 @@ public class GPSDatabase {
         }
     }
 
-    public long insertRows(String column2, String column3, String column4, String column5){
+    public long insertRows(String lat, String lon, String alt, String spe, String tst){
         Log.i(TAG, "insertRows()");
         ContentValues value=new ContentValues();
-        value.put(COLUMN2, column2);
-        value.put(COLUMN3, column3);
-        value.put(COLUMN4, column4);
-        value.put(COLUMN5, column5);
+        value.put(COLUMN_LAT, lat);
+        value.put(COLUMN_LON, lon);
+        value.put(COLUMN_ALT, alt);
+        value.put(COLUMN_SPE, spe);
+        value.put(COLUMN_TST, tst);
+        Log.i(TAG, value+"value");
         return db.insert(TABLENAME, null, value);
     }
     public Cursor getAllRows(){
-        Cursor cursor=db.query(TABLENAME, new String[]{COLUMN1, COLUMN2, COLUMN3, COLUMN4, COLUMN5}, null, null, null, null, null);
+        Cursor cursor=db.query(TABLENAME, new String[]{COLUMN_ID, COLUMN_LAT, COLUMN_LON, COLUMN_ALT, COLUMN_SPE, COLUMN_TST}, null, null, null, null, null);
+        Log.i(TAG, cursor+"cursor");
         return cursor;
+
     }
     public void open() throws SQLException {
         Log.i(TAG, "open()");
@@ -101,8 +106,9 @@ public class GPSDatabase {
             try {
                 point.put("lat", cursor.getString(1));
                 point.put("lon", cursor.getString(2));
-                point.put("alt", cursor.getString(4));
-                point.put("tst", cursor.getString(3));
+                point.put("alt", cursor.getString(3));
+                point.put("spe", cursor.getString(4));
+                point.put("tst", cursor.getString(5));
             } catch (JSONException e) {
                 e.printStackTrace();
             }
