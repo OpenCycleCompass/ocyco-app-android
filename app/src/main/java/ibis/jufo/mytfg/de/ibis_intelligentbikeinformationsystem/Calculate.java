@@ -12,20 +12,20 @@ public class Calculate {
 
     //calculation and output vars
     //speed
-    Float vD; //Durchschnittsgeschwindikeit
-    Float vAkt; //aktuelle Geschwindigkeit
-    Float vDMuss; //notwendige Durchscnittsgeschwindigkeit, um am vorgegebenen Zeitpunkt das Ziel zu erreichen
-    Float vDunt; // Unterschied zwischen aktueller- und notwendiger Durchschnittsgeschwindigkeit
+    Double vD; //Durchschnittsgeschwindikeit
+    Double vAkt; //aktuelle Geschwindigkeit
+    Double vDMuss; //notwendige Durchscnittsgeschwindigkeit, um am vorgegebenen Zeitpunkt das Ziel zu erreichen
+    Double vDunt; // Unterschied zwischen aktueller- und notwendiger Durchschnittsgeschwindigkeit
     //distance
-    Float sGef; //gefahrene Strecke
-    Float sZuf; //zu fahrende Strecke
+    Double sGef; //gefahrene Strecke
+    Double sZuf; //zu fahrende Strecke
     //time
-    Float tGef; //gefahrene Zeit
-    Float tZuf; //zu fahrende Zeit
-    Float tAkt; // aktuelle Zeit
-    Float tAnk; // Ankunftszeit
-    Float tAnkEing; //Eingegebene, gewünschte Ankunftszeit
-    Float tAnkUnt; //Unterschied zwischen realer und gewünschter Ankunftszeit
+    Double tGef; //gefahrene Zeit
+    Double tZuf; //zu fahrende Zeit
+    Double tAkt; // aktuelle Zeit
+    Double tAnk; // Ankunftszeit
+    Double tAnkEing; //Eingegebene, gewünschte Ankunftszeit
+    Double tAnkUnt; //Unterschied zwischen realer und gewünschter Ankunftszeit
 
     public void getLocation (Location location) {
         oldLoc = newLoc;
@@ -38,8 +38,11 @@ public class Calculate {
 
 
     public void calculateDrivenDistance () {
-        //TODO: Calculate the distance between old and newLoc
-
+        //Calculate the distance between old and newLoc and add to sGef
+        Double dLon = 111.3 * (oldLoc.getLongitude() - newLoc.getLongitude());
+        Double dLat = 71.5 * (oldLoc.getLatitude() - newLoc.getLatitude());
+        Double lastDistance = Math.sqrt(dLon * dLon + dLat * dLat);
+        sGef += lastDistance;
     }
 
     public void math () {
