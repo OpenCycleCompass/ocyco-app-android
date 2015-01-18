@@ -52,7 +52,18 @@ public class Calculate {
 
     public void math () {
         //TODO: Main part - mathematical operation to calculate the output vars
-
+        //average speed
+        vD = sGef / tGef;
+        //time to drive
+        tZuf = sZuf / vD;
+        //arrival time
+        tAnk = tAkt + tZuf;
+        //difference between arrival and planed arrival time
+        tAnkUnt = tAnkEing - tAnk;
+        //necessary speed for arriving in time
+        vDMuss = sZuf / tZuf;
+        //difference between real and necessary average speed
+        vDunt = vD - vDMuss;
     }
 
     public void output () {
