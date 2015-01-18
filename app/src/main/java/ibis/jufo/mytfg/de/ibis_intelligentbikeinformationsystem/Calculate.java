@@ -45,6 +45,11 @@ public class Calculate {
         sGef += lastDistance;
     }
 
+    public void calculateDrivenTime () {
+        //calculate driven time and convert to seconds
+        tGef = (double)((firstLoc.getTime() - newLoc.getTime())/1000);
+    }
+
     public void math () {
         //TODO: Main part - mathematical operation to calculate the output vars
 
