@@ -3,6 +3,7 @@ package ibis.jufo.mytfg.de.ibis_intelligentbikeinformationsystem;
 
 import android.location.Location;
 
+
 public class Calculate {
 
     //location vars
@@ -50,8 +51,16 @@ public class Calculate {
         tGef = (double)((firstLoc.getTime() - newLoc.getTime())/1000);
     }
 
+    public void getTimeVars (Double timeInput) {
+        //set tAnkEing
+        tAnkEing = timeInput;
+        //get actual time
+        tAkt = (double) newLoc.getTime();
+
+    }
+
+
     public void math () {
-        //TODO: Main part - mathematical operation to calculate the output vars
         //average speed
         vD = sGef / tGef;
         //time to drive
