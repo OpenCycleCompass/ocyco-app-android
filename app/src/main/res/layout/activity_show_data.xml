@@ -10,8 +10,7 @@
         android:layout_weight="1"
         android:layout_width="match_parent"
         android:layout_height="match_parent"
-        android:name="ibis.jufo.mytfg.de.ibis_intelligentbikeinformationsystem.MapFragment"
-        tools:layout="@layout/fragment_map" />
+        android:name="ibis.jufo.mytfg.de.ibis_intelligentbikeinformationsystem.MapFragment"/>
 
 
     <TableLayout xmlns:android="http://schemas.android.com/apk/res/android"
@@ -38,14 +37,16 @@
                     android:layout_height="wrap_content"
                     android:background="@color/boxes_background"
                     android:gravity="center_horizontal"
-                    android:text="headline" />
+                    android:text="gefahren" />
 
                 <TextView
                     android:layout_width="match_parent"
                     android:layout_height="match_parent"
                     android:background="@color/boxes_background"
                     android:gravity="center"
-                    android:text="content" />
+                    android:text="5,3km"
+                    android:textColor="#000"
+                    android:textStyle="bold" />
 
             </LinearLayout>
 
@@ -62,14 +63,24 @@
                     android:layout_height="wrap_content"
                     android:background="@color/boxes_background"
                     android:gravity="center_horizontal"
-                    android:text="headline" />
+                    android:text="verbleibend" />
 
                 <TextView
                     android:layout_width="match_parent"
                     android:layout_height="match_parent"
                     android:background="@color/boxes_background"
                     android:gravity="center"
-                    android:text="content" />
+                    android:text="10,0*km"
+                    android:textColor="#000"
+                    android:textStyle="bold"/>
+
+                <TextView
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:background="@color/boxes_background"
+                    android:gravity="center_horizontal"
+                    android:text="km/h" />
+
 
             </LinearLayout>
 
@@ -86,14 +97,16 @@
                     android:layout_height="wrap_content"
                     android:background="@color/boxes_background"
                     android:gravity="center_horizontal"
-                    android:text="headline" />
+                    android:text="akt. Geschw." />
 
                 <TextView
                     android:layout_width="match_parent"
                     android:layout_height="match_parent"
                     android:background="@color/boxes_background"
                     android:gravity="center"
-                    android:text="content" />
+                    android:text="17km/h"
+                    android:textColor="#000"
+                    android:textStyle="bold"/>
 
             </LinearLayout>
 
@@ -110,14 +123,16 @@
                     android:layout_height="wrap_content"
                     android:background="@color/boxes_background"
                     android:gravity="center_horizontal"
-                    android:text="headline" />
+                    android:text="avg. Geschw." />
 
                 <TextView
                     android:layout_width="match_parent"
                     android:layout_height="match_parent"
                     android:background="@color/boxes_background"
                     android:gravity="center"
-                    android:text="content" />
+                    android:text="15km/h"
+                    android:textColor="#000"
+                    android:textStyle="bold"/>
 
             </LinearLayout>
 
@@ -140,14 +155,16 @@
                     android:layout_height="wrap_content"
                     android:background="@color/boxes_background"
                     android:gravity="center_horizontal"
-                    android:text="headline" />
+                    android:text="Ank. Zeit" />
 
                 <TextView
                     android:layout_width="match_parent"
                     android:layout_height="match_parent"
                     android:background="@color/boxes_background"
                     android:gravity="center"
-                    android:text="content" />
+                    android:text="15:00"
+                    android:textColor="#000"
+                    android:textStyle="bold"/>
 
             </LinearLayout>
 
@@ -164,14 +181,16 @@
                     android:layout_height="wrap_content"
                     android:background="@color/boxes_background"
                     android:gravity="center_horizontal"
-                    android:text="headline" />
+                    android:text="Zeitdiff." />
 
                 <TextView
                     android:layout_width="match_parent"
                     android:layout_height="match_parent"
                     android:background="@color/boxes_background"
                     android:gravity="center"
-                    android:text="content" />
+                    android:text="-10min"
+                    android:textColor="#900"
+                    android:textStyle="bold"/>
 
             </LinearLayout>
 
@@ -188,14 +207,16 @@
                     android:layout_height="wrap_content"
                     android:background="@color/boxes_background"
                     android:gravity="center_horizontal"
-                    android:text="headline" />
+                    android:text="notw. Geschw." />
 
                 <TextView
                     android:layout_width="match_parent"
                     android:layout_height="match_parent"
                     android:background="@color/boxes_background"
                     android:gravity="center"
-                    android:text="content" />
+                    android:text="20km/h"
+                    android:textColor="#000"
+                    android:textStyle="bold"/>
 
             </LinearLayout>
 
@@ -212,14 +233,16 @@
                     android:layout_height="wrap_content"
                     android:background="@color/boxes_background"
                     android:gravity="center_horizontal"
-                    android:text="headline" />
+                    android:text="Diff." />
 
                 <TextView
                     android:layout_width="match_parent"
                     android:layout_height="match_parent"
                     android:background="@color/boxes_background"
                     android:gravity="center"
-                    android:text="content" />
+                    android:text="-5km/h"
+                    android:textColor="#900"
+                    android:textStyle="bold"/>
 
             </LinearLayout>
 
