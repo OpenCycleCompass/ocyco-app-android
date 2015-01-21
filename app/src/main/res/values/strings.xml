@@ -37,7 +37,7 @@
     <string name="upload_track_duration">Dauer (s)</string>
     <string name="upload_track_length">Länge (m)</string>
     <string name="upload_track_token">Token</string>
-    <string name="upload_track_token_regenerate">Neu generieren</string>
+    <string name="upload_track_token_regenerate">Token neu generieren</string>
     <string name="upload_track">Hochladen</string>
     <string name="upload_track_debugurl">DEBUG: URL</string>
     <string name="upload_track_debugdata">DEBUG: DATA</string>
@@ -50,5 +50,6 @@
     <string name="upload_error_server_unreachable">Fehler: Der Server ist nicht erreichbar \n Bitte versuchen Sie es später erneut</string>
     <string name="upload_track_success_trackid">Track erfolgreich hochgeladen \ntrack_id: </string>
     <string name="error">Fehler: </string>
+    <string name="error_json">Fehler bei der JSON Verarbeitung </string>
 
 </resources>

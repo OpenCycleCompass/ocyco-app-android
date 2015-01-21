@@ -3,6 +3,7 @@ package ibis.jufo.mytfg.de.ibis_intelligentbikeinformationsystem;
 import android.app.NotificationManager;
 import android.content.Context;
 import android.content.Intent;
+import android.content.SharedPreferences;
 import android.net.ConnectivityManager;
 import android.net.NetworkInfo;
 import android.net.Uri;
@@ -59,7 +60,7 @@ public class UploadTrackActivity extends ActionBarActivity {
     private Button button_UploadTrack;
 
     private String data = "[]"; // empty, but valid JSON
-    private String token = "";
+    //private String token = "";
     private long startTst;
     private long stopTst;
     private long length = 0;
@@ -121,9 +122,7 @@ public class UploadTrackActivity extends ActionBarActivity {
         editText_UploadTrackName.setText(this.getString(R.string.upload_track_name_default));
         editText_UploadTrackCom.setText(this.getString(R.string.upload_track_com_default));
 
-        // TODO Read token from UserPrefs if exists, show Toast (and generate token?) if not
-        //editText_UploadTrackToken.setText(UserPrefs->token);
-        // ...
+        editText_UploadTrackToken.setText(getToken());
     }
 
     private String makeUrl() {
@@ -135,7 +134,7 @@ public class UploadTrackActivity extends ActionBarActivity {
                 .appendQueryParameter("comment", editText_UploadTrackCom.getText().toString())
                 .appendQueryParameter("duration", (stopTst - startTst) + "")
                 .appendQueryParameter("length", llength + "")
-                .appendQueryParameter("user_token", token)
+                .appendQueryParameter("user_token", getToken())
                 .build().toString();
         return lurl;
     }
@@ -228,7 +227,9 @@ public class UploadTrackActivity extends ActionBarActivity {
             HttpURLConnection conn = (HttpURLConnection) url.openConnection();
             conn.setReadTimeout(3000 /* milliseconds */);
             conn.setConnectTimeout(5000 /* milliseconds */);
+            Log.i(TAG, "Old User-Agent: " + conn.getRequestProperty("User-Agent"));
             conn.setRequestProperty("User-Agent", "iBis app");
+            Log.i(TAG, "New User-Agent: " + conn.getRequestProperty("User-Agent"));
 
             // Get returned body from webserver:
             conn.setDoInput(true);
@@ -337,35 +338,39 @@ public class UploadTrackActivity extends ActionBarActivity {
             Log.i(TAG, "HTTP result: " + result);
             switch (type){
                 case "token":
+                    String ltoken;
                     try {
                         JSONObject json = new JSONObject(result);
                         if(json.has("token")) {
-                            token = json.getString("token");
+                            ltoken = json.getString("token");
                             button_UploadTrack.setEnabled(true);
-                            // TODO Save token in UserPrefs
+                            saveToken(ltoken);
                         } else if(json.has("error")) {
-                            token = json.getString("error");
+                            ltoken = json.getString("error");
                         } else {
-                            token = "Unknown error";
+                            ltoken = "Unknown error";
                         }
                     } catch (JSONException e) {
                         e.printStackTrace();
-                        token = "Error in JSONObject";
+                        ltoken = "Error in JSONObject";
                     }
-                    editText_UploadTrackToken.setText(token);
+                    editText_UploadTrackToken.setText(ltoken);
                     break;
                 case "upload":
-                    String track_id;
                     String notification = getString(R.string.unknownError);
                     try {
                         JSONObject json = new JSONObject(result);
                         if(json.has("track_id")) {
-                            track_id = getString(R.string.upload_track_success_trackid) + " " + json.getString("track_id");
-                            textView_UploadTrackId.setText(track_id);
-
-                            // Disable Button to prevent multiple uploads
+                            // Disable button to prevent multiple uploads
                             button_UploadTrack.setEnabled(false);
 
+                            // Get track_id
+                            String track_id = json.getString("track_id");
+
+                            // Set textView_UploadTrackId to track_id
+                            textView_UploadTrackId.setText(track_id);
+
+                            // Prepare notification string with track_id, date and nodes:
                             String created_s = "";
                             String nodes_s = "";
                             if(json.has("created")) {
@@ -374,18 +379,15 @@ public class UploadTrackActivity extends ActionBarActivity {
                             if(json.has("nodes")) {
                                 nodes_s = json.getLong("nodes") + "";
                             }
+
+                            // getString(R.string.upload_track_success_trackid);
                             notification = "Track \"" + track_id + "\" mit " + nodes_s + " GPS-Koordinaten erstellt am " + created_s;
-
                         } else if(json.has("error")) {
-                            track_id = json.getString("error");
-
                             notification = getString(R.string.error) + json.getString("error");
 
                             // Enable upload button to make second upload possible
                             button_UploadTrack.setEnabled(true);
                         } else {
-                            track_id = "Unknown error";
-
                             notification = getString(R.string.unknownError);
 
                             // Enable upload button to make second upload possible
@@ -393,13 +395,12 @@ public class UploadTrackActivity extends ActionBarActivity {
                         }
                     } catch (JSONException e) {
                         e.printStackTrace();
-                        track_id = "Error in JSONObject";
-
                         notification = getString(R.string.httpJsonReturnNotificationErrTryCatchHttpJson);
 
                         // Enable upload button to make second upload possible
                         button_UploadTrack.setEnabled(true);
                     } finally {
+                        // Create notification
                         NotificationCompat.Builder mBuilder =
                                 new NotificationCompat.Builder(getBaseContext())
                                         .setSmallIcon(R.drawable.ic_launcher)
@@ -413,11 +414,13 @@ public class UploadTrackActivity extends ActionBarActivity {
                                 (NotificationManager) getSystemService(NOTIFICATION_SERVICE);
                         // Builds the notification and issues it.
                         mNotifyMgr.notify(mNotificationId, mBuilder.build());
+
+                        // Additionally to notification show Toast message
+                        Context context = getApplicationContext();
+                        int duration = Toast.LENGTH_LONG;
+                        Toast toast = Toast.makeText(context, notification, duration);
+                        toast.show();
                     }
-                    Context context = getApplicationContext();
-                    int duration = Toast.LENGTH_LONG;
-                    Toast toast = Toast.makeText(context, track_id, duration);
-                    toast.show();
                     break;
             }
         }
@@ -427,6 +430,23 @@ public class UploadTrackActivity extends ActionBarActivity {
         Calendar calendar = Calendar.getInstance(Locale.ENGLISH);
         calendar.setTimeInMillis(timestamp * 1000);
         return DateFormat.format("dd. MM. yyyy, HH:mm", calendar).toString() + "h";
+    }
+
+    public void saveToken(String t) {
+        SharedPreferences prefs = getSharedPreferences(getString(R.string.preference_file_key), (Context.MODE_MULTI_PROCESS));
+        SharedPreferences.Editor prefs_edit = prefs.edit();
+        if(prefs.contains("token")) {
+            String old_token = prefs.getString("token", "");
+            String old_tokenlist = prefs.getString("oldtokenlist", "");
+            prefs_edit.putString("oldtokenlist", old_tokenlist+";"+old_token);
+        }
+        prefs_edit.putString("token", t);
+        prefs_edit.apply();
+    }
+
+    public String getToken() {
+        SharedPreferences prefs = getSharedPreferences(getString(R.string.preference_file_key), (Context.MODE_MULTI_PROCESS));
+        return prefs.getString("token", null);
     }
 }
 
