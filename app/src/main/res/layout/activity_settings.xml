@@ -7,8 +7,8 @@
     <TextView
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:layout_marginTop="5px"
         android:layout_marginBottom="10px"
+        android:layout_marginTop="5px"
         android:text="@string/general_settings"
         android:textSize="20sp" />
 
@@ -36,48 +36,66 @@
     <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:orientation="horizontal"
+        android:layout_marginBottom="10px"
         android:layout_marginTop="10px"
-        android:layout_marginBottom="10px" >
+        android:orientation="horizontal">
 
         <EditText
             android:id="@+id/enter_distance"
             android:layout_width="0dp"
             android:layout_height="wrap_content"
-            android:layout_weight="1"/>
+            android:layout_weight="1" />
 
         <TextView
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_weight="1"
-            android:text="km"/>
+            android:text="km" />
+
+    </LinearLayout>
+
+    <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginBottom="10px"
+        android:layout_marginTop="30px"
+        android:orientation="horizontal">
+
+    <TextView
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_weight="1"
+        android:text="Die gewünschte Ankunftszeit beträgt:" />
+
+    <TextView
+        android:id="@+id/arrivalTime"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_weight="1"
+        android:text="----" />
 
     </LinearLayout>
 
     <Button
-        android:layout_marginTop="50px"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:text="@string/save"
-        android:onClick="saveSettings"/>
+        android:layout_marginTop="10px"
+        android:text="@string/setTime"
+        android:onClick="showTimePickerDialog" />
+
 
     <Button
-        android:layout_marginTop="50px"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:text="@string/tracking_stop"
-        android:onClick="stopOnlineTracking"/>
+        android:layout_marginTop="50px"
+        android:onClick="saveSettings"
+        android:text="@string/save" />
 
     <Button
-        android:layout_marginTop="50px"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:text="@string/GPSData_Debug"
-        android:onClick="showGPSData"/>
-
-    <TextView
-        android:id="@+id/DEBUG_TextView"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"/>
+        android:layout_marginTop="50px"
+        android:onClick="stopOnlineTracking"
+        android:text="@string/tracking_stop" />
 
 </LinearLayout>

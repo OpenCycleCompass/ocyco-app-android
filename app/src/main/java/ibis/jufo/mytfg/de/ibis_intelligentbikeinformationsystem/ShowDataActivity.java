@@ -11,7 +11,7 @@ import android.view.MenuItem;
 
 
 
-public class ShowDataActivity extends ActionBarActivity {
+public class ShowDataActivity extends ActionBarActivity  {
 
     boolean CollectData;
     boolean doNotRestart;

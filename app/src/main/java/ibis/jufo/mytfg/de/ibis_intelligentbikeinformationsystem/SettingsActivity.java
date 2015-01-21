@@ -5,6 +5,7 @@ import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.SharedPreferences;
+import android.support.v4.app.DialogFragment;
 import android.support.v7.app.ActionBarActivity;
 import android.os.Bundle;
 import android.view.Menu;
@@ -12,8 +13,9 @@ import android.view.MenuItem;
 import android.view.View;
 import android.widget.CheckBox;
 import android.widget.EditText;
+import android.widget.TextView;
 
-public class SettingsActivity extends ActionBarActivity {
+public class SettingsActivity extends ActionBarActivity implements TimePickerFragment.OnTimePickedListener{
 
     //Variables declaration
     public boolean CollectData = false;
@@ -147,7 +149,17 @@ public class SettingsActivity extends ActionBarActivity {
         startService(intent);
     }
 
-    public void showGPSData (View view) {
+    //create and show the TimePickerFragment
+    public void showTimePickerDialog(View v) {
+        DialogFragment mTimePickerFragment = new TimePickerFragment();
+        mTimePickerFragment.show(getSupportFragmentManager(), "timePicker");
+    }
 
+    //get picked time from TimePickerFragment via Interface
+    public void onTimePicked(int hour, int minute) {
+        //show picked time
+        TextView arrivalTime = (TextView) findViewById(R.id.arrivalTime);
+        arrivalTime.setText(hour+":"+minute+" Uhr");
     }
 }
+
