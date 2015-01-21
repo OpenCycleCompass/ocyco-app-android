@@ -228,6 +228,7 @@ public class UploadTrackActivity extends ActionBarActivity {
             HttpURLConnection conn = (HttpURLConnection) url.openConnection();
             conn.setReadTimeout(3000 /* milliseconds */);
             conn.setConnectTimeout(5000 /* milliseconds */);
+            conn.setRequestProperty("User-Agent", "iBis app");
 
             // Get returned body from webserver:
             conn.setDoInput(true);
