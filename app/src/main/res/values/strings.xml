@@ -28,4 +28,27 @@
     <string name="unknownError">Es ist ein unbekannter Fehler aufgetreten.</string>
     <string name="UrlPushTrackData">https://ibis.jufo.mytfg.de/api1/pushtrack.php?data=</string>
     <string name="trackUploaded">Track hochgeladen</string>
+    <string name="title_activity_upload_track">Upload Track</string>
+    <string name="hello_world">Hello world!</string>
+    <string name="upload_track_name">Name des Tracks</string>
+    <string name="upload_track_com">Kommentar (optional)</string>
+    <string name="upload_track_name_default">Insert-Name-Here</string>
+    <string name="upload_track_com_default">Hier könnte Ihre Werbung stehen</string>
+    <string name="upload_track_duration">Dauer (s)</string>
+    <string name="upload_track_length">Länge (m)</string>
+    <string name="upload_track_token">Token</string>
+    <string name="upload_track_token_regenerate">Neu generieren</string>
+    <string name="upload_track">Hochladen</string>
+    <string name="upload_track_debugurl">DEBUG: URL</string>
+    <string name="upload_track_debugdata">DEBUG: DATA</string>
+
+
+    <string name="api1_base_url">https://ibis.jufo.mytfg.de/api1/</string>
+    <string name="api1_token_new">token.php?newtoken=newtoken</string>
+    <string name="api1_pushtrack_new">pushtrack.php?newtrack=newtrack</string>
+    <string name="upload_error_no_network_try_again_later">Keine Netzwerkverbindung: \n Bitte versuchen Sie es später erneut</string>
+    <string name="upload_error_server_unreachable">Fehler: Der Server ist nicht erreichbar \n Bitte versuchen Sie es später erneut</string>
+    <string name="upload_track_success_trackid">Track erfolgreich hochgeladen \ntrack_id: </string>
+    <string name="error">Fehler: </string>
+
 </resources>

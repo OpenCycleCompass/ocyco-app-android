@@ -257,8 +257,13 @@ public class Tracking extends Service implements LocationListener, OnConnectionF
         // Save Data: sendToServer()
         if (true) {
             mGPSDb.open();
-            int returnCode = mGPSDb.sendToServer();
-            String notification;
+
+            Intent intent = mGPSDb.sendToServer(this);
+            intent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
+            startActivity(intent);
+
+
+            /*String notification;
             Log.i(TAG, returnCode + "");
             switch (returnCode) {
                 case 1: // json has error
@@ -289,11 +294,12 @@ public class Tracking extends Service implements LocationListener, OnConnectionF
             NotificationManager mNotifyMgr =
                     (NotificationManager) getSystemService(NOTIFICATION_SERVICE);
             // Builds the notification and issues it.
-            mNotifyMgr.notify(mNotificationId, mBuilder.build());
+            mNotifyMgr.notify(mNotificationId, mBuilder.build()); */
             mGPSDb.close();
         }
         stopLocationUpdates();
         mGPSDb.deleteDatabase();
+        mGoogleApiClient.disconnect();
         super.onDestroy();
     }
 

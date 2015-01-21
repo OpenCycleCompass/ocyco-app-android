@@ -2,6 +2,7 @@ package ibis.jufo.mytfg.de.ibis_intelligentbikeinformationsystem;
 
 import android.content.ContentValues;
 import android.content.Context;
+import android.content.Intent;
 import android.database.Cursor;
 import android.database.SQLException;
 import android.database.sqlite.SQLiteDatabase;
@@ -39,6 +40,9 @@ public class GPSDatabase {
     public int serverNodes = -1;
     public int serverCreated = -1;
 
+    public long startTst;
+    public long stopTst;
+
     // Log TAG
     protected static final String TAG = "GPSDatabase-class";
 
@@ -47,6 +51,7 @@ public class GPSDatabase {
         Log.i(TAG, "GPSDatabase Constructor");
         this.context=context;
         dbHelper=new DbHelper(context);
+        startTst = System.currentTimeMillis()/1000;
     }
 
     //creating a DbHelper
@@ -96,8 +101,9 @@ public class GPSDatabase {
         //return true;
     }
 
-    public int sendToServer() {
+    public Intent sendToServer(Context c) {
         Log.i(TAG, "sendToServer()");
+        stopTst = System.currentTimeMillis()/1000;
         JSONArray data = new JSONArray();
         Cursor cursor = getAllRows();
         cursor.moveToFirst();
@@ -115,10 +121,18 @@ public class GPSDatabase {
             data.put(point);
             cursor.moveToNext();
         }
-        String http_get_string = data.toString();
-        Log.i(TAG, http_get_string);
-        
-        String metadata = "&user_token=ibis_549f4fd2e22254.10943175&newtrack=newtrack&name=app&comment=bla&length=15&duration=100";
+        String data_string = data.toString();
+        Log.i(TAG, data_string);
+
+
+        Intent intent = new Intent(c, UploadTrackActivity.class);
+
+        intent.putExtra("data", data_string);
+        intent.putExtra("stopTst", stopTst);
+        intent.putExtra("startTst", startTst);
+        return intent;
+
+        /*String metadata = "&user_token=ibis_549f4fd2e22254.10943175&newtrack=newtrack&name=app&comment=bla&length=15&duration=100";
         String url = context.getString(R.string.UrlPushTrackData)+http_get_string+metadata;
 
         // Allow network on main thread: bad style
@@ -150,8 +164,10 @@ public class GPSDatabase {
             e.printStackTrace();
         }
         return 3;
+        */
+        //return 0;
     }
-    private String getHttp(String url) throws IOException {
+    /*private String getHttp(String url) throws IOException {
         HttpURLConnection connection = (HttpURLConnection) new URL(url).openConnection();
         connection.connect();
         if (connection.getResponseCode() == HttpURLConnection.HTTP_OK) {
@@ -170,7 +186,7 @@ public class GPSDatabase {
         }
         reader.close();
         return builder.toString();
-    }
+    }*/
 
     public void deleteDatabase() {
         //delete database
