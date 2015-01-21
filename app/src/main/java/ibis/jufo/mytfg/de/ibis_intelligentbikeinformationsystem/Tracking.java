@@ -61,6 +61,8 @@ public class Tracking extends Service implements LocationListener, OnConnectionF
     boolean sendConfirmAccuracy = false;
     boolean saveData=true;
 
+    double tAnkEingTime;
+
 
     @Override
     //Very mystical code...
@@ -237,6 +239,7 @@ public class Tracking extends Service implements LocationListener, OnConnectionF
         //read extra and write to CollectData
         try {
             CollectData = intent.getBooleanExtra("Key", false);
+            tAnkEingTime = intent.getDoubleExtra("Key2", 0);
         } catch (java.lang.NullPointerException e) {
             stopSelf();
         }

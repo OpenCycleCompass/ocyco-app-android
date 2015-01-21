@@ -3,6 +3,7 @@ package ibis.jufo.mytfg.de.ibis_intelligentbikeinformationsystem;
 
 import android.location.Location;
 
+import java.util.Calendar;
 
 public class Calculate {
 
@@ -26,14 +27,29 @@ public class Calculate {
     Double tAkt; // aktuelle Zeit
     Double tAnk; // Ankunftszeit
     Double tAnkEing; //Eingegebene, gewünschte Ankunftszeit
+    double tAnkEingTime; //Eingegebene, gewünschte Ankunftszeit in Millisekunden ohne Datum
     Double tAnkUnt; //Unterschied zwischen realer und gewünschter Ankunftszeit
 
-    public void getLocation (Location location) {
+    public void getData (Location location) {
+        //get location
         oldLoc = newLoc;
         newLoc = location;
-        if (oldLoc == null){
+        if (oldLoc == null) {
             firstLoc = location;
         }
+    }
+
+    public void addDateMilliseconds (double tAnkEingTimeInput) {
+        double tAnkEingTime = tAnkEingTimeInput;
+        //get date in milliseconds
+        final Calendar c = Calendar.getInstance();
+        int current_hour = c.get(Calendar.HOUR_OF_DAY);
+        int current_minute = c.get(Calendar.MINUTE);
+        double milliSeconds = c.get(Calendar.MILLISECOND);
+        double currentTimeMillis = (double) ((current_hour*60+current_minute)*60*1000);
+        double dateInMilliseconds = (milliSeconds - currentTimeMillis);
+        //add date in milliseconds
+        tAnkEing = (dateInMilliseconds + tAnkEingTime);
 
     }
 

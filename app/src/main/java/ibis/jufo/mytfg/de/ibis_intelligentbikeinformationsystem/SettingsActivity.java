@@ -20,6 +20,7 @@ public class SettingsActivity extends ActionBarActivity implements TimePickerFra
     //Variables declaration
     public boolean CollectData = false;
     public float FloatDistStartDest;
+    double tAnkEingTime;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -93,6 +94,7 @@ public class SettingsActivity extends ActionBarActivity implements TimePickerFra
             //so checkOnline will be executed again
             Intent intent = new Intent(this, Tracking.class);
             intent.putExtra("Key", CollectData);
+            intent.putExtra("Key2", tAnkEingTime);
             startService(intent);
 
             //start ShowDataActivity
@@ -160,6 +162,12 @@ public class SettingsActivity extends ActionBarActivity implements TimePickerFra
         //show picked time
         TextView arrivalTime = (TextView) findViewById(R.id.arrivalTime);
         arrivalTime.setText(hour+":"+minute+" Uhr");
+        convertToMilliseconds(hour, minute);
+    }
+
+    //convert hour and minutes to milliseconds for mathematical operations @Calculation
+    public void convertToMilliseconds(int hour, int minute) {
+        tAnkEingTime = (double) ((hour*60+minute)*60*1000);
     }
 }
 
