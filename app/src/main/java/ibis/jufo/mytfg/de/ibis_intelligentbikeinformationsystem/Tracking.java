@@ -55,6 +55,12 @@ public class Tracking extends Service implements LocationListener, OnConnectionF
     boolean sendConfirmAccuracy = false;
     boolean saveData = true;
 
+    // Notification
+    // Sets an ID for the notification
+    private int mNotificationId = 42;
+    private NotificationCompat.Builder mBuilder;
+    // Gets an instance of the NotificationManager service
+    private NotificationManager mNotifyMgr;
 
     @Override
     //Very mystical code...
@@ -74,28 +80,20 @@ public class Tracking extends Service implements LocationListener, OnConnectionF
     public void startOnlineTracking() {
         Log.i(TAG, "startOnlineTracking()");
         // Create Notification with track info
-        // TODO: funktioniert so nicht :(
         Intent tracking_showIntent = new Intent(this, ShowDataActivity.class);
-        tracking_showIntent.putExtra("methodName", "showTrackInfo");
         PendingIntent tracking_showPendingIntent = PendingIntent.getActivity(this, 0, tracking_showIntent, 0);
 
         Intent tracking_stopIntent = new Intent(this, SettingsActivity.class);
-        tracking_showIntent.putExtra("methodName", "stopTracking");
+        tracking_showIntent.putExtra("callMethod", "stopOnlineTracking");
+        // TODO SettingsActivity should call stopOnlineTracking() in onCreate if intent.getExtra("callMethod") is "stopOnlineTracking"
         PendingIntent tracking_stopPendingIntent = PendingIntent.getActivity(this, 0, tracking_stopIntent, 0);
 
-        NotificationCompat.Builder mBuilder =
-                new NotificationCompat.Builder(this)
-                        .setSmallIcon(R.drawable.ic_launcher)
-                        .setContentTitle(getString(R.string.app_name))
-                        .setContentText(getString(R.string.tracking_status_active))
-                        .addAction(R.drawable.ic_launcher, getString(R.string.tracking_stop), tracking_stopPendingIntent)
-                        .addAction(R.drawable.ic_launcher, getString(R.string.tracking_show_tracking), tracking_showPendingIntent)
-                        .setOngoing(true);
-        // Sets an ID for the notification
-        int mNotificationId = 42;
-        // Gets an instance of the NotificationManager service
-        NotificationManager mNotifyMgr =
-                (NotificationManager) getSystemService(NOTIFICATION_SERVICE);
+        mBuilder.setSmallIcon(R.drawable.ic_launcher)
+                .setContentTitle(getString(R.string.app_name))
+                .setContentText(getString(R.string.tracking_status_active))
+                .addAction(R.drawable.ic_launcher, getString(R.string.tracking_stop), tracking_stopPendingIntent)
+                .addAction(R.drawable.ic_launcher, getString(R.string.tracking_show_tracking), tracking_showPendingIntent)
+                .setOngoing(true);
         // Builds the notification and issues it.
         mNotifyMgr.notify(mNotificationId, mBuilder.build());
     }
@@ -165,7 +163,15 @@ public class Tracking extends Service implements LocationListener, OnConnectionF
         if (saveData) {
             updateDatabase();
         }
-
+        mGPSDb.open();
+        int num_rows = mGPSDb.getNumRows();
+        mGPSDb.close();
+        // Update notification
+        mBuilder.setContentText(getString(R.string.tracking_status_active)+ " - " + num_rows + " GPS Punkte aufgezeichnet");
+        // Sets an ID for the notification
+        int mNotificationId = 42;
+        // Builds the notification and issues it.
+        mNotifyMgr.notify(mNotificationId, mBuilder.build());
     }
 
     public void checkAccuracy(Float accuracy) {
@@ -216,6 +222,11 @@ public class Tracking extends Service implements LocationListener, OnConnectionF
         Log.i(TAG, "onCreate()");
         super.onCreate();
         //build SQLite database
+
+
+        mBuilder = new NotificationCompat.Builder(this);
+        // Gets an instance of the NotificationManager service
+        mNotifyMgr = (NotificationManager) getSystemService(NOTIFICATION_SERVICE);
 
         //build and connect Api Client
         buildGoogleApiClient();
