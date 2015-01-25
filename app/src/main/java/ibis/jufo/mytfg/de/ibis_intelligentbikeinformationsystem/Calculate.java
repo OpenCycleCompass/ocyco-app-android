@@ -1,6 +1,5 @@
 package ibis.jufo.mytfg.de.ibis_intelligentbikeinformationsystem;
 
-
 import android.location.Location;
 
 import java.util.Calendar;
@@ -14,23 +13,23 @@ public class Calculate {
 
     //calculation and output vars
     //speed
-    Double vD; //Durchschnittsgeschwindikeit
-    Double vAkt; //aktuelle Geschwindigkeit
-    Double vDMuss; //notwendige Durchscnittsgeschwindigkeit, um am vorgegebenen Zeitpunkt das Ziel zu erreichen
-    Double vDunt; // Unterschied zwischen aktueller- und notwendiger Durchschnittsgeschwindigkeit
+    double vD; //Durchschnittsgeschwindikeit
+    double vAkt; //aktuelle Geschwindigkeit
+    double vDMuss; //notwendige Durchscnittsgeschwindigkeit, um am vorgegebenen Zeitpunkt das Ziel zu erreichen
+    double vDunt; // Unterschied zwischen aktueller- und notwendiger Durchschnittsgeschwindigkeit
     //distance
-    Double sGef; //gefahrene Strecke
-    Double sZuf; //zu fahrende Strecke
+    double sGef; //gefahrene Strecke
+    double sZuf; //zu fahrende Strecke
     //time
-    Double tGef; //gefahrene Zeit
-    Double tZuf; //zu fahrende Zeit
-    Double tAkt; // aktuelle Zeit
-    Double tAnk; // Ankunftszeit
-    Double tAnkEing; //Eingegebene, gewünschte Ankunftszeit
+    double tGef; //gefahrene Zeit
+    double tZuf; //zu fahrende Zeit
+    double tAkt; // aktuelle Zeit
+    double tAnk; // Ankunftszeit
+    double tAnkEing; //Eingegebene, gewünschte Ankunftszeit
     double tAnkEingTime; //Eingegebene, gewünschte Ankunftszeit in Millisekunden ohne Datum
-    Double tAnkUnt; //Unterschied zwischen realer und gewünschter Ankunftszeit
+    double tAnkUnt; //Unterschied zwischen realer und gewünschter Ankunftszeit
 
-    public void getData (Location location) {
+    public void getData(Location location) {
         //get location
         oldLoc = newLoc;
         newLoc = location;
@@ -39,14 +38,14 @@ public class Calculate {
         }
     }
 
-    public void addDateMilliseconds (double tAnkEingTimeInput) {
+    public void addDateMilliseconds(double tAnkEingTimeInput) {
         double tAnkEingTime = tAnkEingTimeInput;
         //get date in milliseconds
         final Calendar c = Calendar.getInstance();
         int current_hour = c.get(Calendar.HOUR_OF_DAY);
         int current_minute = c.get(Calendar.MINUTE);
         double milliSeconds = c.get(Calendar.MILLISECOND);
-        double currentTimeMillis = (double) ((current_hour*60+current_minute)*60*1000);
+        double currentTimeMillis = (double) ((current_hour * 60 + current_minute) * 60 * 1000);
         double dateInMilliseconds = (milliSeconds - currentTimeMillis);
         //add date in milliseconds
         tAnkEing = (dateInMilliseconds + tAnkEingTime);
@@ -54,20 +53,20 @@ public class Calculate {
     }
 
 
-    public void calculateDrivenDistance () {
+    public void calculateDrivenDistance() {
         //Calculate the distance between old and newLoc and add to sGef
-        Double dLon = 111.3 * (oldLoc.getLongitude() - newLoc.getLongitude());
-        Double dLat = 71.5 * (oldLoc.getLatitude() - newLoc.getLatitude());
-        Double lastDistance = Math.sqrt(dLon * dLon + dLat * dLat);
+        double dLon = 111.3 * (oldLoc.getLongitude() - newLoc.getLongitude());
+        double dLat = 71.5 * (oldLoc.getLatitude() - newLoc.getLatitude());
+        double lastDistance = Math.sqrt(dLon * dLon + dLat * dLat);
         sGef += lastDistance;
     }
 
-    public void calculateDrivenTime () {
+    public void calculateDrivenTime() {
         //calculate driven time and convert to seconds
-        tGef = (double)((firstLoc.getTime() - newLoc.getTime())/1000);
+        tGef = (double) ((firstLoc.getTime() - newLoc.getTime()) / 1000);
     }
 
-    public void getTimeVars (Double timeInput) {
+    public void getTimeVars(double timeInput) {
         //set tAnkEing
         tAnkEing = timeInput;
         //get actual time
@@ -76,7 +75,7 @@ public class Calculate {
     }
 
 
-    public void math () {
+    public void math() {
         //average speed
         vD = sGef / tGef;
         //time to drive
@@ -91,9 +90,17 @@ public class Calculate {
         vDunt = vD - vDMuss;
     }
 
-    public void output () {
-        //TODO: send the output vars to ShowDataActivity
 
+    private OnTransferDataListener mOTDListener;
+
+    public void output() {
+        //TODO: send the output vars to ShowDataActivity
+        this.mOTDListener.onTransferData(sGef, sZuf, vAkt, vD, tAnk, tAnkUnt, vDMuss, vDunt);
+    }
+
+    //create and declare Interface
+    public static interface OnTransferDataListener {
+        public abstract void onTransferData(double sGef, double sZuf, double vAkt, double vD, double tAnk, double tAnkUnt, double vDMuss, double vDUnt);
     }
 
 

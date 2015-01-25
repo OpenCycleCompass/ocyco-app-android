@@ -8,15 +8,14 @@ import android.os.Bundle;
 import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
+import android.widget.TextView;
 
 
-
-public class ShowDataActivity extends ActionBarActivity  {
+public class ShowDataActivity extends ActionBarActivity implements Calculate.OnTransferDataListener {
 
     boolean CollectData;
     boolean doNotRestart;
     float accuracy;
-
 
 
     // Log TAG
@@ -81,6 +80,26 @@ public class ShowDataActivity extends ActionBarActivity  {
         //create and show alert dialog
         AlertDialog alertDialog = alertDialogBuilder.create();
         alertDialog.show();
+    }
+
+    //read data from interface and write to info boxes
+    public void onTransferData(double sGef, double sZuf, double vAkt, double vD, double tAnk, double tAnkUnt, double vDMuss, double vDUnt) {
+        TextView sGefBox = (TextView) findViewById(R.id.sGefBox);
+        sGefBox.setText(sGef + "");
+        TextView sZufBox = (TextView) findViewById(R.id.sZufBox);
+        sZufBox.setText(sZuf + "");
+        TextView vAktBox = (TextView) findViewById(R.id.vAktBox);
+        vAktBox.setText(vAkt + "");
+        TextView vDBox = (TextView) findViewById(R.id.vDBox);
+        vDBox.setText(vD + "");
+        TextView tAnkBox = (TextView) findViewById(R.id.tAnkBox);
+        tAnkBox.setText(tAnk + "");
+        TextView tAnkUntBox = (TextView) findViewById(R.id.tAnkUntBox);
+        tAnkUntBox.setText(tAnkUnt + "");
+        TextView vDMussBox = (TextView) findViewById(R.id.vDMussBox);
+        vDMussBox.setText(vDMuss + "");
+        TextView vDUntBox = (TextView) findViewById(R.id.vDUntBox);
+        vDUntBox.setText(tAnk + "");
     }
 
 
