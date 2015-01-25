@@ -59,7 +59,7 @@ public class Tracking extends Service implements LocationListener, OnConnectionF
 
     boolean sendErrorAccuracy = false;
     boolean sendConfirmAccuracy = false;
-    boolean saveData=true;
+    boolean saveData = true;
 
     double tAnkEingTime;
 
@@ -169,18 +169,29 @@ public class Tracking extends Service implements LocationListener, OnConnectionF
         mLastUpdateTime = Long.toString(System.currentTimeMillis() / 1000L);
         checkAccuracy(location.getAccuracy());
         //only save data, if accuracy is ok
-        Log.i(TAG, saveData+"saveData");
+        Log.i(TAG, saveData + "saveData");
         if (saveData) {
             updateDatabase();
         }
+        callCalculate();
+    }
 
+    public void callCalculate() {
+        //create a new instance of Calculate class
+        Calculate mCalculate = new Calculate();
+        mCalculate.getData(mCurrentLocation);
+        mCalculate.calculateTimeVars(tAnkEingTime);
+        mCalculate.calculateDrivenDistance();
+        mCalculate.calculateDrivenTime();
+        mCalculate.math();
+        mCalculate.output();
     }
 
     public void checkAccuracy(Float accuracy) {
-        Log.i(TAG,"checkAccuracy "+accuracy);
+        Log.i(TAG, "checkAccuracy " + accuracy);
         Log.i(TAG, accuracy + " Accuracy");
         if (accuracy > 20 && !sendErrorAccuracy) {
-            saveData=false;
+            saveData = false;
             Intent intent = new Intent(this, ShowDataActivity.class);
             intent.putExtra("KeyAccuracy", accuracy);
             intent.putExtra("KeyDoNotRestart", true);
@@ -190,8 +201,8 @@ public class Tracking extends Service implements LocationListener, OnConnectionF
             //sendErrorAccuracy ist to avoid, that ShowDataActivity is recreated at every Location update
             sendErrorAccuracy = true;
         } else if (accuracy < 20 && !sendConfirmAccuracy) {
-            Log.i(TAG, saveData+"saveData && blabla");
-            saveData=true;
+            Log.i(TAG, saveData + "saveData && blabla");
+            saveData = true;
             Intent intent = new Intent(this, ShowDataActivity.class);
             intent.putExtra("KeyAccuracy", accuracy);
             intent.putExtra("KeyDoNotRestart", true);
