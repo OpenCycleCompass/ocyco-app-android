@@ -95,6 +95,7 @@ public class SettingsActivity extends ActionBarActivity implements TimePickerFra
             Intent intent = new Intent(this, Tracking.class);
             intent.putExtra("Key", CollectData);
             intent.putExtra("Key2", tAnkEingTime);
+            intent.putExtra("Key3", tAnkEingTime);
             startService(intent);
 
             //start ShowDataActivity

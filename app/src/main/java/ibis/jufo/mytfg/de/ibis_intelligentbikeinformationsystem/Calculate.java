@@ -1,6 +1,7 @@
 package ibis.jufo.mytfg.de.ibis_intelligentbikeinformationsystem;
 
 import android.location.Location;
+import android.util.Log;
 
 import java.util.Calendar;
 
@@ -18,6 +19,7 @@ public class Calculate {
     double vDMuss; //notwendige Durchscnittsgeschwindigkeit, um am vorgegebenen Zeitpunkt das Ziel zu erreichen
     double vDunt; // Unterschied zwischen aktueller- und notwendiger Durchschnittsgeschwindigkeit
     //distance
+    double sEing; //eingegebene Strecke
     double sGef; //gefahrene Strecke
     double sZuf; //zu fahrende Strecke
     //time
@@ -28,14 +30,29 @@ public class Calculate {
     double tAnkEing; //Eingegebene, gewünschte Ankunftszeit
     double tAnkUnt; //Unterschied zwischen realer und gewünschter Ankunftszeit
 
-    public void getData(Location location) {
+    // Log TAG
+    protected static final String TAG = "iBis-calculate-class";
+
+
+    public void getData(Location location, Double sEingInput) {
         //get location
         oldLoc = newLoc;
         newLoc = location;
         if (oldLoc == null) {
             firstLoc = location;
         }
+        //get distance
+        sEing = sEingInput;
     }
+
+    public boolean checkFirstLoc () {
+        boolean firstLoc = false;
+        if (oldLoc == null) {
+            firstLoc=true;
+        }
+        return firstLoc;
+    }
+
 
     public void calculateTimeVars(double tAnkEingTimeInput) {
         double tAnkEingTime = tAnkEingTimeInput;
@@ -46,11 +63,11 @@ public class Calculate {
         double milliSeconds = c.get(Calendar.MILLISECOND);
         double currentTimeMillis = (double) ((current_hour * 60 + current_minute) * 60 * 1000);
         double dateInMilliseconds = (milliSeconds - currentTimeMillis);
-        //add date in milliseconds, convert to seconds
-        tAnkEing = (dateInMilliseconds + tAnkEingTime) / 1000;
+        //add date in milliseconds, convert to hours
+        tAnkEing = (((dateInMilliseconds + tAnkEingTime)/1000)/60)/60;
 
-        //get actual time in seconds
-        tAkt = currentTimeMillis / 1000;
+        //get actual time in hours
+        tAkt = ((currentTimeMillis / 1000)/60)/60;
     }
 
 
@@ -64,36 +81,45 @@ public class Calculate {
 
     public void calculateDrivenTime() {
         //calculate driven time and convert to seconds
-        tGef = (double) ((firstLoc.getTime() - newLoc.getTime()) / 1000);
+        tGef = (double) (newLoc.getTime() - (firstLoc.getTime()) / 1000);
     }
 
 
     public void math() {
         //average speed
         vD = sGef / tGef;
+        Log.i(TAG, vD+"="+sGef+"/"+tGef);
+        //distance to drive
+        sZuf = sEing - sGef;
+        Log.i(TAG, sZuf+"="+sEing+"-"+sGef);
         //time to drive
         tZuf = sZuf / vD;
+        Log.i(TAG, tZuf+"="+sZuf+"/"+vD);
         //arrival time
         tAnk = tAkt + tZuf;
+        Log.i(TAG, tAnk+"="+tAkt+"+"+tZuf);
         //difference between arrival and planed arrival time
         tAnkUnt = tAnkEing - tAnk;
+        Log.i(TAG, tAnkUnt+"="+tAnkEing+"/"+tAnk);
         //necessary speed for arriving in time
-        vDMuss = sZuf / tZuf;
+        vDMuss = sZuf / (tAnkEing-tAnk);
+        Log.i(TAG, vDMuss+"="+sZuf+"/"+tAnkEing+"-"+tAnk);
         //difference between real and necessary average speed
         vDunt = vD - vDMuss;
-    }
-
-
-    private OnTransferDataListener mOTDListener;
-
-    public void output() {
-        //TODO: send the output vars to ShowDataActivity
-        this.mOTDListener.onTransferData(sGef, sZuf, vAkt, vD, tAnk, tAnkUnt, vDMuss, vDunt);
+        Log.i(TAG, vDunt+"="+vD+"-"+vDMuss);
     }
 
     //create and declare Interface
     public static interface OnTransferDataListener {
         public abstract void onTransferData(double sGef, double sZuf, double vAkt, double vD, double tAnk, double tAnkUnt, double vDMuss, double vDUnt);
+    }
+
+    public OnTransferDataListener mOTDListener;
+
+    public void output() {
+        Log.i(TAG, sGef+" "+sZuf+" "+vAkt+" "+vD+" "+tAnk+" "+tAnkUnt+" "+vDMuss+" "+vDunt);
+        //TODO: NullPointerException beheben...
+        this.mOTDListener.onTransferData(sGef, sZuf, vAkt, vD, tAnk, tAnkUnt, vDMuss, vDunt);
     }
 
 

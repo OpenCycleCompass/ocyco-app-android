@@ -45,9 +45,9 @@ public class ShowDataActivity extends ActionBarActivity implements Calculate.OnT
         }
         // Start tracking Service, if Activity wasn't started from Tracking service
         if (!doNotRestart) {
-            Intent intent = new Intent(this, Tracking.class);
+            /*Intent intent = new Intent(this, Tracking.class);
             intent.putExtra("Key", CollectData);
-            startService(intent);
+            startService(intent); */
         }
     }
 

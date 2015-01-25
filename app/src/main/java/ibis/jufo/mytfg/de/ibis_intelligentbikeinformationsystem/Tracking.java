@@ -62,6 +62,10 @@ public class Tracking extends Service implements LocationListener, OnConnectionF
     boolean saveData = true;
 
     double tAnkEingTime;
+    double sEing;
+
+    //create a new instance of Calculate class
+    Calculate mCalculate = new Calculate();
 
 
     @Override
@@ -159,11 +163,12 @@ public class Tracking extends Service implements LocationListener, OnConnectionF
 
     @Override
     public void onLocationChanged(Location location) {
+        boolean firstLoc = false;
+
         // Nur zum testen
         if (!CollectData) {
             stopSelf();
         }
-
         Log.i(TAG, "onLocationChanged()");
         mCurrentLocation = location;
         mLastUpdateTime = Long.toString(System.currentTimeMillis() / 1000L);
@@ -173,18 +178,22 @@ public class Tracking extends Service implements LocationListener, OnConnectionF
         if (saveData) {
             updateDatabase();
         }
+
         callCalculate();
     }
 
     public void callCalculate() {
-        //create a new instance of Calculate class
-        Calculate mCalculate = new Calculate();
-        mCalculate.getData(mCurrentLocation);
-        mCalculate.calculateTimeVars(tAnkEingTime);
-        mCalculate.calculateDrivenDistance();
-        mCalculate.calculateDrivenTime();
-        mCalculate.math();
-        mCalculate.output();
+        mCalculate.getData(mCurrentLocation, sEing);
+        //only call mathematical methods, if this is not the first location - else there will be a NPE
+        if (!mCalculate.checkFirstLoc()) {
+            mCalculate.calculateTimeVars(tAnkEingTime);
+            mCalculate.calculateDrivenDistance();
+            mCalculate.calculateDrivenTime();
+            mCalculate.math();
+            mCalculate.output();
+
+        }
+
     }
 
     public void checkAccuracy(Float accuracy) {
@@ -251,6 +260,7 @@ public class Tracking extends Service implements LocationListener, OnConnectionF
         try {
             CollectData = intent.getBooleanExtra("Key", false);
             tAnkEingTime = intent.getDoubleExtra("Key2", 0);
+            sEing = (double) intent.getFloatExtra("Key3", 0);
         } catch (java.lang.NullPointerException e) {
             stopSelf();
         }
@@ -333,4 +343,5 @@ public class Tracking extends Service implements LocationListener, OnConnectionF
         // onConnectionFailed.
         // -> Wir tun nix
     }
+
 }
