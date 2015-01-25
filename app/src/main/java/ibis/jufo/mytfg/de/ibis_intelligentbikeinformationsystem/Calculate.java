@@ -26,7 +26,6 @@ public class Calculate {
     double tAkt; // aktuelle Zeit
     double tAnk; // Ankunftszeit
     double tAnkEing; //Eingegebene, gewünschte Ankunftszeit
-    double tAnkEingTime; //Eingegebene, gewünschte Ankunftszeit in Millisekunden ohne Datum
     double tAnkUnt; //Unterschied zwischen realer und gewünschter Ankunftszeit
 
     public void getData(Location location) {
@@ -38,7 +37,7 @@ public class Calculate {
         }
     }
 
-    public void addDateMilliseconds(double tAnkEingTimeInput) {
+    public void calculateTimeVars(double tAnkEingTimeInput) {
         double tAnkEingTime = tAnkEingTimeInput;
         //get date in milliseconds
         final Calendar c = Calendar.getInstance();
@@ -47,9 +46,11 @@ public class Calculate {
         double milliSeconds = c.get(Calendar.MILLISECOND);
         double currentTimeMillis = (double) ((current_hour * 60 + current_minute) * 60 * 1000);
         double dateInMilliseconds = (milliSeconds - currentTimeMillis);
-        //add date in milliseconds
-        tAnkEing = (dateInMilliseconds + tAnkEingTime);
+        //add date in milliseconds, convert to seconds
+        tAnkEing = (dateInMilliseconds + tAnkEingTime) / 1000;
 
+        //get actual time in seconds
+        tAkt = currentTimeMillis / 1000;
     }
 
 
@@ -64,14 +65,6 @@ public class Calculate {
     public void calculateDrivenTime() {
         //calculate driven time and convert to seconds
         tGef = (double) ((firstLoc.getTime() - newLoc.getTime()) / 1000);
-    }
-
-    public void getTimeVars(double timeInput) {
-        //set tAnkEing
-        tAnkEing = timeInput;
-        //get actual time
-        tAkt = (double) newLoc.getTime();
-
     }
 
 
