@@ -122,7 +122,11 @@ public class UploadTrackActivity extends ActionBarActivity {
         editText_UploadTrackName.setText(this.getString(R.string.upload_track_name_default));
         editText_UploadTrackCom.setText(this.getString(R.string.upload_track_com_default));
 
-        editText_UploadTrackToken.setText(getToken());
+        String ltoken = getToken();
+        if(ltoken!=null) {
+            editText_UploadTrackToken.setText(ltoken);
+            button_UploadTrack.setEnabled(true);
+        }
     }
 
     private String makeUrl() {
