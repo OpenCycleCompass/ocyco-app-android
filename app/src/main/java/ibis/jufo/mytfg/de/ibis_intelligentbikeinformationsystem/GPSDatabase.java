@@ -79,6 +79,14 @@ public class GPSDatabase {
         return cursor;
 
     }
+    public int getNumRows(){
+        int num = 0;
+        Cursor mCount= db.rawQuery("SELECT COUNT(*) FROM "+TABLENAME, null);
+        mCount.moveToFirst();
+        num = mCount.getInt(0);
+        mCount.close();
+        return num;
+    }
     public void open() throws SQLException {
         Log.i(TAG, "open()");
         db= dbHelper.getWritableDatabase();
