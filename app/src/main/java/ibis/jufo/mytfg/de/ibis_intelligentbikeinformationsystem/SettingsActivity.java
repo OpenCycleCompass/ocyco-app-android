@@ -36,7 +36,15 @@ public class SettingsActivity extends ActionBarActivity {
         EditText editDistance = (EditText) findViewById(R.id.enter_distance);
         editDistance.setText(Float.toString(FloatDistStartDest));
 
+        // call stopOnlineTracking() if SettingsActivity has benn started
+        // from notification action "Tracking Beenden"
+        Bundle bundle = getIntent().getExtras();
+        if(bundle != null) {
+            if (bundle.getString("callMethod") == "stopOnlineTracking") {
+                stopOnlineTracking();
+            }
         }
+    }
 
 
     @Override
@@ -104,7 +112,7 @@ public class SettingsActivity extends ActionBarActivity {
         //set up a new alert dialog
         AlertDialog.Builder alertDialogBuilder = new AlertDialog.Builder(SettingsActivity.this);
         alertDialogBuilder.setTitle("Bitte geben sie eine Zahl ein!");
-        alertDialogBuilder.setMessage("\""+StrEditText+"\""+" ist keine Zahl! ");
+        alertDialogBuilder.setMessage("\"" + StrEditText + "\"" + " ist keine Zahl! ");
 
         //create the OK Button and onClickListener
         alertDialogBuilder.setPositiveButton("OK",new DialogInterface.OnClickListener() {
@@ -135,7 +143,11 @@ public class SettingsActivity extends ActionBarActivity {
         }
     }
 
-    public void stopOnlineTracking (View view) {
+    public void onClickstopOnlineTracking(View view) {
+        stopOnlineTracking();
+    }
+
+    public void stopOnlineTracking() {
         //set collect data false
         CollectData=false;
         final CheckBox checkBox = (CheckBox) findViewById(R.id.CBCollectData);

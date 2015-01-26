@@ -80,20 +80,7 @@ public class Tracking extends Service implements LocationListener, OnConnectionF
     public void startOnlineTracking() {
         Log.i(TAG, "startOnlineTracking()");
         // Create Notification with track info
-        Intent tracking_showIntent = new Intent(this, ShowDataActivity.class);
-        PendingIntent tracking_showPendingIntent = PendingIntent.getActivity(this, 0, tracking_showIntent, 0);
-
-        Intent tracking_stopIntent = new Intent(this, SettingsActivity.class);
-        tracking_showIntent.putExtra("callMethod", "stopOnlineTracking");
-        // TODO SettingsActivity should call stopOnlineTracking() in onCreate if intent.getExtra("callMethod") is "stopOnlineTracking"
-        PendingIntent tracking_stopPendingIntent = PendingIntent.getActivity(this, 0, tracking_stopIntent, 0);
-
-        mBuilder.setSmallIcon(R.drawable.ic_launcher)
-                .setContentTitle(getString(R.string.app_name))
-                .setContentText(getString(R.string.tracking_status_active))
-                .addAction(R.drawable.ic_launcher, getString(R.string.tracking_stop), tracking_stopPendingIntent)
-                .addAction(R.drawable.ic_launcher, getString(R.string.tracking_show_tracking), tracking_showPendingIntent)
-                .setOngoing(true);
+        mBuilder.setContentText(getString(R.string.tracking_status_active));
         // Builds the notification and issues it.
         mNotifyMgr.notify(mNotificationId, mBuilder.build());
     }
@@ -221,10 +208,24 @@ public class Tracking extends Service implements LocationListener, OnConnectionF
     public void onCreate() {
         Log.i(TAG, "onCreate()");
         super.onCreate();
-        //build SQLite database
 
+        // Create Notification
+        Intent tracking_showIntent = new Intent(this, ShowDataActivity.class);
+        PendingIntent tracking_showPendingIntent = PendingIntent.getActivity(this, 0, tracking_showIntent, 0);
+
+        Intent tracking_stopIntent = new Intent(this, SettingsActivity.class);
+        tracking_stopIntent.putExtra("callMethod", "stopOnlineTracking");
+        // TODO SettingsActivity should call stopOnlineTracking() in onCreate if intent.getExtra("callMethod") is "stopOnlineTracking"
+        PendingIntent tracking_stopPendingIntent = PendingIntent.getActivity(this, 0, tracking_stopIntent, 0);
 
         mBuilder = new NotificationCompat.Builder(this);
+
+        mBuilder.setSmallIcon(R.mipmap.ic_launcher)
+                .setContentTitle(getString(R.string.app_name))
+                .addAction(R.drawable.ic_action_cancel, getString(R.string.tracking_stop_notification), tracking_stopPendingIntent)
+                .addAction(R.drawable.ic_action_map, getString(R.string.tracking_show_tracking), tracking_showPendingIntent)
+                .setOngoing(true);
+
         // Gets an instance of the NotificationManager service
         mNotifyMgr = (NotificationManager) getSystemService(NOTIFICATION_SERVICE);
 

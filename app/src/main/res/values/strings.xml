@@ -19,6 +19,7 @@
 
     <string name="tracking_start">Tracking starten</string>
     <string name="tracking_stop">Tracking beenden</string>
+    <string name="tracking_stop_notification">Beenden</string>
     <string name="tracking_status_inactive">Tracking läuft nicht</string>
     <string name="tracking_status_active">Tracking läuft</string>
     <string name="tracking_show_tracking">Anzeigen</string>
