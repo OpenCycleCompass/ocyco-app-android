@@ -27,6 +27,11 @@
             android:label="@string/title_activity_show_data"
             android:screenOrientation="portrait">
         </activity>
+        <activity
+            android:name=".UploadTrackActivity"
+            android:label="@string/title_activity_upload_track"
+            android:screenOrientation="portrait">
+        </activity>
         <service
             android:name="Tracking"
             android:label="iBis Tracking GPS" />
