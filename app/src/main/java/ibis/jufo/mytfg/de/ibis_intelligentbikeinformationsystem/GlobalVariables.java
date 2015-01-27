@@ -4,7 +4,7 @@ import android.app.Application;
 
 public class GlobalVariables extends Application {
     //The variables can be set and read from every Activity or Service!
-    double sGef, sZuf, vAkt, vD, tAnk, tAnkUnt, vDMuss, vDunt;
+    double sGef, sZuf, vAkt, vD, tAnk, tAnkUnt, vDMuss, vDunt, tAnkEingTime, sEing;
 
     public void setCalculationVars (double sGefIn, double sZufIn, double vAktIn, double vDIn, double tAnkIn, double tAnkUntIn, double vDMussIn, double vDuntIn) {
         sGef = sGefIn;
@@ -15,6 +15,20 @@ public class GlobalVariables extends Application {
         tAnkUnt = tAnkUntIn;
         vDMuss = vDMussIn;
         vDunt = vDuntIn;
+    }
+
+    public void setSettingVars(double tAnkEingTimeIn, double sEingIn) {
+        tAnkEingTime = tAnkEingTimeIn;
+        sEing = sEingIn;
+    }
+
+    public double getsEing () {
+        return sEing;
+    }
+
+
+    public double gettAnkEingTime () {
+        return tAnkEingTime;
     }
 
     public double getsGef () {

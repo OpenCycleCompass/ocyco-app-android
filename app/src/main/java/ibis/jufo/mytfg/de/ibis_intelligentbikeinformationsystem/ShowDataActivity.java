@@ -21,6 +21,9 @@ public class ShowDataActivity extends ActionBarActivity {
     // Log TAG
     protected static final String TAG = "IBisShowDataActivity-class";
 
+    //create instance of GlobalVariables class
+    GlobalVariables mGlobalVariable;
+
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -49,6 +52,8 @@ public class ShowDataActivity extends ActionBarActivity {
             intent.putExtra("Key", CollectData);
             startService(intent); */
         }
+        //initialize global variable class
+        mGlobalVariable = (GlobalVariables) getApplicationContext();
         showData();
     }
 
@@ -86,7 +91,6 @@ public class ShowDataActivity extends ActionBarActivity {
     //read data from interface and write to info boxes
     public void showData() {
         //get variables from global class
-        final GlobalVariables mGlobalVariable = (GlobalVariables) getApplicationContext();
         double sGef = mGlobalVariable.getsGef();
         double sZuf = mGlobalVariable.getsZuf();
         double vAkt = mGlobalVariable.getvAkt();

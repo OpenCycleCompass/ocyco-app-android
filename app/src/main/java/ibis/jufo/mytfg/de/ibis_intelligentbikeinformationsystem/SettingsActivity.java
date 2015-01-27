@@ -15,18 +15,20 @@ import android.widget.CheckBox;
 import android.widget.EditText;
 import android.widget.TextView;
 
-public class SettingsActivity extends ActionBarActivity implements TimePickerFragment.OnTimePickedListener{
+public class SettingsActivity extends ActionBarActivity implements TimePickerFragment.OnTimePickedListener {
 
     //Variables declaration
     public boolean CollectData = false;
     public float FloatDistStartDest;
     double tAnkEingTime;
 
+    //create instance of GlobalVariables class
+    GlobalVariables mGlobalVariable;
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_settings);
-
         // Restore preferences
         SharedPreferences settings = getSharedPreferences(getString(R.string.preference_file_key), Context.MODE_PRIVATE);
         //get variables
@@ -38,8 +40,9 @@ public class SettingsActivity extends ActionBarActivity implements TimePickerFra
         //set Text to enter_distance
         EditText editDistance = (EditText) findViewById(R.id.enter_distance);
         editDistance.setText(Float.toString(FloatDistStartDest));
-
-        }
+        //initialize global variable class
+        mGlobalVariable = (GlobalVariables) getApplicationContext();
+    }
 
 
     @Override
@@ -49,7 +52,7 @@ public class SettingsActivity extends ActionBarActivity implements TimePickerFra
     }
 
     @Override
-    protected void onStop(){
+    protected void onStop() {
         super.onStop();
 
         //saving settings
@@ -89,13 +92,13 @@ public class SettingsActivity extends ActionBarActivity implements TimePickerFra
             exception = true;
             openAlert(StrEditText);
         }
+        double sEing = (double) FloatDistStartDest;
+        mGlobalVariable.setSettingVars(tAnkEingTime, sEing);
         if (!exception) {
             //restart Tracking Service starts it's onStartCommand (NOT onCreate),
             //so checkOnline will be executed again
             Intent intent = new Intent(this, Tracking.class);
             intent.putExtra("Key", CollectData);
-            intent.putExtra("Key2", tAnkEingTime);
-            intent.putExtra("Key3", tAnkEingTime);
             startService(intent);
 
             //start ShowDataActivity
@@ -109,13 +112,13 @@ public class SettingsActivity extends ActionBarActivity implements TimePickerFra
         //set up a new alert dialog
         AlertDialog.Builder alertDialogBuilder = new AlertDialog.Builder(SettingsActivity.this);
         alertDialogBuilder.setTitle("Bitte geben sie eine Zahl ein!");
-        alertDialogBuilder.setMessage("\""+StrEditText+"\""+" ist keine Zahl! ");
+        alertDialogBuilder.setMessage("\"" + StrEditText + "\"" + " ist keine Zahl! ");
 
         //create the OK Button and onClickListener
-        alertDialogBuilder.setPositiveButton("OK",new DialogInterface.OnClickListener() {
+        alertDialogBuilder.setPositiveButton("OK", new DialogInterface.OnClickListener() {
             //close dialog when clicked
             public void onClick(DialogInterface dialog, int id) {
-            dialog.cancel();
+                dialog.cancel();
             }
         });
         //create and show alert dialog
@@ -140,9 +143,9 @@ public class SettingsActivity extends ActionBarActivity implements TimePickerFra
         }
     }
 
-    public void stopOnlineTracking (View view) {
+    public void stopOnlineTracking(View view) {
         //set collect data false
-        CollectData=false;
+        CollectData = false;
         final CheckBox checkBox = (CheckBox) findViewById(R.id.CBCollectData);
         checkBox.setChecked(CollectData);
         //restart Tracking Service starts it's onStartCommand (NOT onCreate),
@@ -162,13 +165,13 @@ public class SettingsActivity extends ActionBarActivity implements TimePickerFra
     public void onTimePicked(int hour, int minute) {
         //show picked time
         TextView arrivalTime = (TextView) findViewById(R.id.arrivalTime);
-        arrivalTime.setText(hour+":"+minute+" Uhr");
+        arrivalTime.setText(hour + ":" + minute + " Uhr");
         convertToMilliseconds(hour, minute);
     }
 
     //convert hour and minutes to milliseconds for mathematical operations @Calculation
     public void convertToMilliseconds(int hour, int minute) {
-        tAnkEingTime = (double) ((hour*60+minute)*60*1000);
+        tAnkEingTime = (double) ((hour * 60 + minute) * 60 * 1000);
     }
 }
 

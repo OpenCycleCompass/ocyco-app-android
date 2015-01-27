@@ -61,11 +61,10 @@ public class Tracking extends Service implements LocationListener, OnConnectionF
     boolean sendConfirmAccuracy = false;
     boolean saveData = true;
 
-    double tAnkEingTime;
-    double sEing;
 
-    //create a new instance of Calculate class
+    //create a new instance of classes
     Calculate mCalculate = new Calculate();
+    GlobalVariables mGlobalVariable;
 
 
     @Override
@@ -183,10 +182,10 @@ public class Tracking extends Service implements LocationListener, OnConnectionF
 
     public void callCalculate() {
         Log.i(TAG, "callCalculate()");
-        mCalculate.getData(mCurrentLocation, sEing);
+        mCalculate.getData(mCurrentLocation, mGlobalVariable.getsEing());
         //only call mathematical methods, if this is not the first location - else there will be a NPE
         if (!mCalculate.checkFirstLoc()) {
-            mCalculate.calculateTimeVars(tAnkEingTime);
+            mCalculate.calculateTimeVars(mGlobalVariable.gettAnkEingTime());
             mCalculate.calculateDrivenDistance();
             mCalculate.calculateDrivenTime();
             mCalculate.calculateSpeed();
@@ -201,7 +200,6 @@ public class Tracking extends Service implements LocationListener, OnConnectionF
             double vDMuss = mCalculate.getvDMuss();
             double vDunt = mCalculate.getvDunt();
             //write Variables to global class
-            final GlobalVariables mGlobalVariable = (GlobalVariables) getApplicationContext();
             mGlobalVariable.setCalculationVars(sGef, sZuf, vAkt, vD, tAnk, tAnkUnt, vDMuss, vDunt);
 
         }
@@ -264,16 +262,16 @@ public class Tracking extends Service implements LocationListener, OnConnectionF
 
         //create Database
         mGPSDb = new GPSDatabase(this.getApplicationContext());
+        //initialize global variable class
+        mGlobalVariable = (GlobalVariables) getApplicationContext();
     }
 
     @Override
     public int onStartCommand(Intent intent, int flags, int startId) {
         Log.i(TAG, "onStartCommand()");
-        //read extra and write to CollectData
+        //read extra
         try {
             CollectData = intent.getBooleanExtra("Key", false);
-            tAnkEingTime = intent.getDoubleExtra("Key2", 0);
-            sEing = (double) intent.getFloatExtra("Key3", 0);
         } catch (java.lang.NullPointerException e) {
             stopSelf();
         }
