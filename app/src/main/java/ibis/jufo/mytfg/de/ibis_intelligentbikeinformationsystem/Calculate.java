@@ -19,6 +19,7 @@ public class Calculate {
     double vDMuss; //notwendige Durchscnittsgeschwindigkeit, um am vorgegebenen Zeitpunkt das Ziel zu erreichen
     double vDunt; // Unterschied zwischen aktueller- und notwendiger Durchschnittsgeschwindigkeit
     //distance
+    double lastDistance;
     double sEing; //eingegebene Strecke
     double sGef; //gefahrene Strecke
     double sZuf; //zu fahrende Strecke
@@ -53,6 +54,20 @@ public class Calculate {
         return firstLoc;
     }
 
+    public void calculateSpeed () {
+        if (newLoc.hasSpeed()) {
+            vAkt = newLoc.getSpeed();
+        }
+        else {
+            //time difference between last GPS points in hours
+            double oldTime = oldLoc.getTime();
+            double newTime = newLoc.getTime();
+            double timeDiff = (((newTime-oldTime)/1000)/60)/60;
+            Log.i(TAG, "calculateSpeed()"+lastDistance+"/"+timeDiff);
+            vAkt = lastDistance/timeDiff;
+        }
+    }
+
 
     public void calculateTimeVars(double tAnkEingTimeInput) {
         double tAnkEingTime = tAnkEingTimeInput;
@@ -75,7 +90,7 @@ public class Calculate {
         //Calculate the distance between old and newLoc and add to sGef
         double dLon = 111.3 * (oldLoc.getLongitude() - newLoc.getLongitude());
         double dLat = 71.5 * (oldLoc.getLatitude() - newLoc.getLatitude());
-        double lastDistance = Math.sqrt(dLon * dLon + dLat * dLat);
+        lastDistance = Math.sqrt(dLon * dLon + dLat * dLat);
         sGef += lastDistance;
     }
 

@@ -5,7 +5,6 @@
  */
 package ibis.jufo.mytfg.de.ibis_intelligentbikeinformationsystem;
 
-import android.app.Activity;
 import android.app.NotificationManager;
 import android.app.PendingIntent;
 import android.app.Service;
@@ -164,7 +163,6 @@ public class Tracking extends Service implements LocationListener, OnConnectionF
 
     @Override
     public void onLocationChanged(Location location) {
-        boolean firstLoc = false;
 
         // Nur zum testen
         if (!CollectData) {
@@ -191,6 +189,7 @@ public class Tracking extends Service implements LocationListener, OnConnectionF
             mCalculate.calculateTimeVars(tAnkEingTime);
             mCalculate.calculateDrivenDistance();
             mCalculate.calculateDrivenTime();
+            mCalculate.calculateSpeed();
             mCalculate.math();
             //get Variables from calculation
             double sGef = mCalculate.getsGef();
