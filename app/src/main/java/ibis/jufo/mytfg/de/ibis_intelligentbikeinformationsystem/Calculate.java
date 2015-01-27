@@ -45,10 +45,10 @@ public class Calculate {
         sEing = sEingInput;
     }
 
-    public boolean checkFirstLoc () {
+    public boolean checkFirstLoc() {
         boolean firstLoc = false;
         if (oldLoc == null) {
-            firstLoc=true;
+            firstLoc = true;
         }
         return firstLoc;
     }
@@ -64,10 +64,10 @@ public class Calculate {
         double currentTimeMillis = (double) ((current_hour * 60 + current_minute) * 60 * 1000);
         double dateInMilliseconds = (milliSeconds - currentTimeMillis);
         //add date in milliseconds, convert to hours
-        tAnkEing = (((dateInMilliseconds + tAnkEingTime)/1000)/60)/60;
+        tAnkEing = (((dateInMilliseconds + tAnkEingTime) / 1000) / 60) / 60;
 
         //get actual time in hours
-        tAkt = ((currentTimeMillis / 1000)/60)/60;
+        tAkt = ((currentTimeMillis / 1000) / 60) / 60;
     }
 
 
@@ -88,38 +88,56 @@ public class Calculate {
     public void math() {
         //average speed
         vD = sGef / tGef;
-        Log.i(TAG, vD+"="+sGef+"/"+tGef);
+        Log.i(TAG, vD + "=" + sGef + "/" + tGef);
         //distance to drive
         sZuf = sEing - sGef;
-        Log.i(TAG, sZuf+"="+sEing+"-"+sGef);
+        Log.i(TAG, sZuf + "=" + sEing + "-" + sGef);
         //time to drive
         tZuf = sZuf / vD;
-        Log.i(TAG, tZuf+"="+sZuf+"/"+vD);
+        Log.i(TAG, tZuf + "=" + sZuf + "/" + vD);
         //arrival time
         tAnk = tAkt + tZuf;
-        Log.i(TAG, tAnk+"="+tAkt+"+"+tZuf);
+        Log.i(TAG, tAnk + "=" + tAkt + "+" + tZuf);
         //difference between arrival and planed arrival time
         tAnkUnt = tAnkEing - tAnk;
-        Log.i(TAG, tAnkUnt+"="+tAnkEing+"/"+tAnk);
+        Log.i(TAG, tAnkUnt + "=" + tAnkEing + "/" + tAnk);
         //necessary speed for arriving in time
-        vDMuss = sZuf / (tAnkEing-tAnk);
-        Log.i(TAG, vDMuss+"="+sZuf+"/"+tAnkEing+"-"+tAnk);
+        vDMuss = sZuf / (tAnkEing - tAnk);
+        Log.i(TAG, vDMuss + "=" + sZuf + "/" + tAnkEing + "-" + tAnk);
         //difference between real and necessary average speed
         vDunt = vD - vDMuss;
-        Log.i(TAG, vDunt+"="+vD+"-"+vDMuss);
+        Log.i(TAG, vDunt + "=" + vD + "-" + vDMuss);
     }
 
-    //create and declare Interface
-    public static interface OnTransferDataListener {
-        public abstract void onTransferData(double sGef, double sZuf, double vAkt, double vD, double tAnk, double tAnkUnt, double vDMuss, double vDUnt);
+    //getters
+    public double getsGef () {
+        return sGef;
     }
 
-    public OnTransferDataListener mOTDListener;
+    public double getsZuf () {
+        return sZuf;
+    }
+    public double getvAkt () {
+        return vAkt;
+    }
 
-    public void output() {
-        Log.i(TAG, sGef+" "+sZuf+" "+vAkt+" "+vD+" "+tAnk+" "+tAnkUnt+" "+vDMuss+" "+vDunt);
-        //TODO: NullPointerException beheben...
-        this.mOTDListener.onTransferData(sGef, sZuf, vAkt, vD, tAnk, tAnkUnt, vDMuss, vDunt);
+    public double getvD () {
+        return vD;
+    }
+    public double gettAnk () {
+        return tAnk;
+    }
+
+    public double gettAnkUnt () {
+        return tAnkUnt;
+    }
+
+    public double getvDMuss () {
+        return vDMuss;
+    }
+
+    public double getvDunt () {
+        return vDunt;
     }
 
 

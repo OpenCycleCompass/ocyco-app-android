@@ -5,6 +5,7 @@
  */
 package ibis.jufo.mytfg.de.ibis_intelligentbikeinformationsystem;
 
+import android.app.Activity;
 import android.app.NotificationManager;
 import android.app.PendingIntent;
 import android.app.Service;
@@ -183,6 +184,7 @@ public class Tracking extends Service implements LocationListener, OnConnectionF
     }
 
     public void callCalculate() {
+        Log.i(TAG, "callCalculate()");
         mCalculate.getData(mCurrentLocation, sEing);
         //only call mathematical methods, if this is not the first location - else there will be a NPE
         if (!mCalculate.checkFirstLoc()) {
@@ -190,7 +192,18 @@ public class Tracking extends Service implements LocationListener, OnConnectionF
             mCalculate.calculateDrivenDistance();
             mCalculate.calculateDrivenTime();
             mCalculate.math();
-            mCalculate.output();
+            //get Variables from calculation
+            double sGef = mCalculate.getsGef();
+            double sZuf = mCalculate.getsZuf();
+            double vAkt = mCalculate.getvAkt();
+            double vD = mCalculate.getvD();
+            double tAnk = mCalculate.gettAnk();
+            double tAnkUnt = mCalculate.gettAnkUnt();
+            double vDMuss = mCalculate.getvDMuss();
+            double vDunt = mCalculate.getvDunt();
+            //write Variables to global class
+            final GlobalVariables mGlobalVariable = (GlobalVariables) getApplicationContext();
+            mGlobalVariable.setCalculationVars(sGef, sZuf, vAkt, vD, tAnk, tAnkUnt, vDMuss, vDunt);
 
         }
 
@@ -223,6 +236,7 @@ public class Tracking extends Service implements LocationListener, OnConnectionF
 
         }
     }
+
 
     public void updateDatabase() {
         Log.i(TAG, "updateDatabase()");

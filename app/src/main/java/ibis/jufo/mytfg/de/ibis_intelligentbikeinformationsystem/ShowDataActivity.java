@@ -11,7 +11,7 @@ import android.view.MenuItem;
 import android.widget.TextView;
 
 
-public class ShowDataActivity extends ActionBarActivity implements Calculate.OnTransferDataListener {
+public class ShowDataActivity extends ActionBarActivity {
 
     boolean CollectData;
     boolean doNotRestart;
@@ -49,6 +49,7 @@ public class ShowDataActivity extends ActionBarActivity implements Calculate.OnT
             intent.putExtra("Key", CollectData);
             startService(intent); */
         }
+        showData();
     }
 
 
@@ -83,7 +84,18 @@ public class ShowDataActivity extends ActionBarActivity implements Calculate.OnT
     }
 
     //read data from interface and write to info boxes
-    public void onTransferData(double sGef, double sZuf, double vAkt, double vD, double tAnk, double tAnkUnt, double vDMuss, double vDUnt) {
+    public void showData() {
+        //get variables from global class
+        final GlobalVariables mGlobalVariable = (GlobalVariables) getApplicationContext();
+        double sGef = mGlobalVariable.getsGef();
+        double sZuf = mGlobalVariable.getsZuf();
+        double vAkt = mGlobalVariable.getvAkt();
+        double vD = mGlobalVariable.getvD();
+        double tAnk = mGlobalVariable.gettAnk();
+        double tAnkUnt = mGlobalVariable.gettAnkUnt();
+        double vDMuss = mGlobalVariable.getvDMuss();
+        double vDunt = mGlobalVariable.getvDunt();
+
         TextView sGefBox = (TextView) findViewById(R.id.sGefBox);
         sGefBox.setText(sGef + "");
         TextView sZufBox = (TextView) findViewById(R.id.sZufBox);
@@ -99,7 +111,7 @@ public class ShowDataActivity extends ActionBarActivity implements Calculate.OnT
         TextView vDMussBox = (TextView) findViewById(R.id.vDMussBox);
         vDMussBox.setText(vDMuss + "");
         TextView vDUntBox = (TextView) findViewById(R.id.vDUntBox);
-        vDUntBox.setText(tAnk + "");
+        vDUntBox.setText(vDunt + "");
     }
 
 
