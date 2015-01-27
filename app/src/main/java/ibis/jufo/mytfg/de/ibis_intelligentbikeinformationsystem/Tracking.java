@@ -222,9 +222,13 @@ public class Tracking extends Service implements LocationListener, OnConnectionF
 
         mBuilder.setSmallIcon(R.mipmap.ic_launcher)
                 .setContentTitle(getString(R.string.app_name))
+                .setContentIntent(tracking_showPendingIntent) // default action (sole action on
+                // android < 4.2) is to start ShowDataActivity
                 .addAction(R.drawable.ic_action_cancel, getString(R.string.tracking_stop_notification), tracking_stopPendingIntent)
+                // Action Button: start SettingsActivity and call stopOnlineTracking()
                 .addAction(R.drawable.ic_action_map, getString(R.string.tracking_show_tracking), tracking_showPendingIntent)
-                .setOngoing(true);
+                // Action Button: start ShowDataActivity
+                .setOngoing(true); // notification is permanent
 
         // Gets an instance of the NotificationManager service
         mNotifyMgr = (NotificationManager) getSystemService(NOTIFICATION_SERVICE);
