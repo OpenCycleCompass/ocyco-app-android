@@ -1,6 +1,7 @@
 package ibis.jufo.mytfg.de.ibis_intelligentbikeinformationsystem;
 
 import android.app.NotificationManager;
+import android.app.PendingIntent;
 import android.content.Context;
 import android.content.Intent;
 import android.content.SharedPreferences;
@@ -405,9 +406,12 @@ public class UploadTrackActivity extends ActionBarActivity {
                         button_UploadTrack.setEnabled(true);
                     } finally {
                         // Create notification
+                        Intent intentIbisWeb = new Intent(Intent.ACTION_VIEW, Uri.parse("https://ibis.jufo.mytfg.de/map.php"));
+                        PendingIntent pIntentIbisWeb = PendingIntent.getActivity(getApplicationContext(), 0, intentIbisWeb, 0);
                         NotificationCompat.Builder mBuilder =
                                 new NotificationCompat.Builder(getBaseContext())
-                                        .setSmallIcon(R.drawable.ic_launcher)
+                                        .setContentIntent(pIntentIbisWeb)
+                                        .setSmallIcon(R.mipmap.ic_launcher)
                                         .setContentTitle(getString(R.string.app_name_short) + getString(R.string.trackUploaded))
                                         .setContentText(notification)
                                         .setStyle(new NotificationCompat.BigTextStyle().bigText(notification));
