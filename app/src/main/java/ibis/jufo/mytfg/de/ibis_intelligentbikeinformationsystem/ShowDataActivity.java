@@ -3,6 +3,7 @@ package ibis.jufo.mytfg.de.ibis_intelligentbikeinformationsystem;
 import android.app.AlertDialog;
 import android.content.DialogInterface;
 import android.content.Intent;
+import android.os.Handler;
 import android.support.v7.app.ActionBarActivity;
 import android.os.Bundle;
 import android.util.Log;
@@ -16,6 +17,8 @@ public class ShowDataActivity extends ActionBarActivity {
     boolean CollectData;
     boolean doNotRestart;
     float accuracy;
+
+    long startTime = 0;
 
 
     // Log TAG
@@ -54,7 +57,7 @@ public class ShowDataActivity extends ActionBarActivity {
         }
         //initialize global variable class
         mGlobalVariable = (GlobalVariables) getApplicationContext();
-        showData();
+        updateUI();
     }
 
 
@@ -88,8 +91,29 @@ public class ShowDataActivity extends ActionBarActivity {
         alertDialog.show();
     }
 
+    //Timer for updating the info boxes
+    Handler timerHandler = new Handler();
+    Runnable timerRunnable = new Runnable() {
+
+        @Override
+        public void run() {
+            Log.i(TAG, "run()");
+
+            showData();
+
+            timerHandler.postDelayed(this, 500);
+        }
+    };
+
+    public void updateUI () {
+        Log.i(TAG, "updateUI()");
+        startTime = System.currentTimeMillis();
+        timerHandler.postDelayed(timerRunnable, 0);
+    }
+
     //read data from interface and write to info boxes
     public void showData() {
+        Log.i(TAG, "showData()");
         //get variables from global class
         double sGef = mGlobalVariable.getsGef();
         double sZuf = mGlobalVariable.getsZuf();
