@@ -307,6 +307,10 @@ public class Tracking extends Service implements LocationListener, OnConnectionF
         stopLocationUpdates();
         mGPSDb.deleteDatabase();
         mGoogleApiClient.disconnect();
+
+        // remove tracking notification
+        mNotifyMgr.cancel(mNotificationId);
+
         super.onDestroy();
     }
 
