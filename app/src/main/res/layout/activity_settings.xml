@@ -61,18 +61,18 @@
         android:layout_marginTop="30px"
         android:orientation="horizontal">
 
-    <TextView
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_weight="1"
-        android:text="Die gewünschte Ankunftszeit beträgt:" />
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_weight="1"
+            android:text="Die gewünschte Ankunftszeit beträgt:" />
 
-    <TextView
-        android:id="@+id/arrivalTime"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_weight="1"
-        android:text="----" />
+        <TextView
+            android:id="@+id/arrivalTime"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_weight="1"
+            android:text="----" />
 
     </LinearLayout>
 
@@ -95,7 +95,7 @@
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:layout_marginTop="50px"
-        android:onClick="stopOnlineTracking"
+        android:onClick="onClickstopOnlineTracking"
         android:text="@string/tracking_stop" />
 
 </LinearLayout>

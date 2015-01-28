@@ -13,7 +13,6 @@ import android.location.Location;
 import android.os.Bundle;
 import android.os.IBinder;
 import android.support.v4.app.NotificationCompat;
-import android.text.format.DateFormat;
 import android.util.Log;
 
 import com.google.android.gms.common.ConnectionResult;
@@ -24,9 +23,6 @@ import com.google.android.gms.location.LocationListener;
 import com.google.android.gms.location.LocationRequest;
 import com.google.android.gms.location.LocationServices;
 
-import java.util.Calendar;
-import java.util.Locale;
-
 
 public class Tracking extends Service implements LocationListener, OnConnectionFailedListener, ConnectionCallbacks {
 
@@ -36,11 +32,9 @@ public class Tracking extends Service implements LocationListener, OnConnectionF
     //Variables declaration
     public boolean CollectData;
 
-    //The desired interval for location updates. Inexact. Updates may be more or less frequent.
+    // The desired interval for location updates. Inexact. Updates may be more or less frequent.
     public static final long UPDATE_INTERVAL_IN_MILLISECONDS = 5000;
-    /* The fastest rate for active location updates. Exact. Updates will never be more frequent
-    * than this value.
-    */
+    // The fastest rate for active location updates. Exact. Updates will never be more frequent than this value.
     public static final long FASTEST_UPDATE_INTERVAL_IN_MILLISECONDS =
             UPDATE_INTERVAL_IN_MILLISECONDS / 2;
 
@@ -61,6 +55,12 @@ public class Tracking extends Service implements LocationListener, OnConnectionF
     boolean sendConfirmAccuracy = false;
     boolean saveData = true;
 
+    // Notification
+    // Sets an ID for the notification
+    private int mNotificationId = 42;
+    private NotificationCompat.Builder mBuilder;
+    // Gets an instance of the NotificationManager service
+    private NotificationManager mNotifyMgr;
 
     //create a new instance of classes
     Calculate mCalculate = new Calculate();
@@ -85,28 +85,7 @@ public class Tracking extends Service implements LocationListener, OnConnectionF
     public void startOnlineTracking() {
         Log.i(TAG, "startOnlineTracking()");
         // Create Notification with track info
-        // TODO: funktioniert so nicht :(
-        Intent tracking_showIntent = new Intent(this, ShowDataActivity.class);
-        tracking_showIntent.putExtra("methodName", "showTrackInfo");
-        PendingIntent tracking_showPendingIntent = PendingIntent.getActivity(this, 0, tracking_showIntent, 0);
-
-        Intent tracking_stopIntent = new Intent(this, SettingsActivity.class);
-        tracking_showIntent.putExtra("methodName", "stopTracking");
-        PendingIntent tracking_stopPendingIntent = PendingIntent.getActivity(this, 0, tracking_stopIntent, 0);
-
-        NotificationCompat.Builder mBuilder =
-                new NotificationCompat.Builder(this)
-                        .setSmallIcon(R.drawable.ic_launcher)
-                        .setContentTitle(getString(R.string.app_name))
-                        .setContentText(getString(R.string.tracking_status_active))
-                        .addAction(R.drawable.ic_launcher, getString(R.string.tracking_stop), tracking_stopPendingIntent)
-                        .addAction(R.drawable.ic_launcher, getString(R.string.tracking_show_tracking), tracking_showPendingIntent)
-                        .setOngoing(true);
-        // Sets an ID for the notification
-        int mNotificationId = 42;
-        // Gets an instance of the NotificationManager service
-        NotificationManager mNotifyMgr =
-                (NotificationManager) getSystemService(NOTIFICATION_SERVICE);
+        mBuilder.setContentText(getString(R.string.tracking_status_active));
         // Builds the notification and issues it.
         mNotifyMgr.notify(mNotificationId, mBuilder.build());
     }
@@ -176,6 +155,15 @@ public class Tracking extends Service implements LocationListener, OnConnectionF
         if (saveData) {
             updateDatabase();
         }
+        mGPSDb.open();
+        int num_rows = mGPSDb.getNumRows();
+        mGPSDb.close();
+        // Update notification
+        mBuilder.setContentText(getString(R.string.tracking_status_active)+ " - " + num_rows + " GPS Punkte aufgezeichnet");
+        // Sets an ID for the notification
+        int mNotificationId = 42;
+        // Builds the notification and issues it.
+        mNotifyMgr.notify(mNotificationId, mBuilder.build());
 
         callCalculate();
     }
@@ -254,7 +242,30 @@ public class Tracking extends Service implements LocationListener, OnConnectionF
     public void onCreate() {
         Log.i(TAG, "onCreate()");
         super.onCreate();
-        //build SQLite database
+
+        // Create Notification
+        Intent tracking_showIntent = new Intent(this, ShowDataActivity.class);
+        PendingIntent tracking_showPendingIntent = PendingIntent.getActivity(this, 0, tracking_showIntent, 0);
+
+        Intent tracking_stopIntent = new Intent(this, SettingsActivity.class);
+        tracking_stopIntent.putExtra("callMethod", "stopOnlineTracking");
+        // TODO SettingsActivity should call stopOnlineTracking() in onCreate if intent.getExtra("callMethod") is "stopOnlineTracking"
+        PendingIntent tracking_stopPendingIntent = PendingIntent.getActivity(this, 0, tracking_stopIntent, 0);
+
+        mBuilder = new NotificationCompat.Builder(this);
+
+        mBuilder.setSmallIcon(R.mipmap.ic_launcher)
+                .setContentTitle(getString(R.string.app_name))
+                .setContentIntent(tracking_showPendingIntent) // default action (sole action on
+                // android < 4.2) is to start ShowDataActivity
+                .addAction(R.drawable.ic_action_cancel, getString(R.string.tracking_stop_notification), tracking_stopPendingIntent)
+                // Action Button: start SettingsActivity and call stopOnlineTracking()
+                .addAction(R.drawable.ic_action_map, getString(R.string.tracking_show_tracking), tracking_showPendingIntent)
+                // Action Button: start ShowDataActivity
+                .setOngoing(true); // notification is permanent
+
+        // Gets an instance of the NotificationManager service
+        mNotifyMgr = (NotificationManager) getSystemService(NOTIFICATION_SERVICE);
 
         //build and connect Api Client
         buildGoogleApiClient();
@@ -280,55 +291,22 @@ public class Tracking extends Service implements LocationListener, OnConnectionF
         return super.onStartCommand(intent, flags, startId);
     }
 
-    private String getDate(long timestamp) {
-        Calendar calendar = Calendar.getInstance(Locale.ENGLISH);
-        calendar.setTimeInMillis(timestamp * 1000);
-        return DateFormat.format("dd. MM. yyyy, HH:mm", calendar).toString() + "h";
-    }
-
     @Override
     public void onDestroy() {
         Log.i(TAG, "onDestroy()");
         // Save Data: sendToServer()
         if (true) {
             mGPSDb.open();
-            int returnCode = mGPSDb.sendToServer();
-            String notification;
-            Log.i(TAG, returnCode + "");
-            switch (returnCode) {
-                case 1: // json has error
-                    notification = mGPSDb.serverTrack_id;
-                    break;
-                case 2: // no known json field
-                    notification = getString(R.string.httpJsonReturnNotificationNoField);
-                    break;
-                case 3: // http communication or json failed
-                    notification = getString(R.string.httpJsonReturnNotificationErrTryCatchHttpJson);
-                    break;
-                case 0: // success
-                    notification = "Track \"" + mGPSDb.serverTrack_id + "\" mit " + mGPSDb.serverNodes + " GPS-Koordinaten erstellt am " + getDate(mGPSDb.serverCreated);
-                    break;
-                default:
-                    notification = getString(R.string.unknownError);
-                    break;
-            }
-            NotificationCompat.Builder mBuilder =
-                    new NotificationCompat.Builder(this)
-                            .setSmallIcon(R.drawable.ic_launcher)
-                            .setContentTitle(getString(R.string.app_name_short) + getString(R.string.trackUploaded))
-                            .setContentText(notification)
-                            .setStyle(new NotificationCompat.BigTextStyle().bigText(notification));
-            // Sets an ID for the notification
-            int mNotificationId = 43;
-            // Gets an instance of the NotificationManager service
-            NotificationManager mNotifyMgr =
-                    (NotificationManager) getSystemService(NOTIFICATION_SERVICE);
-            // Builds the notification and issues it.
-            mNotifyMgr.notify(mNotificationId, mBuilder.build());
+            // Start Intent returned by mGPSDb.sendToServer()
+            // intent has track data as "Extra"
+            Intent intent = mGPSDb.sendToServer(this);
+            intent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
+            startActivity(intent);
             mGPSDb.close();
         }
         stopLocationUpdates();
         mGPSDb.deleteDatabase();
+        mGoogleApiClient.disconnect();
         super.onDestroy();
     }
 

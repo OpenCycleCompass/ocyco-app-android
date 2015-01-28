@@ -29,6 +29,7 @@ public class SettingsActivity extends ActionBarActivity implements TimePickerFra
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_settings);
+
         // Restore preferences
         SharedPreferences settings = getSharedPreferences(getString(R.string.preference_file_key), Context.MODE_PRIVATE);
         //get variables
@@ -40,8 +41,15 @@ public class SettingsActivity extends ActionBarActivity implements TimePickerFra
         //set Text to enter_distance
         EditText editDistance = (EditText) findViewById(R.id.enter_distance);
         editDistance.setText(Float.toString(FloatDistStartDest));
-        //initialize global variable class
-        mGlobalVariable = (GlobalVariables) getApplicationContext();
+
+        // call stopOnlineTracking() if SettingsActivity has benn started
+        // from notification action "Tracking Beenden"
+        Bundle bundle = getIntent().getExtras();
+        if(bundle != null) {
+            if (bundle.getString("callMethod") == "stopOnlineTracking") {
+                stopOnlineTracking();
+            }
+        }
     }
 
 
@@ -52,7 +60,7 @@ public class SettingsActivity extends ActionBarActivity implements TimePickerFra
     }
 
     @Override
-    protected void onStop() {
+    protected void onStop(){
         super.onStop();
 
         //saving settings
@@ -112,7 +120,7 @@ public class SettingsActivity extends ActionBarActivity implements TimePickerFra
         //set up a new alert dialog
         AlertDialog.Builder alertDialogBuilder = new AlertDialog.Builder(SettingsActivity.this);
         alertDialogBuilder.setTitle("Bitte geben sie eine Zahl ein!");
-        alertDialogBuilder.setMessage("\"" + StrEditText + "\"" + " ist keine Zahl! ");
+        alertDialogBuilder.setMessage("\""+StrEditText+"\""+" ist keine Zahl! ");
 
         //create the OK Button and onClickListener
         alertDialogBuilder.setPositiveButton("OK", new DialogInterface.OnClickListener() {
@@ -143,7 +151,11 @@ public class SettingsActivity extends ActionBarActivity implements TimePickerFra
         }
     }
 
-    public void stopOnlineTracking(View view) {
+    public void onClickstopOnlineTracking(View view) {
+        stopOnlineTracking();
+    }
+
+    public void stopOnlineTracking() {
         //set collect data false
         CollectData = false;
         final CheckBox checkBox = (CheckBox) findViewById(R.id.CBCollectData);
