@@ -42,6 +42,9 @@ public class SettingsActivity extends ActionBarActivity implements TimePickerFra
         EditText editDistance = (EditText) findViewById(R.id.enter_distance);
         editDistance.setText(Float.toString(FloatDistStartDest));
 
+        //initialize global variable class
+        mGlobalVariable = (GlobalVariables) getApplicationContext();
+
         // call stopOnlineTracking() if SettingsActivity has benn started
         // from notification action "Tracking Beenden"
         Bundle bundle = getIntent().getExtras();
