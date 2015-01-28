@@ -70,19 +70,22 @@ public class Calculate {
 
 
     public void calculateTimeVars(double tAnkEingTimeInput) {
-        double tAnkEingTime = tAnkEingTimeInput;
+        tAnkEing = ((tAnkEingTimeInput/1000)/60)/60;
+        Log.i(TAG, "tAnkEingTimeInput "+tAnkEingTimeInput);
         //get date in milliseconds
         final Calendar c = Calendar.getInstance();
         int current_hour = c.get(Calendar.HOUR_OF_DAY);
         int current_minute = c.get(Calendar.MINUTE);
-        double milliSeconds = c.get(Calendar.MILLISECOND);
-        double currentTimeMillis = (double) ((current_hour * 60 + current_minute) * 60 * 1000);
-        double dateInMilliseconds = (milliSeconds - currentTimeMillis);
+        double milliSeconds = System.currentTimeMillis();
+        Log.i(TAG, "hour "+current_hour);
+        Log.i(TAG, "minute "+current_minute);
+        double timeInMillis = (double) ((current_hour * 60 + current_minute) * 60 * 1000);
+        double dateInMilliseconds = (milliSeconds - timeInMillis);
         //add date in milliseconds, convert to hours
-        tAnkEing = (((dateInMilliseconds + tAnkEingTime) / 1000) / 60) / 60;
+        //tAnkEing = (((dateInMilliseconds + tAnkEingTime) / 1000) / 60) / 60;
 
         //get actual time in hours
-        tAkt = ((currentTimeMillis / 1000) / 60) / 60;
+        tAkt = (((milliSeconds - dateInMilliseconds) / 1000) / 60) / 60;
     }
 
 
@@ -95,8 +98,10 @@ public class Calculate {
     }
 
     public void calculateDrivenTime() {
-        //calculate driven time and convert to seconds
-        tGef = (double) (newLoc.getTime() - (firstLoc.getTime()) / 1000);
+        //calculate driven time and convert to hours
+        double newTime = newLoc.getTime();
+        double firstTime = firstLoc.getTime();
+        tGef = ((((newTime - firstTime) / 1000)/60)/60);
     }
 
 
@@ -114,14 +119,14 @@ public class Calculate {
         tAnk = tAkt + tZuf;
         Log.i(TAG, tAnk + "=" + tAkt + "+" + tZuf);
         //difference between arrival and planed arrival time
-        tAnkUnt = tAnkEing - tAnk;
-        Log.i(TAG, tAnkUnt + "=" + tAnkEing + "/" + tAnk);
+        tAnkUnt = tAnk - tAnkEing;
+        Log.i(TAG, tAnkUnt + "=" + tAnk + "-" + tAnkEing);
         //necessary speed for arriving in time
-        vDMuss = sZuf / (tAnkEing - tAnk);
+        vDMuss = sZuf / (tAnkEing - tAkt);
         Log.i(TAG, vDMuss + "=" + sZuf + "/" + tAnkEing + "-" + tAnk);
         //difference between real and necessary average speed
-        vDunt = vD - vDMuss;
-        Log.i(TAG, vDunt + "=" + vD + "-" + vDMuss);
+        vDunt = vDMuss - vD;
+        Log.i(TAG, vDunt + "=" + vDMuss + "-" + vD);
     }
 
     //getters
