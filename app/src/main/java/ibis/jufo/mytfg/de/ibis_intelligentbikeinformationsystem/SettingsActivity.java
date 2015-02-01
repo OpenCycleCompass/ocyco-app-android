@@ -75,7 +75,7 @@ public class SettingsActivity extends ActionBarActivity implements TimePickerFra
         editor.putBoolean("CollectData", CollectData);
         editor.putFloat("FloatDistStartDest", FloatDistStartDest);
         // Commit the edits!
-        editor.commit();
+        editor.apply();
     }
 
     public void onCheckboxClicked(View view) {

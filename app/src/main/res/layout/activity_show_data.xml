@@ -37,7 +37,7 @@
                     android:layout_height="wrap_content"
                     android:background="@color/boxes_background"
                     android:gravity="center_horizontal"
-                    android:text="gefahren" />
+                    android:text="@string/driven" />
 
                 <TextView
                     android:id="@+id/sGefBox"
@@ -45,7 +45,7 @@
                     android:layout_height="match_parent"
                     android:background="@color/boxes_background"
                     android:gravity="center"
-                    android:text="---"
+                    android:text="@string/driven_defaultval"
                     android:textColor="#000"
                     android:textStyle="bold" />
 
@@ -64,7 +64,7 @@
                     android:layout_height="wrap_content"
                     android:background="@color/boxes_background"
                     android:gravity="center_horizontal"
-                    android:text="verbleibend" />
+                    android:text="@string/remaining" />
 
                 <TextView
                     android:id="@+id/sZufBox"
@@ -72,7 +72,7 @@
                     android:layout_height="match_parent"
                     android:background="@color/boxes_background"
                     android:gravity="center"
-                    android:text="---"
+                    android:text="@string/remaining_defaultval"
                     android:textColor="#000"
                     android:textStyle="bold"/>
 
@@ -81,7 +81,7 @@
                     android:layout_height="wrap_content"
                     android:background="@color/boxes_background"
                     android:gravity="center_horizontal"
-                    android:text="km/h" />
+                    android:text="@string/km_h" />
 
 
             </LinearLayout>
@@ -99,7 +99,7 @@
                     android:layout_height="wrap_content"
                     android:background="@color/boxes_background"
                     android:gravity="center_horizontal"
-                    android:text="akt. Geschw." />
+                    android:text="@string/current_velocity" />
 
                 <TextView
                     android:id="@+id/vAktBox"
@@ -107,7 +107,7 @@
                     android:layout_height="match_parent"
                     android:background="@color/boxes_background"
                     android:gravity="center"
-                    android:text="---"
+                    android:text="@string/current_velocity_defaultval"
                     android:textColor="#000"
                     android:textStyle="bold"/>
 
@@ -126,7 +126,7 @@
                     android:layout_height="wrap_content"
                     android:background="@color/boxes_background"
                     android:gravity="center_horizontal"
-                    android:text="avg. Geschw." />
+                    android:text="@string/average_velocity" />
 
                 <TextView
                     android:id="@+id/vDBox"
@@ -134,7 +134,7 @@
                     android:layout_height="match_parent"
                     android:background="@color/boxes_background"
                     android:gravity="center"
-                    android:text="---"
+                    android:text="@string/average_velocity_defaultval"
                     android:textColor="#000"
                     android:textStyle="bold"/>
 
@@ -159,7 +159,7 @@
                     android:layout_height="wrap_content"
                     android:background="@color/boxes_background"
                     android:gravity="center_horizontal"
-                    android:text="Ank. Zeit" />
+                    android:text="@string/arrival_time" />
 
                 <TextView
                     android:id="@+id/tAnkBox"
@@ -167,7 +167,7 @@
                     android:layout_height="match_parent"
                     android:background="@color/boxes_background"
                     android:gravity="center"
-                    android:text="---"
+                    android:text="@string/arrival_time_defaultval"
                     android:textColor="#000"
                     android:textStyle="bold"/>
 
@@ -186,7 +186,7 @@
                     android:layout_height="wrap_content"
                     android:background="@color/boxes_background"
                     android:gravity="center_horizontal"
-                    android:text="Zeitdiff." />
+                    android:text="@string/time_difference" />
 
                 <TextView
                     android:id="@+id/tAnkUntBox"
@@ -194,7 +194,7 @@
                     android:layout_height="match_parent"
                     android:background="@color/boxes_background"
                     android:gravity="center"
-                    android:text="---"
+                    android:text="@string/time_difference_defaultval"
                     android:textColor="#900"
                     android:textStyle="bold"/>
 
@@ -213,7 +213,7 @@
                     android:layout_height="wrap_content"
                     android:background="@color/boxes_background"
                     android:gravity="center_horizontal"
-                    android:text="notw. Geschw." />
+                    android:text="@string/required_velocity" />
 
 
                 <TextView
@@ -222,7 +222,7 @@
                     android:layout_height="match_parent"
                     android:background="@color/boxes_background"
                     android:gravity="center"
-                    android:text="---"
+                    android:text="@string/required_velocity_defaultval"
                     android:textColor="#000"
                     android:textStyle="bold"/>
 
@@ -241,7 +241,7 @@
                     android:layout_height="wrap_content"
                     android:background="@color/boxes_background"
                     android:gravity="center_horizontal"
-                    android:text="Diff." />
+                    android:text="@string/difference" />
 
                 <TextView
                     android:id="@+id/vDUntBox"
@@ -249,7 +249,7 @@
                     android:layout_height="match_parent"
                     android:background="@color/boxes_background"
                     android:gravity="center"
-                    android:text="---"
+                    android:text="@string/difference_defaultval"
                     android:textColor="#900"
                     android:textStyle="bold"/>
 
