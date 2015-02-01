@@ -17,21 +17,21 @@
     <string name="action_show_data_activity">Hauptseite</string>
     <string name="preference_file_key">pref_file_key</string>
 
-    <string name="tracking_start">Tracking starten</string>
+
     <string name="tracking_stop">Tracking beenden</string>
     <string name="tracking_stop_notification">Beenden</string>
-    <string name="tracking_status_inactive">Tracking läuft nicht</string>
+
     <string name="tracking_status_active">Tracking läuft</string>
     <string name="tracking_show_tracking">Anzeigen</string>
-    <string name="GPSData_Debug">Inhalt aus GPS Datenbank anzeigen (DEBUGGING)</string>
-    <string name="httpJsonReturnNotificationNoField">Keine gültige Antwort vom Server empfangen</string>
+
+
     <string name="httpJsonReturnNotificationErrTryCatchHttpJson">Fehler beim Kommunizieren mit dem Server</string>
     <string name="unknownError">Es ist ein unbekannter Fehler aufgetreten.</string>
-    <string name="UrlPushTrackData">https://ibis.jufo.mytfg.de/api1/pushtrack.php?data=</string>
+
     <string name="trackUploaded">Track hochgeladen</string>
     <string name="setTime">gewünschte Ankunftszeit einstellen</string>
     <string name="title_activity_upload_track">Upload Track</string>
-    <string name="hello_world">Hello world!</string>
+
     <string name="upload_track_name">Name des Tracks</string>
     <string name="upload_track_com">Kommentar (optional)</string>
     <string name="upload_track_name_default">Insert-Name-Here</string>
@@ -50,8 +50,28 @@
     <string name="api1_pushtrack_new">pushtrack.php?newtrack=newtrack</string>
     <string name="upload_error_no_network_try_again_later">Keine Netzwerkverbindung: \n Bitte versuchen Sie es später erneut</string>
     <string name="upload_error_server_unreachable">Fehler: Der Server ist nicht erreichbar \n Bitte versuchen Sie es später erneut</string>
-    <string name="upload_track_success_trackid">Track erfolgreich hochgeladen \ntrack_id: </string>
+
     <string name="error">Fehler: </string>
-    <string name="error_json">Fehler bei der JSON Verarbeitung </string>
+    <string name="km">km</string>
+    <string name="desired_arrival_time">Die gewünschte Ankunftszeit beträgt:</string>
+    <string name="desired_arrival_time_defaultval">----</string>
+    <string name="driven">gefahren</string>
+    <string name="driven_defaultval">---</string>
+    <string name="remaining">verbleibend</string>
+    <string name="remaining_defaultval">---</string>
+    <string name="km_h">km/h</string>
+    <string name="current_velocity">akt. Geschw.</string>
+    <string name="current_velocity_defaultval">---</string>
+    <string name="average_velocity">avg. Geschw.</string>
+    <string name="average_velocity_defaultval">---</string>
+    <string name="arrival_time">Ank. Zeit</string>
+    <string name="arrival_time_defaultval">---</string>
+    <string name="time_difference">Zeitdiff.</string>
+    <string name="time_difference_defaultval">---</string>
+    <string name="required_velocity">notw. Geschw.</string>
+    <string name="required_velocity_defaultval">---</string>
+    <string name="difference">Diff.</string>
+    <string name="difference_defaultval">---</string>
+
 
 </resources>
