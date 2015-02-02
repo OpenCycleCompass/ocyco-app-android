@@ -21,6 +21,7 @@ import android.view.MenuItem;
 import android.view.View;
 import android.widget.Button;
 import android.widget.EditText;
+import android.widget.Switch;
 import android.widget.TextView;
 import android.widget.Toast;
 
@@ -57,6 +58,9 @@ public class UploadTrackActivity extends ActionBarActivity {
     private EditText editText_UploadTrackLength;
     private EditText editText_UploadTrackToken;
     private TextView textView_UploadTrackId;
+    private Switch switch_UploadTrackPublic;
+    private TextView textView_UploadTrackName;
+    private TextView textView_UploadTrackCom;
 
     private Button button_UploadTrack;
 
@@ -65,6 +69,8 @@ public class UploadTrackActivity extends ActionBarActivity {
     private long startTst;
     private long stopTst;
     private long length = 0;
+
+    private boolean uploadPublic = false;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -76,6 +82,9 @@ public class UploadTrackActivity extends ActionBarActivity {
         editText_UploadTrackLength = (EditText) findViewById(R.id.editText_UploadTrackLength);
         editText_UploadTrackToken = (EditText) findViewById(R.id.editText_UploadTrackToken);
         textView_UploadTrackId = (TextView) findViewById(R.id.textView_UploadTrackId);
+        switch_UploadTrackPublic = (Switch) findViewById(R.id.switch_UploadTrackPublic);
+        textView_UploadTrackName = (TextView) findViewById(R.id.textView_UploadTrackName);
+        textView_UploadTrackCom = (TextView) findViewById(R.id.textView_UploadTrackCom);
 
         button_UploadTrack = (Button) findViewById(R.id.button_UploadTrack);
 
@@ -110,38 +119,95 @@ public class UploadTrackActivity extends ActionBarActivity {
 
         length = calcLength();
 
+        initUI();
         updateUI();
     }
 
-    // Update GUI Fields
+    // Update GUI (enable/disable name and comment editText)
     private void updateUI() {
-        editText_UploadTrackDuration.setText((stopTst-startTst)+"");
+        if(!uploadPublic) {
+            editText_UploadTrackName.setEnabled(false);
+            editText_UploadTrackCom.setEnabled(false);
+            textView_UploadTrackName.setEnabled(false);
+            textView_UploadTrackCom.setEnabled(false);
+        } else {
+            editText_UploadTrackName.setEnabled(true);
+            editText_UploadTrackCom.setEnabled(true);
+            textView_UploadTrackName.setEnabled(true);
+            textView_UploadTrackCom.setEnabled(true);
+        }
+    }
+
+    // Initialize GUI
+    private void initUI() {
+        // Load SharedPrefs
+        SharedPreferences prefs = getSharedPreferences(getString(R.string.preference_file_key), (Context.MODE_MULTI_PROCESS));
+
+        editText_UploadTrackDuration.setText(Long.toString(stopTst-startTst));
 
         long llength = calcLength();
-        editText_UploadTrackLength.setText(llength+"");
+        editText_UploadTrackLength.setText(Long.toString(llength));
 
-        editText_UploadTrackName.setText(this.getString(R.string.upload_track_name_default));
-        editText_UploadTrackCom.setText(this.getString(R.string.upload_track_com_default));
+        uploadPublic = prefs.getBoolean("upload_public", false);
 
-        String ltoken = getToken();
+        String lname = prefs.getString("upload_name", null);
+        if(lname!=null) {
+            editText_UploadTrackName.setText(lname);
+        } else {
+            editText_UploadTrackName.setText(this.getString(R.string.upload_track_name_default));
+        }
+
+        String lcom = prefs.getString("upload_com", null);
+        if(lcom!=null) {
+            editText_UploadTrackCom.setText(lcom);
+        } else {
+            editText_UploadTrackCom.setText(this.getString(R.string.upload_track_com_default));
+        }
+
+        String ltoken = prefs.getString("upload_token", null);
         if(ltoken!=null) {
             editText_UploadTrackToken.setText(ltoken);
             button_UploadTrack.setEnabled(true);
         }
+
+        // Make editTexts not editable
+        editText_UploadTrackToken.setKeyListener(null);
+        editText_UploadTrackLength.setKeyListener(null);
+        editText_UploadTrackDuration.setKeyListener(null);
+    }
+
+    public void onSwitchPublic(View v) {
+        if(switch_UploadTrackPublic.isChecked()) {
+            uploadPublic = true;
+            Log.i(TAG, "onSwitchPublic(): checked");
+        } else {
+            uploadPublic = false;
+            Log.i(TAG, "onSwitchPublic(): not checked");
+        }
+        updateUI();
+        savePublicToPrefs(uploadPublic);
     }
 
     private String makeUrl() {
         long llength = calcLength();
-        String lurl;
+        String lurlstr;
+        Uri.Builder lurl;
         lurl = Uri.parse(this.getString(R.string.api1_base_url)+this.getString(R.string.api1_pushtrack_new))
-                .buildUpon()
-                .appendQueryParameter("name", editText_UploadTrackName.getText().toString())
-                .appendQueryParameter("comment", editText_UploadTrackCom.getText().toString())
-                .appendQueryParameter("duration", (stopTst - startTst) + "")
-                .appendQueryParameter("length", llength + "")
-                .appendQueryParameter("user_token", getToken())
-                .build().toString();
-        return lurl;
+            .buildUpon()
+            .appendQueryParameter("duration", Long.toString(stopTst - startTst))
+            .appendQueryParameter("length", Long.toString(llength))
+            .appendQueryParameter("user_token", getTokenFromPrefs());
+        if(uploadPublic) {
+            lurl.appendQueryParameter("name", editText_UploadTrackName.getText().toString())
+                    .appendQueryParameter("comment", editText_UploadTrackCom.getText().toString())
+                    .appendQueryParameter("public", "true");
+        } else {
+            lurl.appendQueryParameter("name", "none")
+                    .appendQueryParameter("comment", "none")
+                    .appendQueryParameter("public", "false");
+        }
+        lurlstr = lurl.build().toString();
+        return lurlstr;
     }
 
     public long calcLength() {
@@ -181,7 +247,7 @@ public class UploadTrackActivity extends ActionBarActivity {
     }
 
     public void getToken(View v) {
-        String lurl = ""+this.getString(R.string.api1_base_url)+this.getString(R.string.api1_token_new);
+        String lurl = this.getString(R.string.api1_base_url)+this.getString(R.string.api1_token_new);
         Log.i(TAG, lurl);
         ConnectivityManager connMgr = (ConnectivityManager) getSystemService(Context.CONNECTIVITY_SERVICE);
         NetworkInfo networkInfo = connMgr.getActiveNetworkInfo();
@@ -379,10 +445,10 @@ public class UploadTrackActivity extends ActionBarActivity {
                             String created_s = "";
                             String nodes_s = "";
                             if(json.has("created")) {
-                                created_s = getDate(json.getLong("created")) + "";
+                                created_s = getDate(json.getLong("created"));
                             }
                             if(json.has("nodes")) {
-                                nodes_s = json.getLong("nodes") + "";
+                                nodes_s = Long.toString(json.getLong("nodes"));
                             }
 
                             // getString(R.string.upload_track_success_trackid);
@@ -440,21 +506,28 @@ public class UploadTrackActivity extends ActionBarActivity {
         return DateFormat.format("dd. MM. yyyy, HH:mm", calendar).toString() + "h";
     }
 
-    public void saveToken(String t) {
+    private void saveToken(String t) {
         SharedPreferences prefs = getSharedPreferences(getString(R.string.preference_file_key), (Context.MODE_MULTI_PROCESS));
         SharedPreferences.Editor prefs_edit = prefs.edit();
-        if(prefs.contains("token")) {
-            String old_token = prefs.getString("token", "");
-            String old_tokenlist = prefs.getString("oldtokenlist", "");
-            prefs_edit.putString("oldtokenlist", old_tokenlist+";"+old_token);
+        if(prefs.contains("upload_token")) {
+            String old_token = prefs.getString("upload_token", "");
+            String old_tokenlist = prefs.getString("upload_oldtokenlist", "");
+            prefs_edit.putString("upload_oldtokenlist", old_tokenlist+";"+old_token);
         }
-        prefs_edit.putString("token", t);
+        prefs_edit.putString("upload_token", t);
         prefs_edit.apply();
     }
 
-    public String getToken() {
+    public String getTokenFromPrefs() {
         SharedPreferences prefs = getSharedPreferences(getString(R.string.preference_file_key), (Context.MODE_MULTI_PROCESS));
-        return prefs.getString("token", null);
+        return prefs.getString("upload_token", null);
+    }
+
+    private void savePublicToPrefs(Boolean p) {
+        SharedPreferences prefs = getSharedPreferences(getString(R.string.preference_file_key), (Context.MODE_MULTI_PROCESS));
+        SharedPreferences.Editor prefs_edit = prefs.edit();
+        prefs_edit.putBoolean("upload_public", p);
+        prefs_edit.apply();
     }
 }
 

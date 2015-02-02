@@ -6,6 +6,19 @@
     android:paddingBottom="@dimen/activity_vertical_margin"
     tools:context="ibis.jufo.mytfg.de.ibis_intelligentbikeinformationsystem.UploadTrackActivity">
 
+    <Switch
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="@string/upload_track_public_visible"
+        android:id="@+id/switch_UploadTrackPublic"
+        android:focusableInTouchMode="true"
+        android:layout_alignParentLeft="true"
+        android:layout_alignParentStart="true"
+        android:layout_alignParentTop="true"
+        android:layout_alignParentRight="true"
+        android:layout_alignParentEnd="true"
+        android:onClick="onSwitchPublic" />
+
     <TextView
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
@@ -15,7 +28,7 @@
         android:labelFor="@+id/editText_UploadTrackName"
         android:layout_alignParentLeft="true"
         android:layout_alignParentStart="true"
-        android:layout_alignParentTop="true"
+        android:layout_below="@+id/switch_UploadTrackPublic"
         android:layout_alignParentRight="true"
         android:layout_alignParentEnd="true" />
 
@@ -148,8 +161,8 @@
         android:layout_alignParentBottom="true"
         android:layout_alignParentLeft="true"
         android:layout_alignParentStart="true"
-        android:layout_alignRight="@+id/button_UploadTrackTokenRegenerate"
-        android:layout_alignEnd="@+id/button_UploadTrackTokenRegenerate"
+        android:layout_alignParentRight="true"
+        android:layout_alignParentEnd="true"
         android:onClick="uploadTrack" />
 
     <Button

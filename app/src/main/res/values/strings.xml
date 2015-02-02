@@ -50,6 +50,7 @@
     <string name="api1_pushtrack_new">pushtrack.php?newtrack=newtrack</string>
     <string name="upload_error_no_network_try_again_later">Keine Netzwerkverbindung: \n Bitte versuchen Sie es später erneut</string>
     <string name="upload_error_server_unreachable">Fehler: Der Server ist nicht erreichbar \n Bitte versuchen Sie es später erneut</string>
+    <string name="upload_track_public_visible">Track öffentlich einsehbar hochladen</string>
 
     <string name="error">Fehler: </string>
     <string name="km">km</string>
