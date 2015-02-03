@@ -65,6 +65,7 @@ public class Calculate {
             double timeDiff = (((newTime-oldTime)/1000)/60)/60;
             Log.i(TAG, "calculateSpeed()"+lastDistance+"/"+timeDiff);
             vAkt = lastDistance/timeDiff;
+            Log.i(TAG, "calculateSpeed()"+vAkt);
         }
     }
 

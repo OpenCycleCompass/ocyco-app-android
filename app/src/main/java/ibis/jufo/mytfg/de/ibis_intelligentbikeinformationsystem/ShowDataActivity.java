@@ -98,31 +98,39 @@ public class ShowDataActivity extends ActionBarActivity {
         @Override
         public void run() {
             Log.i(TAG, "run()");
-
-            showData();
+            if (accuracy < 20) {
+                showData();
+            }
 
             timerHandler.postDelayed(this, 500);
         }
     };
 
-    public void updateUI () {
+    public void updateUI() {
         Log.i(TAG, "updateUI()");
         startTime = System.currentTimeMillis();
         timerHandler.postDelayed(timerRunnable, 0);
     }
 
+    String roundDecimals(double d) {
+        return  Double.toString(Math.round(d*100) / 100);
+    }
+
     //read data from interface and write to info boxes
     public void showData() {
         Log.i(TAG, "showData()");
-        //get variables from global class
-        double sGef = mGlobalVariable.getsGef();
-        double sZuf = mGlobalVariable.getsZuf();
-        double vAkt = mGlobalVariable.getvAkt();
-        double vD = mGlobalVariable.getvD();
-        double tAnk = mGlobalVariable.gettAnk();
-        double tAnkUnt = mGlobalVariable.gettAnkUnt();
-        double vDMuss = mGlobalVariable.getvDMuss();
-        double vDunt = mGlobalVariable.getvDunt();
+        //get variables from global class and round
+        String sGef = roundDecimals(mGlobalVariable.getsGef());
+        String sZuf = roundDecimals(mGlobalVariable.getsZuf());
+        Log.i(TAG, "vAkt----------- " + mGlobalVariable.getvAkt());
+        double temp = mGlobalVariable.getvAkt();
+        String vAkt = roundDecimals(temp);
+        //String vAkt = roundDecimals(mGlobalVariable.getvAkt());
+        String vD = roundDecimals(mGlobalVariable.getvD());
+        String tAnk = roundDecimals(mGlobalVariable.gettAnk());
+        String tAnkUnt = roundDecimals(mGlobalVariable.gettAnkUnt());
+        String vDMuss = roundDecimals(mGlobalVariable.getvDMuss());
+        String vDunt = roundDecimals(mGlobalVariable.getvDunt());
 
         TextView sGefBox = (TextView) findViewById(R.id.sGefBox);
         sGefBox.setText(sGef + "");

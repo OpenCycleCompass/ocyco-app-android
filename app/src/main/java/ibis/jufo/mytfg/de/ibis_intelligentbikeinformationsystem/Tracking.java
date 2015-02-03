@@ -182,6 +182,7 @@ public class Tracking extends Service implements LocationListener, OnConnectionF
             double sGef = mCalculate.getsGef();
             double sZuf = mCalculate.getsZuf();
             double vAkt = mCalculate.getvAkt();
+            Log.i(TAG, "vAktCallCalc "+vAkt);
             double vD = mCalculate.getvD();
             double tAnk = mCalculate.gettAnk();
             double tAnkUnt = mCalculate.gettAnkUnt();
