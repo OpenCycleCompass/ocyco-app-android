@@ -57,6 +57,7 @@ public class ShowDataActivity extends ActionBarActivity {
         }
         //initialize global variable class
         mGlobalVariable = (GlobalVariables) getApplicationContext();
+
         updateUI();
     }
 

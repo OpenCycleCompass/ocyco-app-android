@@ -235,7 +235,8 @@ public class Tracking extends Service implements LocationListener, OnConnectionF
         mGPSDb.open();
         mGPSDb.insertRows(lat, lon, alt, spe, tst);
         mGPSDb.close();
-
+        //write position to GlobalVariables class
+        mGlobalVariable.setLocation(mCurrentLocation);
     }
 
 
