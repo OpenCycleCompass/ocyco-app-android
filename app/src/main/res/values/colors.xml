@@ -2,4 +2,6 @@
 <resources>
     <color name="boxes_background">#fff</color>
     <color name="boxes_border">#555</color>
+    <color name="bad_value">#900</color>
+    <color name="good_value">#090</color>
 </resources>

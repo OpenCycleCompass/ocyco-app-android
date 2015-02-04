@@ -115,7 +115,6 @@ public class ShowDataActivity extends ActionBarActivity {
 
     String roundDecimals(double d) {
         String x = String.format("%.2f", d);
-        Log.i(TAG, "roundDecimals(double d)" + x);
         return x;
     }
 
@@ -151,6 +150,17 @@ public class ShowDataActivity extends ActionBarActivity {
         vDMussBox.setText(vDMuss + "");
         TextView vDUntBox = (TextView) findViewById(R.id.vDUntBox);
         vDUntBox.setText(vDunt + "");
+        //set color
+        if (mGlobalVariable.gettAnkUnt() < 0) {
+            tAnkUntBox.setTextColor(getResources().getColor(R.color.good_value));
+        } else if (mGlobalVariable.gettAnkUnt() > 0) {
+            tAnkUntBox.setTextColor(getResources().getColor(R.color.bad_value));
+        }
+        if (mGlobalVariable.getvDunt() < 0) {
+            vDUntBox.setTextColor(getResources().getColor(R.color.good_value));
+        } else if (mGlobalVariable.getvDunt() > 0) {
+            vDUntBox.setTextColor(getResources().getColor(R.color.bad_value));
+        }
     }
 
 
