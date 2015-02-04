@@ -65,7 +65,7 @@ public class MapFragment extends Fragment {
         mMapView.getOverlays().add(this.mLocationOverlay);
         mMapView.getOverlays().add(this.mCompassOverlay);
         mMapView.getOverlays().add(this.mScaleBarOverlay);
-        mMapView.getController().setZoom(15);
+        mMapView.getController().setZoom(18);
         startMapUpdates();
 
         //initialize global variable class
