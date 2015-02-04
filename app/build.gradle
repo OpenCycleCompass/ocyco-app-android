@@ -12,7 +12,7 @@ android {
     }
     signingConfigs {
         releaseSigning {
-            storeFile file("~/ibis.keystore")
+            storeFile file(System.getenv("ANDROID_KEYSTORE_FILE"))
             storePassword System.getenv("ANDROID_KEYSTORE_PW")
             keyAlias "ibis"
             keyPassword System.getenv("ANDROID_KEYSTORE_PW")
