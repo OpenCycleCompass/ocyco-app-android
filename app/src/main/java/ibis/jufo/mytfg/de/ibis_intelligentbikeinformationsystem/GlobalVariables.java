@@ -8,7 +8,7 @@ public class GlobalVariables extends Application {
     double sGef, sZuf, vAkt, vD, tAnk, tAnkUnt, vDMuss, vDunt, tAnkEingTime, sEing;
     Location location;
 
-    public void setCalculationVars (double sGefIn, double sZufIn, double vAktIn, double vDIn, double tAnkIn, double tAnkUntIn, double vDMussIn, double vDuntIn) {
+    public void setCalculationVars(double sGefIn, double sZufIn, double vAktIn, double vDIn, double tAnkIn, double tAnkUntIn, double vDMussIn, double vDuntIn) {
         sGef = sGefIn;
         sZuf = sZufIn;
         vAkt = vAktIn;
@@ -32,45 +32,44 @@ public class GlobalVariables extends Application {
         return location;
     }
 
-    public double getsEing () {
+    public double getsEing() {
         return sEing;
     }
 
-    public double gettAnkEingTime () {
+    public double gettAnkEingTime() {
         return tAnkEingTime;
     }
 
-    public double getsGef () {
+    public double getsGef() {
         return sGef;
     }
 
-    public double getsZuf () {
+    public double getsZuf() {
         return sZuf;
     }
-    public double getvAkt () {
+
+    public double getvAkt() {
         return vAkt;
     }
 
-    public double getvD () {
+    public double getvD() {
         return vD;
     }
-    public double gettAnk () {
+
+    public double gettAnk() {
         return tAnk;
     }
 
-    public double gettAnkUnt () {
+    public double gettAnkUnt() {
         return tAnkUnt;
     }
 
-    public double getvDMuss () {
+    public double getvDMuss() {
         return vDMuss;
     }
 
-    public double getvDunt () {
+    public double getvDunt() {
         return vDunt;
     }
-
-
-
 }
 

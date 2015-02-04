@@ -34,7 +34,6 @@ public class MapFragment extends Fragment {
     GlobalVariables mGlobalVariables;
 
 
-
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
         mResourceProxy = new ResourceProxyImpl(inflater.getContext().getApplicationContext());
@@ -100,5 +99,4 @@ public class MapFragment extends Fragment {
             Log.i(TAG, "NullPointerException");
         }
     }
-
 }

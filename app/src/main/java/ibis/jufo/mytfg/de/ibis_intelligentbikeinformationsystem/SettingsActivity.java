@@ -48,7 +48,7 @@ public class SettingsActivity extends ActionBarActivity implements TimePickerFra
         // call stopOnlineTracking() if SettingsActivity has benn started
         // from notification action "Tracking Beenden"
         Bundle bundle = getIntent().getExtras();
-        if(bundle != null) {
+        if (bundle != null) {
             if (bundle.getString("callMethod") == "stopOnlineTracking") {
                 stopOnlineTracking();
             }
@@ -63,7 +63,7 @@ public class SettingsActivity extends ActionBarActivity implements TimePickerFra
     }
 
     @Override
-    protected void onStop(){
+    protected void onStop() {
         super.onStop();
 
         //saving settings
@@ -123,7 +123,7 @@ public class SettingsActivity extends ActionBarActivity implements TimePickerFra
         //set up a new alert dialog
         AlertDialog.Builder alertDialogBuilder = new AlertDialog.Builder(SettingsActivity.this);
         alertDialogBuilder.setTitle("Bitte geben sie eine Zahl ein!");
-        alertDialogBuilder.setMessage("\""+StrEditText+"\""+" ist keine Zahl! ");
+        alertDialogBuilder.setMessage("\"" + StrEditText + "\"" + " ist keine Zahl! ");
 
         //create the OK Button and onClickListener
         alertDialogBuilder.setPositiveButton("OK", new DialogInterface.OnClickListener() {

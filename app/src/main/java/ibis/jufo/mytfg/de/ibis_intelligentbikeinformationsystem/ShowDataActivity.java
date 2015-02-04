@@ -114,7 +114,7 @@ public class ShowDataActivity extends ActionBarActivity {
     }
 
     String roundDecimals(double d) {
-        return  Double.toString(Math.round(d*100) / 100);
+        return Double.toString(Math.round(d * 100) / 100);
     }
 
     //read data from interface and write to info boxes
@@ -124,15 +124,15 @@ public class ShowDataActivity extends ActionBarActivity {
         String sGef = roundDecimals(mGlobalVariable.getsGef());
         String sZuf = roundDecimals(mGlobalVariable.getsZuf());
         Log.i(TAG, "vAkt----------- " + mGlobalVariable.getvAkt());
-        double temp = mGlobalVariable.getvAkt();
-        String vAkt = roundDecimals(temp);
-        //String vAkt = roundDecimals(mGlobalVariable.getvAkt());
+        //double temp = mGlobalVariable.getvAkt();
+        //String vAkt = roundDecimals(temp);
+        String vAkt = roundDecimals(mGlobalVariable.getvAkt());
         String vD = roundDecimals(mGlobalVariable.getvD());
         String tAnk = roundDecimals(mGlobalVariable.gettAnk());
         String tAnkUnt = roundDecimals(mGlobalVariable.gettAnkUnt());
         String vDMuss = roundDecimals(mGlobalVariable.getvDMuss());
         String vDunt = roundDecimals(mGlobalVariable.getvDunt());
-
+        //show in infoboxes
         TextView sGefBox = (TextView) findViewById(R.id.sGefBox);
         sGefBox.setText(sGef + "");
         TextView sZufBox = (TextView) findViewById(R.id.sZufBox);
