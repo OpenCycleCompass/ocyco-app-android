@@ -114,7 +114,9 @@ public class ShowDataActivity extends ActionBarActivity {
     }
 
     String roundDecimals(double d) {
-        return Double.toString(Math.round(d * 100) / 100);
+        String x = String.format("%.2f", d);
+        Log.i(TAG, "roundDecimals(double d)" + x);
+        return x;
     }
 
     //read data from interface and write to info boxes
