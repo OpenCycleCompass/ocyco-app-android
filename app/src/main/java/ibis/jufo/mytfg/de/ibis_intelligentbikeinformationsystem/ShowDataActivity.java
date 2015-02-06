@@ -114,25 +114,34 @@ public class ShowDataActivity extends ActionBarActivity {
     }
 
     String roundDecimals(double d) {
-        String x = String.format("%.2f", d);
-        return x;
+        return String.format("%.2f", d);
     }
 
     //read data from interface and write to info boxes
     public void showData() {
         Log.i(TAG, "showData()");
         //get variables from global class and round
-        String sGef = roundDecimals(mGlobalVariable.getsGef());
-        String sZuf = roundDecimals(mGlobalVariable.getsZuf());
-        Log.i(TAG, "vAkt----------- " + mGlobalVariable.getvAkt());
-        //double temp = mGlobalVariable.getvAkt();
-        //String vAkt = roundDecimals(temp);
-        String vAkt = roundDecimals(mGlobalVariable.getvAkt());
-        String vD = roundDecimals(mGlobalVariable.getvD());
-        String tAnk = roundDecimals(mGlobalVariable.gettAnk());
-        String tAnkUnt = roundDecimals(mGlobalVariable.gettAnkUnt());
-        String vDMuss = roundDecimals(mGlobalVariable.getvDMuss());
-        String vDunt = roundDecimals(mGlobalVariable.getvDunt());
+        String sGef = roundDecimals(mGlobalVariable.getsGef()) + " km";
+        String sZuf = roundDecimals(mGlobalVariable.getsZuf()) + " km";
+        String vAkt = roundDecimals(mGlobalVariable.getvAkt()) + " km/h";
+        String vD = roundDecimals(mGlobalVariable.getvD()) + " km/h";
+        //get the time and format it
+        double tAnkD = mGlobalVariable.gettAnk();
+        int tAnkStd = (int) tAnkD;
+        int tAnkMin = (int) Math.round(((tAnkD - tAnkStd) * 60));
+        String tAnk = tAnkStd + ":" + tAnkMin + " Uhr";
+        if (tAnkStd > 23) {
+            int tAnkDays = tAnkStd / 24;
+            tAnkStd = tAnkStd - tAnkDays * 24;
+            tAnk = tAnkStd + ":" + tAnkMin + " h " + System.getProperty("line.separator") + "in " + tAnkDays + " d";
+        }
+        //get the time and format it
+        double tAnkUntD = mGlobalVariable.gettAnkUnt();
+        int tAnkUntStd = (int) tAnkUntD;
+        int tAnkUntMin = (int) Math.round(((tAnkUntD - tAnkUntStd) * 60));
+        String tAnkUnt = tAnkUntStd + "h " + tAnkUntMin + "min";
+        String vDMuss = roundDecimals(mGlobalVariable.getvDMuss()) + " km/h";
+        String vDunt = roundDecimals(mGlobalVariable.getvDunt()) + " km/h";
         //show in infoboxes
         TextView sGefBox = (TextView) findViewById(R.id.sGefBox);
         sGefBox.setText(sGef + "");
