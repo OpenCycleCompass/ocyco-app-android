@@ -7,6 +7,7 @@ public class GlobalVariables extends Application {
     //The variables can be set and read from every Activity or Service!
     double sGef, sZuf, vAkt, vD, tAnk, tAnkUnt, vDMuss, vDunt, tAnkEingTime, sEing;
     Location location;
+    boolean show_locationOverlay, show_compassOverlay, show_scaleBarOverlay;
 
     public void setCalculationVars(double sGefIn, double sZufIn, double vAktIn, double vDIn, double tAnkIn, double tAnkUntIn, double vDMussIn, double vDuntIn) {
         sGef = sGefIn;
@@ -26,6 +27,30 @@ public class GlobalVariables extends Application {
     public void setSettingVars(double tAnkEingTimeIn, double sEingIn) {
         tAnkEingTime = tAnkEingTimeIn;
         sEing = sEingIn;
+    }
+
+    public void setShowLocationOverlay(boolean show_locationOverlay_in) {
+        show_locationOverlay = show_locationOverlay_in;
+    }
+
+    public void setShowCompassOverlay(boolean show_compassOverlay_in) {
+        show_compassOverlay = show_compassOverlay_in;
+    }
+
+    public void setShowScaleBarOverlay(boolean show_scaleBarOverlay_in) {
+        show_scaleBarOverlay = show_scaleBarOverlay_in;
+    }
+
+    public boolean isShow_locationOverlay() {
+        return show_locationOverlay;
+    }
+
+    public boolean isShow_compassOverlay() {
+        return show_compassOverlay;
+    }
+
+    public boolean isShow_scaleBarOverlay() {
+        return show_scaleBarOverlay;
     }
 
     public Location getLocation() {

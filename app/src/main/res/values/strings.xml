@@ -72,6 +72,10 @@
     <string name="required_velocity_defaultval">---</string>
     <string name="difference">Diff.</string>
     <string name="difference_defaultval">---</string>
+    <string name="map_settings">Karteneinstellungen</string>
+    <string name="cb_show_locationOverlay">Position anzeigen</string>
+    <string name="cb_show_compassOverlay">Kompass anzeigen</string>
+    <string name="cb_show_scaleBarOverlay">Maßstab anzeigen</string>
 
 
 </resources>

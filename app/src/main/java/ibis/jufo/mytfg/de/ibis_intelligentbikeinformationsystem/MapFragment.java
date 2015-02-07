@@ -47,6 +47,8 @@ public class MapFragment extends Fragment {
 
         final Context context = this.getActivity();
         final DisplayMetrics dm = context.getResources().getDisplayMetrics();
+        //initialize global variable class
+        mGlobalVariables = (GlobalVariables) getActivity().getApplicationContext();
 
         //set zoom and touch controls
         mMapView.setBuiltInZoomControls(true);
@@ -62,14 +64,19 @@ public class MapFragment extends Fragment {
         mScaleBarOverlay.setCentred(true);
         mScaleBarOverlay.setScaleBarOffset(dm.widthPixels / 2, 10);
         //add overlays
-        mMapView.getOverlays().add(this.mLocationOverlay);
-        mMapView.getOverlays().add(this.mCompassOverlay);
-        mMapView.getOverlays().add(this.mScaleBarOverlay);
+        if (mGlobalVariables.isShow_locationOverlay()) {
+            mMapView.getOverlays().add(this.mLocationOverlay);
+        }
+        if (mGlobalVariables.isShow_compassOverlay()) {
+            mMapView.getOverlays().add(this.mCompassOverlay);
+        }
+        if (mGlobalVariables.isShow_scaleBarOverlay()) {
+            mMapView.getOverlays().add(this.mScaleBarOverlay);
+        }
         mMapView.getController().setZoom(18);
         startMapUpdates();
 
-        //initialize global variable class
-        mGlobalVariables = (GlobalVariables) getActivity().getApplicationContext();
+
     }
 
     //Timer for updating the map

@@ -87,6 +87,15 @@ public class SettingsActivity extends ActionBarActivity implements TimePickerFra
             case R.id.CBCollectData:
                 CollectData = checked;
                 break;
+            case R.id.cb_show_locationOverlay:
+                mGlobalVariable.setShowLocationOverlay(checked);
+                break;
+            case R.id.cb_show_compassOverlay:
+                mGlobalVariable.setShowCompassOverlay(checked);
+                break;
+            case R.id.cb_show_scaleBarOverlay:
+                mGlobalVariable.setShowScaleBarOverlay(checked);
+                break;
         }
     }
 
