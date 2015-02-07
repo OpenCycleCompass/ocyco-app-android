@@ -20,6 +20,8 @@ public class ShowDataActivity extends ActionBarActivity {
 
     long startTime = 0;
 
+    String tAnkMinStr;
+
 
     // Log TAG
     protected static final String TAG = "IBisShowDataActivity-class";
@@ -129,11 +131,15 @@ public class ShowDataActivity extends ActionBarActivity {
         double tAnkD = mGlobalVariable.gettAnk();
         int tAnkStd = (int) tAnkD;
         int tAnkMin = (int) Math.round(((tAnkD - tAnkStd) * 60));
-        String tAnk = tAnkStd + ":" + tAnkMin + " Uhr";
+        tAnkMinStr = Integer.toString(tAnkMin);
+        if (tAnkMin < 10) {
+            tAnkMinStr = "0" + tAnkMin;
+        }
+        String tAnk = tAnkStd + ":" + tAnkMinStr + " Uhr";
         if (tAnkStd > 23) {
             int tAnkDays = tAnkStd / 24;
             tAnkStd = tAnkStd - tAnkDays * 24;
-            tAnk = tAnkStd + ":" + tAnkMin + " h " + System.getProperty("line.separator") + "in " + tAnkDays + " d";
+            tAnk = tAnkStd + ":" + tAnkMinStr + " Uhr" + System.getProperty("line.separator") + "in " + tAnkDays + " Tagen";
         }
         //get the time and format it
         double tAnkUntD = mGlobalVariable.gettAnkUnt();

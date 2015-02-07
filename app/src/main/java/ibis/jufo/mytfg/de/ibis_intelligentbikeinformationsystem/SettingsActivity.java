@@ -180,7 +180,11 @@ public class SettingsActivity extends ActionBarActivity implements TimePickerFra
     public void onTimePicked(int hour, int minute) {
         //show picked time
         TextView arrivalTime = (TextView) findViewById(R.id.arrivalTime);
-        arrivalTime.setText(hour + ":" + minute + " Uhr");
+        if (minute < 10) {
+            arrivalTime.setText(hour + ":0" + minute + " Uhr");
+        } else {
+            arrivalTime.setText(hour + ":" + minute + " Uhr");
+        }
         convertToMilliseconds(hour, minute);
     }
 
