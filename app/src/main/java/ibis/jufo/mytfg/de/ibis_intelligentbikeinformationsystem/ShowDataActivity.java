@@ -29,6 +29,16 @@ public class ShowDataActivity extends ActionBarActivity {
     //create instance of GlobalVariables class
     GlobalVariables mGlobalVariable;
 
+    //info boxes
+    TextView sGefBox;
+    TextView sZufBox;
+    TextView vAktBox;
+    TextView vDBox;
+    TextView tAnkBox;
+    TextView tAnkUntBox;
+    TextView vDMussBox;
+    TextView vDUntBox;
+
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -59,8 +69,32 @@ public class ShowDataActivity extends ActionBarActivity {
         }
         //initialize global variable class
         mGlobalVariable = (GlobalVariables) getApplicationContext();
+        //info box text fields
+        sGefBox = (TextView) findViewById(R.id.sGefBox);
+        sZufBox = (TextView) findViewById(R.id.sZufBox);
+        vAktBox = (TextView) findViewById(R.id.vAktBox);
+        vDBox = (TextView) findViewById(R.id.vDBox);
+        tAnkBox = (TextView) findViewById(R.id.tAnkBox);
+        tAnkUntBox = (TextView) findViewById(R.id.tAnkUntBox);
+        vDMussBox = (TextView) findViewById(R.id.vDMussBox);
+        vDUntBox = (TextView) findViewById(R.id.vDUntBox);
 
+
+        setTextSize();
         updateUI();
+    }
+
+    private void setTextSize() {
+        float textSize = mGlobalVariable.getTextSize();
+        Log.i(TAG, "setTextSize() " + textSize);
+        sGefBox.setTextSize(0x00000003, textSize);
+        sZufBox.setTextSize(0x00000003, textSize);
+        vAktBox.setTextSize(0x00000003, textSize);
+        vDBox.setTextSize(0x00000003, textSize);
+        tAnkBox.setTextSize(0x00000003, textSize);
+        tAnkUntBox.setTextSize(0x00000003, textSize);
+        vDMussBox.setTextSize(0x00000003, textSize);
+        vDUntBox.setTextSize(0x00000003, textSize);
     }
 
 
@@ -149,21 +183,13 @@ public class ShowDataActivity extends ActionBarActivity {
         String vDMuss = roundDecimals(mGlobalVariable.getvDMuss()) + " km/h";
         String vDunt = roundDecimals(mGlobalVariable.getvDunt()) + " km/h";
         //show in infoboxes
-        TextView sGefBox = (TextView) findViewById(R.id.sGefBox);
         sGefBox.setText(sGef + "");
-        TextView sZufBox = (TextView) findViewById(R.id.sZufBox);
         sZufBox.setText(sZuf + "");
-        TextView vAktBox = (TextView) findViewById(R.id.vAktBox);
         vAktBox.setText(vAkt + "");
-        TextView vDBox = (TextView) findViewById(R.id.vDBox);
         vDBox.setText(vD + "");
-        TextView tAnkBox = (TextView) findViewById(R.id.tAnkBox);
         tAnkBox.setText(tAnk + "");
-        TextView tAnkUntBox = (TextView) findViewById(R.id.tAnkUntBox);
         tAnkUntBox.setText(tAnkUnt + "");
-        TextView vDMussBox = (TextView) findViewById(R.id.vDMussBox);
         vDMussBox.setText(vDMuss + "");
-        TextView vDUntBox = (TextView) findViewById(R.id.vDUntBox);
         vDUntBox.setText(vDunt + "");
         //set color
         if (mGlobalVariable.gettAnkUnt() < 0) {

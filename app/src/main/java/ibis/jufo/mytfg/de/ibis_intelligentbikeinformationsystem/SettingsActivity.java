@@ -21,6 +21,7 @@ public class SettingsActivity extends ActionBarActivity implements TimePickerFra
     public boolean CollectData = false;
     public float FloatDistStartDest;
     double tAnkEingTime;
+    float FloatTextSize;
 
     //create instance of GlobalVariables class
     GlobalVariables mGlobalVariable;
@@ -35,12 +36,15 @@ public class SettingsActivity extends ActionBarActivity implements TimePickerFra
         //get variables
         CollectData = settings.getBoolean("CollectData", false);
         FloatDistStartDest = settings.getFloat("FloatDistStartDest", 0);
+        FloatTextSize = settings.getFloat("FloatTextSize", 8);
         //setting check box
         final CheckBox checkBox = (CheckBox) findViewById(R.id.CBCollectData);
         checkBox.setChecked(CollectData);
-        //set Text to enter_distance
+        //set default text
         EditText editDistance = (EditText) findViewById(R.id.enter_distance);
         editDistance.setText(Float.toString(FloatDistStartDest));
+        EditText enter_text_size = (EditText) findViewById(R.id.enter_text_size);
+        enter_text_size.setText(Float.toString(FloatTextSize));
 
         //initialize global variable class
         mGlobalVariable = (GlobalVariables) getApplicationContext();
@@ -74,6 +78,7 @@ public class SettingsActivity extends ActionBarActivity implements TimePickerFra
         SharedPreferences.Editor editor = settings.edit();
         editor.putBoolean("CollectData", CollectData);
         editor.putFloat("FloatDistStartDest", FloatDistStartDest);
+        editor.putFloat("FloatTextSize", FloatTextSize);
         // Commit the edits!
         editor.apply();
     }
@@ -112,8 +117,17 @@ public class SettingsActivity extends ActionBarActivity implements TimePickerFra
             exception = true;
             openAlert(StrEditText);
         }
+        EditText enter_text_size = (EditText) findViewById(R.id.enter_text_size);
+        String strEnterTxtSz = enter_text_size.getText().toString();
+        //try to convert String to Float
+        try {
+            FloatTextSize = Float.parseFloat(strEnterTxtSz);
+        } catch (java.lang.NumberFormatException e) {
+            exception = true;
+            openAlert(strEnterTxtSz);
+        }
         double sEing = (double) FloatDistStartDest;
-        mGlobalVariable.setSettingVars(tAnkEingTime, sEing);
+        mGlobalVariable.setSettingVars(tAnkEingTime, sEing, FloatTextSize);
         if (!exception) {
             //restart Tracking Service starts it's onStartCommand (NOT onCreate),
             //so checkOnline will be executed again

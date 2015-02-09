@@ -6,6 +6,7 @@ import android.location.Location;
 public class GlobalVariables extends Application {
     //The variables can be set and read from every Activity or Service!
     double sGef, sZuf, vAkt, vD, tAnk, tAnkUnt, vDMuss, vDunt, tAnkEingTime, sEing;
+    float textSize;
     Location location;
     boolean show_locationOverlay, show_compassOverlay, show_scaleBarOverlay;
 
@@ -24,9 +25,10 @@ public class GlobalVariables extends Application {
         location = locationIn;
     }
 
-    public void setSettingVars(double tAnkEingTimeIn, double sEingIn) {
+    public void setSettingVars(double tAnkEingTimeIn, double sEingIn, float textSizeIn) {
         tAnkEingTime = tAnkEingTimeIn;
         sEing = sEingIn;
+        textSize = textSizeIn;
     }
 
     public void setShowLocationOverlay(boolean show_locationOverlay_in) {
@@ -63,6 +65,10 @@ public class GlobalVariables extends Application {
 
     public double gettAnkEingTime() {
         return tAnkEingTime;
+    }
+
+    public float getTextSize() {
+        return textSize;
     }
 
     public double getsGef() {

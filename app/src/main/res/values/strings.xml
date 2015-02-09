@@ -76,6 +76,8 @@
     <string name="cb_show_locationOverlay">Position anzeigen</string>
     <string name="cb_show_compassOverlay">Kompass anzeigen</string>
     <string name="cb_show_scaleBarOverlay">Maßstab anzeigen</string>
+    <string name="text_size">Textgröße in den Infoboxen:</string>
+    <string name="text_size_unit">dp</string>
 
 
 </resources>
