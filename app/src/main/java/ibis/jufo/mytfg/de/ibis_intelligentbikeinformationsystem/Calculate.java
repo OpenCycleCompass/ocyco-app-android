@@ -56,7 +56,7 @@ public class Calculate {
 
     public void calculateSpeed() {
         if (newLoc.hasSpeed()) {
-            vAkt = newLoc.getSpeed();
+            vAkt = (newLoc.getSpeed())*3.6;
         } else {
             //time difference between last GPS points in hours
             double oldTime = oldLoc.getTime();
