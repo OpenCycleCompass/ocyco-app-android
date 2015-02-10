@@ -91,13 +91,13 @@ public class UploadTrackActivity extends ActionBarActivity {
         button_UploadTrack.setEnabled(false);
 
         // Only accept a-z, A-Z, "-" and "_" as name
-        editText_UploadTrackName.setFilters(new InputFilter[] {
+        editText_UploadTrackName.setFilters(new InputFilter[]{
                 new InputFilter() {
                     public CharSequence filter(CharSequence src, int start, int end, Spanned dst, int dstart, int dend) {
-                        if(src.equals("")){ // for backspace
+                        if (src.equals("")) { // for backspace
                             return src;
                         }
-                        if(src.toString().matches("[a-zA-Z_-]+")){
+                        if (src.toString().matches("[a-zA-Z_-]+")) {
                             return src;
                         }
                         return "";
@@ -107,13 +107,13 @@ public class UploadTrackActivity extends ActionBarActivity {
 
         //receiving intent
         Intent incomingIntent = getIntent();
-        if(incomingIntent.hasExtra("data")) {
+        if (incomingIntent.hasExtra("data")) {
             data = incomingIntent.getStringExtra("data");
         }
-        if(incomingIntent.hasExtra("startTst")) {
+        if (incomingIntent.hasExtra("startTst")) {
             startTst = incomingIntent.getLongExtra("startTst", 0);
         }
-        if(incomingIntent.hasExtra("stopTst")) {
+        if (incomingIntent.hasExtra("stopTst")) {
             stopTst = incomingIntent.getLongExtra("stopTst", 0);
         }
 
@@ -236,6 +236,7 @@ public class UploadTrackActivity extends ActionBarActivity {
         Toast toast = Toast.makeText(context, lurl, duration);
         toast.show();
     }
+
     public void debugShowData(View v) {
         // Generate / concatenate url
         String ldata = data;
@@ -305,10 +306,10 @@ public class UploadTrackActivity extends ActionBarActivity {
             // Get returned body from webserver:
             conn.setDoInput(true);
 
-            if(ldata!=null) {
+            if (ldata != null) {
                 conn.setRequestMethod("POST");
                 //conn.addRequestProperty("data", ldata); // wrong
-                Log.i(TAG, "POST: "+ldata);
+                Log.i(TAG, "POST: " + ldata);
 
                 // Write POST Data:
                 conn.setDoOutput(true);
@@ -348,13 +349,11 @@ public class UploadTrackActivity extends ActionBarActivity {
         }
     }
 
-    private String getQuery(List<NameValuePair> params) throws UnsupportedEncodingException
-    {
+    private String getQuery(List<NameValuePair> params) throws UnsupportedEncodingException {
         StringBuilder result = new StringBuilder();
         boolean first = true;
 
-        for (NameValuePair pair : params)
-        {
+        for (NameValuePair pair : params) {
             if (first)
                 first = false;
             else
@@ -384,7 +383,8 @@ public class UploadTrackActivity extends ActionBarActivity {
     // displayed in the UI by the AsyncTask's onPostExecute method.
     private class GetHttpTask extends AsyncTask<String, Void, String> {
         String type = "";
-        public void setType(String s){
+
+        public void setType(String s) {
             type = s;
         }
 
@@ -407,16 +407,16 @@ public class UploadTrackActivity extends ActionBarActivity {
         @Override
         protected void onPostExecute(String result) {
             Log.i(TAG, "HTTP result: " + result);
-            switch (type){
+            switch (type) {
                 case "token":
                     String ltoken;
                     try {
                         JSONObject json = new JSONObject(result);
-                        if(json.has("token")) {
+                        if (json.has("token")) {
                             ltoken = json.getString("token");
                             button_UploadTrack.setEnabled(true);
                             saveToken(ltoken);
-                        } else if(json.has("error")) {
+                        } else if (json.has("error")) {
                             ltoken = json.getString("error");
                         } else {
                             ltoken = "Unknown error";
@@ -431,7 +431,7 @@ public class UploadTrackActivity extends ActionBarActivity {
                     String notification = getString(R.string.unknownError);
                     try {
                         JSONObject json = new JSONObject(result);
-                        if(json.has("track_id")) {
+                        if (json.has("track_id")) {
                             // Disable button to prevent multiple uploads
                             button_UploadTrack.setEnabled(false);
 
@@ -453,7 +453,7 @@ public class UploadTrackActivity extends ActionBarActivity {
 
                             // getString(R.string.upload_track_success_trackid);
                             notification = "Track \"" + track_id + "\" mit " + nodes_s + " GPS-Koordinaten erstellt am " + created_s;
-                        } else if(json.has("error")) {
+                        } else if (json.has("error")) {
                             notification = getString(R.string.error) + json.getString("error");
 
                             // Enable upload button to make second upload possible

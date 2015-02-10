@@ -21,6 +21,7 @@ public class SettingsActivity extends ActionBarActivity implements TimePickerFra
     public boolean CollectData = false;
     public float FloatDistStartDest;
     double tAnkEingTime;
+    float FloatTextSize;
 
     //create instance of GlobalVariables class
     GlobalVariables mGlobalVariable;
@@ -30,25 +31,37 @@ public class SettingsActivity extends ActionBarActivity implements TimePickerFra
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_settings);
 
+        //initialize global variable class
+        mGlobalVariable = (GlobalVariables) getApplicationContext();
+
         // Restore preferences
         SharedPreferences settings = getSharedPreferences(getString(R.string.preference_file_key), Context.MODE_PRIVATE);
         //get variables
         CollectData = settings.getBoolean("CollectData", false);
+        mGlobalVariable.setShowLocationOverlay(settings.getBoolean("showLocationOverlay", true));
+        mGlobalVariable.setShowCompassOverlay(settings.getBoolean("showCompassOverlay", true));
+        mGlobalVariable.setShowScaleBarOverlay(settings.getBoolean("showScaleBarOverlay", true));
         FloatDistStartDest = settings.getFloat("FloatDistStartDest", 0);
-        //setting check box
-        final CheckBox checkBox = (CheckBox) findViewById(R.id.CBCollectData);
-        checkBox.setChecked(CollectData);
-        //set Text to enter_distance
+        FloatTextSize = settings.getFloat("FloatTextSize", 8);
+        //set check boxes
+        final CheckBox CBcollectData = (CheckBox) findViewById(R.id.CBCollectData);
+        CBcollectData.setChecked(CollectData);
+        final CheckBox cb_show_compassOverlay = (CheckBox) findViewById(R.id.cb_show_compassOverlay);
+        cb_show_compassOverlay.setChecked(mGlobalVariable.isShow_compassOverlay());
+        final CheckBox cb_show_locationOverlay = (CheckBox) findViewById(R.id.cb_show_locationOverlay);
+        cb_show_locationOverlay.setChecked(mGlobalVariable.isShow_locationOverlay());
+        final CheckBox cb_show_scaleBarOverlay = (CheckBox) findViewById(R.id.cb_show_scaleBarOverlay);
+        cb_show_scaleBarOverlay.setChecked(mGlobalVariable.isShow_scaleBarOverlay());
+        //set default text
         EditText editDistance = (EditText) findViewById(R.id.enter_distance);
         editDistance.setText(Float.toString(FloatDistStartDest));
-
-        //initialize global variable class
-        mGlobalVariable = (GlobalVariables) getApplicationContext();
+        EditText enter_text_size = (EditText) findViewById(R.id.enter_text_size);
+        enter_text_size.setText(Float.toString(FloatTextSize));
 
         // call stopOnlineTracking() if SettingsActivity has benn started
         // from notification action "Tracking Beenden"
         Bundle bundle = getIntent().getExtras();
-        if(bundle != null) {
+        if (bundle != null) {
             if (bundle.getString("callMethod") == "stopOnlineTracking") {
                 stopOnlineTracking();
             }
@@ -63,7 +76,7 @@ public class SettingsActivity extends ActionBarActivity implements TimePickerFra
     }
 
     @Override
-    protected void onStop(){
+    protected void onStop() {
         super.onStop();
 
         //saving settings
@@ -73,7 +86,11 @@ public class SettingsActivity extends ActionBarActivity implements TimePickerFra
         //creating a editor
         SharedPreferences.Editor editor = settings.edit();
         editor.putBoolean("CollectData", CollectData);
+        editor.putBoolean("showCompassOverlay", mGlobalVariable.isShow_compassOverlay());
+        editor.putBoolean("showLocationOverlay", mGlobalVariable.isShow_locationOverlay());
+        editor.putBoolean("showScaleBarOverlay", mGlobalVariable.isShow_scaleBarOverlay());
         editor.putFloat("FloatDistStartDest", FloatDistStartDest);
+        editor.putFloat("FloatTextSize", FloatTextSize);
         // Commit the edits!
         editor.apply();
     }
@@ -86,6 +103,15 @@ public class SettingsActivity extends ActionBarActivity implements TimePickerFra
         switch (view.getId()) {
             case R.id.CBCollectData:
                 CollectData = checked;
+                break;
+            case R.id.cb_show_locationOverlay:
+                mGlobalVariable.setShowLocationOverlay(checked);
+                break;
+            case R.id.cb_show_compassOverlay:
+                mGlobalVariable.setShowCompassOverlay(checked);
+                break;
+            case R.id.cb_show_scaleBarOverlay:
+                mGlobalVariable.setShowScaleBarOverlay(checked);
                 break;
         }
     }
@@ -103,8 +129,17 @@ public class SettingsActivity extends ActionBarActivity implements TimePickerFra
             exception = true;
             openAlert(StrEditText);
         }
+        EditText enter_text_size = (EditText) findViewById(R.id.enter_text_size);
+        String strEnterTxtSz = enter_text_size.getText().toString();
+        //try to convert String to Float
+        try {
+            FloatTextSize = Float.parseFloat(strEnterTxtSz);
+        } catch (java.lang.NumberFormatException e) {
+            exception = true;
+            openAlert(strEnterTxtSz);
+        }
         double sEing = (double) FloatDistStartDest;
-        mGlobalVariable.setSettingVars(tAnkEingTime, sEing);
+        mGlobalVariable.setSettingVars(tAnkEingTime, sEing, FloatTextSize);
         if (!exception) {
             //restart Tracking Service starts it's onStartCommand (NOT onCreate),
             //so checkOnline will be executed again
@@ -123,7 +158,7 @@ public class SettingsActivity extends ActionBarActivity implements TimePickerFra
         //set up a new alert dialog
         AlertDialog.Builder alertDialogBuilder = new AlertDialog.Builder(SettingsActivity.this);
         alertDialogBuilder.setTitle("Bitte geben sie eine Zahl ein!");
-        alertDialogBuilder.setMessage("\""+StrEditText+"\""+" ist keine Zahl! ");
+        alertDialogBuilder.setMessage("\"" + StrEditText + "\"" + " ist keine Zahl! ");
 
         //create the OK Button and onClickListener
         alertDialogBuilder.setPositiveButton("OK", new DialogInterface.OnClickListener() {
@@ -180,7 +215,11 @@ public class SettingsActivity extends ActionBarActivity implements TimePickerFra
     public void onTimePicked(int hour, int minute) {
         //show picked time
         TextView arrivalTime = (TextView) findViewById(R.id.arrivalTime);
-        arrivalTime.setText(hour + ":" + minute + " Uhr");
+        if (minute < 10) {
+            arrivalTime.setText(hour + ":0" + minute + " Uhr");
+        } else {
+            arrivalTime.setText(hour + ":" + minute + " Uhr");
+        }
         convertToMilliseconds(hour, minute);
     }
 

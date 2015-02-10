@@ -14,8 +14,8 @@ import java.util.Calendar;
 
 public class TimePickerFragment extends DialogFragment implements TimePickerDialog.OnTimeSetListener {
 
-   @Override
-   public Dialog onCreateDialog(Bundle savedInstanceState) {
+    @Override
+    public Dialog onCreateDialog(Bundle savedInstanceState) {
         // use current time as default
         final Calendar c = Calendar.getInstance();
         int current_hour = c.get(Calendar.HOUR_OF_DAY);
@@ -41,9 +41,8 @@ public class TimePickerFragment extends DialogFragment implements TimePickerDial
     public void onAttach(Activity activity) {
         super.onAttach(this.getActivity());
         try {
-            this.mOPTListener = (OnTimePickedListener)activity;
-        }
-        catch (final ClassCastException e) {
+            this.mOPTListener = (OnTimePickedListener) activity;
+        } catch (final ClassCastException e) {
             throw new ClassCastException(activity.toString() + " must implement OnTimePickedListener");
         }
     }

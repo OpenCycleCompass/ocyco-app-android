@@ -195,7 +195,7 @@
                     android:background="@color/boxes_background"
                     android:gravity="center"
                     android:text="@string/time_difference_defaultval"
-                    android:textColor="#900"
+                    android:textColor="#000"
                     android:textStyle="bold"/>
 
             </LinearLayout>
@@ -250,7 +250,7 @@
                     android:background="@color/boxes_background"
                     android:gravity="center"
                     android:text="@string/difference_defaultval"
-                    android:textColor="#900"
+                    android:textColor="#000"
                     android:textStyle="bold"/>
 
             </LinearLayout>

@@ -159,7 +159,7 @@ public class Tracking extends Service implements LocationListener, OnConnectionF
         int num_rows = mGPSDb.getNumRows();
         mGPSDb.close();
         // Update notification
-        mBuilder.setContentText(getString(R.string.tracking_status_active)+ " - " + num_rows + " GPS Punkte aufgezeichnet");
+        mBuilder.setContentText(getString(R.string.tracking_status_active) + " - " + num_rows + " GPS Punkte aufgezeichnet");
         // Sets an ID for the notification
         int mNotificationId = 42;
         // Builds the notification and issues it.
@@ -182,6 +182,7 @@ public class Tracking extends Service implements LocationListener, OnConnectionF
             double sGef = mCalculate.getsGef();
             double sZuf = mCalculate.getsZuf();
             double vAkt = mCalculate.getvAkt();
+            Log.i(TAG, "vAktCallCalc " + vAkt);
             double vD = mCalculate.getvD();
             double tAnk = mCalculate.gettAnk();
             double tAnkUnt = mCalculate.gettAnkUnt();
@@ -234,7 +235,8 @@ public class Tracking extends Service implements LocationListener, OnConnectionF
         mGPSDb.open();
         mGPSDb.insertRows(lat, lon, alt, spe, tst);
         mGPSDb.close();
-
+        //write position to GlobalVariables class
+        mGlobalVariable.setLocation(mCurrentLocation);
     }
 
 
@@ -257,11 +259,11 @@ public class Tracking extends Service implements LocationListener, OnConnectionF
         mBuilder.setSmallIcon(R.mipmap.ic_launcher)
                 .setContentTitle(getString(R.string.app_name))
                 .setContentIntent(tracking_showPendingIntent) // default action (sole action on
-                // android < 4.2) is to start ShowDataActivity
+                        // android < 4.2) is to start ShowDataActivity
                 .addAction(R.drawable.ic_action_cancel, getString(R.string.tracking_stop_notification), tracking_stopPendingIntent)
-                // Action Button: start SettingsActivity and call stopOnlineTracking()
+                        // Action Button: start SettingsActivity and call stopOnlineTracking()
                 .addAction(R.drawable.ic_action_map, getString(R.string.tracking_show_tracking), tracking_showPendingIntent)
-                // Action Button: start ShowDataActivity
+                        // Action Button: start ShowDataActivity
                 .setOngoing(true); // notification is permanent
 
         // Gets an instance of the NotificationManager service

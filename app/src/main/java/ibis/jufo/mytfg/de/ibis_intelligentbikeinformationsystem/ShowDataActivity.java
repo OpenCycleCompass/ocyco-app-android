@@ -20,12 +20,24 @@ public class ShowDataActivity extends ActionBarActivity {
 
     long startTime = 0;
 
+    String tAnkMinStr;
+
 
     // Log TAG
     protected static final String TAG = "IBisShowDataActivity-class";
 
     //create instance of GlobalVariables class
     GlobalVariables mGlobalVariable;
+
+    //info boxes
+    TextView sGefBox;
+    TextView sZufBox;
+    TextView vAktBox;
+    TextView vDBox;
+    TextView tAnkBox;
+    TextView tAnkUntBox;
+    TextView vDMussBox;
+    TextView vDUntBox;
 
 
     @Override
@@ -57,7 +69,32 @@ public class ShowDataActivity extends ActionBarActivity {
         }
         //initialize global variable class
         mGlobalVariable = (GlobalVariables) getApplicationContext();
+        //info box text fields
+        sGefBox = (TextView) findViewById(R.id.sGefBox);
+        sZufBox = (TextView) findViewById(R.id.sZufBox);
+        vAktBox = (TextView) findViewById(R.id.vAktBox);
+        vDBox = (TextView) findViewById(R.id.vDBox);
+        tAnkBox = (TextView) findViewById(R.id.tAnkBox);
+        tAnkUntBox = (TextView) findViewById(R.id.tAnkUntBox);
+        vDMussBox = (TextView) findViewById(R.id.vDMussBox);
+        vDUntBox = (TextView) findViewById(R.id.vDUntBox);
+
+
+        setTextSize();
         updateUI();
+    }
+
+    private void setTextSize() {
+        float textSize = mGlobalVariable.getTextSize();
+        Log.i(TAG, "setTextSize() " + textSize);
+        sGefBox.setTextSize(0x00000003, textSize);
+        sZufBox.setTextSize(0x00000003, textSize);
+        vAktBox.setTextSize(0x00000003, textSize);
+        vDBox.setTextSize(0x00000003, textSize);
+        tAnkBox.setTextSize(0x00000003, textSize);
+        tAnkUntBox.setTextSize(0x00000003, textSize);
+        vDMussBox.setTextSize(0x00000003, textSize);
+        vDUntBox.setTextSize(0x00000003, textSize);
     }
 
 
@@ -98,48 +135,79 @@ public class ShowDataActivity extends ActionBarActivity {
         @Override
         public void run() {
             Log.i(TAG, "run()");
-
-            showData();
+            if (accuracy < 20) {
+                showData();
+            }
 
             timerHandler.postDelayed(this, 500);
         }
     };
 
-    public void updateUI () {
+    public void updateUI() {
         Log.i(TAG, "updateUI()");
         startTime = System.currentTimeMillis();
         timerHandler.postDelayed(timerRunnable, 0);
     }
 
+    String roundDecimals(double d) {
+        return String.format("%.2f", d);
+    }
+
     //read data from interface and write to info boxes
     public void showData() {
         Log.i(TAG, "showData()");
-        //get variables from global class
-        double sGef = mGlobalVariable.getsGef();
-        double sZuf = mGlobalVariable.getsZuf();
-        double vAkt = mGlobalVariable.getvAkt();
-        double vD = mGlobalVariable.getvD();
-        double tAnk = mGlobalVariable.gettAnk();
-        double tAnkUnt = mGlobalVariable.gettAnkUnt();
-        double vDMuss = mGlobalVariable.getvDMuss();
-        double vDunt = mGlobalVariable.getvDunt();
-
-        TextView sGefBox = (TextView) findViewById(R.id.sGefBox);
+        //get variables from global class and round
+        String sGef = roundDecimals(mGlobalVariable.getsGef()) + " km";
+        String sZuf = roundDecimals(mGlobalVariable.getsZuf()) + " km";
+        String vAkt = roundDecimals(mGlobalVariable.getvAkt()) + " km/h";
+        String vD = roundDecimals(mGlobalVariable.getvD()) + " km/h";
+        //get the time and format it
+        double tAnkD = mGlobalVariable.gettAnk();
+        int tAnkStd = (int) tAnkD;
+        int tAnkMin = (int) Math.round(((tAnkD - tAnkStd) * 60));
+        tAnkMinStr = Integer.toString(tAnkMin);
+        if (tAnkMin < 10) {
+            tAnkMinStr = "0" + tAnkMin;
+        }
+        String tAnk = tAnkStd + ":" + tAnkMinStr + " Uhr";
+        if (tAnkStd > 23) {
+            int tAnkDays = tAnkStd / 24;
+            tAnkStd = tAnkStd - tAnkDays * 24;
+            tAnk = tAnkStd + ":" + tAnkMinStr + " Uhr" + System.getProperty("line.separator") + "in " + tAnkDays + " Tagen";
+        }
+        //get the time and format it
+        double tAnkUntD = mGlobalVariable.gettAnkUnt();
+        int tAnkUntStd = (int) tAnkUntD;
+        int tAnkUntMin = (int) Math.round(((tAnkUntD - tAnkUntStd) * 60));
+        String tAnkUnt = tAnkUntStd + "h " + tAnkUntMin + "min";
+        String vDMuss = roundDecimals(mGlobalVariable.getvDMuss()) + " km/h";
+        String vDunt = roundDecimals(mGlobalVariable.getvDunt()) + " km/h";
+        //show in infoboxes
         sGefBox.setText(sGef + "");
-        TextView sZufBox = (TextView) findViewById(R.id.sZufBox);
         sZufBox.setText(sZuf + "");
-        TextView vAktBox = (TextView) findViewById(R.id.vAktBox);
         vAktBox.setText(vAkt + "");
-        TextView vDBox = (TextView) findViewById(R.id.vDBox);
         vDBox.setText(vD + "");
-        TextView tAnkBox = (TextView) findViewById(R.id.tAnkBox);
         tAnkBox.setText(tAnk + "");
-        TextView tAnkUntBox = (TextView) findViewById(R.id.tAnkUntBox);
         tAnkUntBox.setText(tAnkUnt + "");
-        TextView vDMussBox = (TextView) findViewById(R.id.vDMussBox);
         vDMussBox.setText(vDMuss + "");
-        TextView vDUntBox = (TextView) findViewById(R.id.vDUntBox);
         vDUntBox.setText(vDunt + "");
+        //set color
+        if (mGlobalVariable.gettAnkUnt() < 0) {
+            tAnkUntBox.setTextColor(getResources().getColor(R.color.good_value));
+        } else if (mGlobalVariable.gettAnkUnt() > 0) {
+            tAnkUntBox.setTextColor(getResources().getColor(R.color.bad_value));
+        }
+        if (mGlobalVariable.getvDunt() < 0) {
+            vDUntBox.setTextColor(getResources().getColor(R.color.good_value));
+        } else if (mGlobalVariable.getvDunt() > 0) {
+            vDUntBox.setTextColor(getResources().getColor(R.color.bad_value));
+        }
+        //set vDMuss & vDunt ---, if it is later then the wanted arrival time
+        if (mGlobalVariable.getvDMuss() < 0) {
+            vDMussBox.setText("---");
+            vDUntBox.setText("---");
+            vDUntBox.setTextColor(getResources().getColor(R.color.default_black));
+        }
     }
 
 

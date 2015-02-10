@@ -54,31 +54,31 @@ public class Calculate {
         return firstLoc;
     }
 
-    public void calculateSpeed () {
+    public void calculateSpeed() {
         if (newLoc.hasSpeed()) {
             vAkt = newLoc.getSpeed();
-        }
-        else {
+        } else {
             //time difference between last GPS points in hours
             double oldTime = oldLoc.getTime();
             double newTime = newLoc.getTime();
-            double timeDiff = (((newTime-oldTime)/1000)/60)/60;
-            Log.i(TAG, "calculateSpeed()"+lastDistance+"/"+timeDiff);
-            vAkt = lastDistance/timeDiff;
+            double timeDiff = (((newTime - oldTime) / 1000) / 60) / 60;
+            Log.i(TAG, "calculateSpeed()" + lastDistance + "/" + timeDiff);
+            vAkt = lastDistance / timeDiff;
+            Log.i(TAG, "calculateSpeed()" + vAkt);
         }
     }
 
 
     public void calculateTimeVars(double tAnkEingTimeInput) {
-        tAnkEing = ((tAnkEingTimeInput/1000)/60)/60;
-        Log.i(TAG, "tAnkEingTimeInput "+tAnkEingTimeInput);
+        tAnkEing = ((tAnkEingTimeInput / 1000) / 60) / 60;
+        Log.i(TAG, "tAnkEingTimeInput " + tAnkEingTimeInput);
         //get date in milliseconds
         final Calendar c = Calendar.getInstance();
         int current_hour = c.get(Calendar.HOUR_OF_DAY);
         int current_minute = c.get(Calendar.MINUTE);
         double milliSeconds = System.currentTimeMillis();
-        Log.i(TAG, "hour "+current_hour);
-        Log.i(TAG, "minute "+current_minute);
+        Log.i(TAG, "hour " + current_hour);
+        Log.i(TAG, "minute " + current_minute);
         double timeInMillis = (double) ((current_hour * 60 + current_minute) * 60 * 1000);
         double dateInMilliseconds = (milliSeconds - timeInMillis);
         //add date in milliseconds, convert to hours
@@ -101,7 +101,7 @@ public class Calculate {
         //calculate driven time and convert to hours
         double newTime = newLoc.getTime();
         double firstTime = firstLoc.getTime();
-        tGef = ((((newTime - firstTime) / 1000)/60)/60);
+        tGef = ((((newTime - firstTime) / 1000) / 60) / 60);
     }
 
 
@@ -130,35 +130,35 @@ public class Calculate {
     }
 
     //getters
-    public double getsGef () {
+    public double getsGef() {
         return sGef;
     }
 
-    public double getsZuf () {
+    public double getsZuf() {
         return sZuf;
     }
-    public double getvAkt () {
+
+    public double getvAkt() {
         return vAkt;
     }
 
-    public double getvD () {
+    public double getvD() {
         return vD;
     }
-    public double gettAnk () {
+
+    public double gettAnk() {
         return tAnk;
     }
 
-    public double gettAnkUnt () {
+    public double gettAnkUnt() {
         return tAnkUnt;
     }
 
-    public double getvDMuss () {
+    public double getvDMuss() {
         return vDMuss;
     }
 
-    public double getvDunt () {
+    public double getvDunt() {
         return vDunt;
     }
-
-
 }
