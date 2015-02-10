@@ -10,10 +10,23 @@ android {
         versionCode 1
         versionName "1.0"
     }
+    signingConfigs {
+        releaseSigning {
+            storeFile file("ibis.keystore")
+            storePassword System.getenv("ANDROID_KEYSTORE_PW")
+            keyAlias "ibis"
+            keyPassword System.getenv("ANDROID_KEYSTORE_PW")
+        }
+    }
     buildTypes {
+        unsignedrelease {
+            minifyEnabled false
+            proguardFiles getDefaultProguardFile('proguard-android.txt'), 'proguard-rules.pro'
+        }
         release {
             minifyEnabled false
             proguardFiles getDefaultProguardFile('proguard-android.txt'), 'proguard-rules.pro'
+            signingConfig signingConfigs.releaseSigning
         }
     }
     productFlavors {
