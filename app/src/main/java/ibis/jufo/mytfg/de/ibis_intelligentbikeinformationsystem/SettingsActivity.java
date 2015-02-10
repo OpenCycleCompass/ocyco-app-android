@@ -31,23 +31,32 @@ public class SettingsActivity extends ActionBarActivity implements TimePickerFra
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_settings);
 
+        //initialize global variable class
+        mGlobalVariable = (GlobalVariables) getApplicationContext();
+
         // Restore preferences
         SharedPreferences settings = getSharedPreferences(getString(R.string.preference_file_key), Context.MODE_PRIVATE);
         //get variables
         CollectData = settings.getBoolean("CollectData", false);
+        mGlobalVariable.setShowLocationOverlay(settings.getBoolean("showLocationOverlay", true));
+        mGlobalVariable.setShowCompassOverlay(settings.getBoolean("showCompassOverlay", true));
+        mGlobalVariable.setShowScaleBarOverlay(settings.getBoolean("showScaleBarOverlay", true));
         FloatDistStartDest = settings.getFloat("FloatDistStartDest", 0);
         FloatTextSize = settings.getFloat("FloatTextSize", 8);
-        //setting check box
-        final CheckBox checkBox = (CheckBox) findViewById(R.id.CBCollectData);
-        checkBox.setChecked(CollectData);
+        //set check boxes
+        final CheckBox CBcollectData = (CheckBox) findViewById(R.id.CBCollectData);
+        CBcollectData.setChecked(CollectData);
+        final CheckBox cb_show_compassOverlay = (CheckBox) findViewById(R.id.cb_show_compassOverlay);
+        cb_show_compassOverlay.setChecked(mGlobalVariable.isShow_compassOverlay());
+        final CheckBox cb_show_locationOverlay = (CheckBox) findViewById(R.id.cb_show_locationOverlay);
+        cb_show_locationOverlay.setChecked(mGlobalVariable.isShow_locationOverlay());
+        final CheckBox cb_show_scaleBarOverlay = (CheckBox) findViewById(R.id.cb_show_scaleBarOverlay);
+        cb_show_scaleBarOverlay.setChecked(mGlobalVariable.isShow_scaleBarOverlay());
         //set default text
         EditText editDistance = (EditText) findViewById(R.id.enter_distance);
         editDistance.setText(Float.toString(FloatDistStartDest));
         EditText enter_text_size = (EditText) findViewById(R.id.enter_text_size);
         enter_text_size.setText(Float.toString(FloatTextSize));
-
-        //initialize global variable class
-        mGlobalVariable = (GlobalVariables) getApplicationContext();
 
         // call stopOnlineTracking() if SettingsActivity has benn started
         // from notification action "Tracking Beenden"
@@ -77,6 +86,9 @@ public class SettingsActivity extends ActionBarActivity implements TimePickerFra
         //creating a editor
         SharedPreferences.Editor editor = settings.edit();
         editor.putBoolean("CollectData", CollectData);
+        editor.putBoolean("showCompassOverlay", mGlobalVariable.isShow_compassOverlay());
+        editor.putBoolean("showLocationOverlay", mGlobalVariable.isShow_locationOverlay());
+        editor.putBoolean("showScaleBarOverlay", mGlobalVariable.isShow_scaleBarOverlay());
         editor.putFloat("FloatDistStartDest", FloatDistStartDest);
         editor.putFloat("FloatTextSize", FloatTextSize);
         // Commit the edits!
