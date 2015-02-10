@@ -202,6 +202,12 @@ public class ShowDataActivity extends ActionBarActivity {
         } else if (mGlobalVariable.getvDunt() > 0) {
             vDUntBox.setTextColor(getResources().getColor(R.color.bad_value));
         }
+        //set vDMuss & vDunt ---, if it is later then the wanted arrival time
+        if (mGlobalVariable.getvDMuss() < 0) {
+            vDMussBox.setText("---");
+            vDUntBox.setText("---");
+            vDUntBox.setTextColor(getResources().getColor(R.color.default_black));
+        }
     }
 
 
