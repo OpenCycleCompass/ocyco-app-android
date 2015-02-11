@@ -1,4 +1,4 @@
-package ibis.jufo.mytfg.de.ibis_intelligentbikeinformationsystem;
+package de.mytfg.jufo.ibis;
 
 import android.app.AlertDialog;
 import android.content.Context;
@@ -14,6 +14,7 @@ import android.view.View;
 import android.widget.CheckBox;
 import android.widget.EditText;
 import android.widget.TextView;
+
 
 public class SettingsActivity extends ActionBarActivity implements TimePickerFragment.OnTimePickedListener {
 

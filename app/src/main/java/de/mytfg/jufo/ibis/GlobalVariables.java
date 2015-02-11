@@ -1,4 +1,4 @@
-package ibis.jufo.mytfg.de.ibis_intelligentbikeinformationsystem;
+package de.mytfg.jufo.ibis;
 
 import android.app.Application;
 import android.location.Location;

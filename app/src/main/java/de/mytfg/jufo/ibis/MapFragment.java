@@ -1,4 +1,4 @@
-package ibis.jufo.mytfg.de.ibis_intelligentbikeinformationsystem;
+package de.mytfg.jufo.ibis;
 
 import android.content.Context;
 import android.os.Bundle;

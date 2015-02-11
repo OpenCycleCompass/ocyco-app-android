@@ -1,7 +1,7 @@
 <menu xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
-    tools:context="ibis.jufo.mytfg.de.ibis_intelligentbikeinformationsystem.SettingsActivity">
+    tools:context="de.mytfg.jufo.ibis.SettingsActivity">
     <item
         android:id="@+id/action_show_data"
         android:orderInCategory="100"

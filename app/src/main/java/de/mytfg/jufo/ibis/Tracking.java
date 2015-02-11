@@ -3,7 +3,7 @@
  * iBis Tracking Service
  * receives location updates, save to SQLite.
  */
-package ibis.jufo.mytfg.de.ibis_intelligentbikeinformationsystem;
+package de.mytfg.jufo.ibis;
 
 import android.app.NotificationManager;
 import android.app.PendingIntent;
@@ -22,7 +22,6 @@ import com.google.android.gms.common.api.GoogleApiClient.OnConnectionFailedListe
 import com.google.android.gms.location.LocationListener;
 import com.google.android.gms.location.LocationRequest;
 import com.google.android.gms.location.LocationServices;
-
 
 public class Tracking extends Service implements LocationListener, OnConnectionFailedListener, ConnectionCallbacks {
 

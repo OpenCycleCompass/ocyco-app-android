@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
 <manifest xmlns:android="http://schemas.android.com/apk/res/android"
-    package="ibis.jufo.mytfg.de.ibis_intelligentbikeinformationsystem" >
+    package="de.mytfg.jufo.ibis" >
 
     <uses-permission android:name="android.permission.ACCESS_FINE_LOCATION"/>
     <uses-permission android:name="android.permission.ACCESS_WIFI_STATE" />
@@ -9,14 +9,14 @@
     <uses-permission android:name="android.permission.WRITE_EXTERNAL_STORAGE" />
 
     <application
-        android:name="GlobalVariables"
+        android:name="de.mytfg.jufo.ibis.GlobalVariables"
         android:allowBackup="true"
         android:icon="@mipmap/ic_launcher"
         android:label="@string/app_name"
         android:theme="@style/AppTheme"
         android:supportsRtl="false">
         <activity
-            android:name=".MainActivity"
+            android:name="de.mytfg.jufo.ibis.MainActivity"
             android:label="@string/app_name"
             android:screenOrientation="portrait">
             <intent-filter>
@@ -26,22 +26,22 @@
             </intent-filter>
         </activity>
         <activity
-            android:name=".SettingsActivity"
+            android:name="de.mytfg.jufo.ibis.SettingsActivity"
             android:label="@string/title_activity_settings"
             android:screenOrientation="portrait">
         </activity>
         <activity
-            android:name=".ShowDataActivity"
+            android:name="de.mytfg.jufo.ibis.ShowDataActivity"
             android:label="@string/title_activity_show_data"
             android:screenOrientation="portrait">
         </activity>
         <activity
-            android:name=".UploadTrackActivity"
+            android:name="de.mytfg.jufo.ibis.UploadTrackActivity"
             android:label="@string/title_activity_upload_track"
             android:screenOrientation="portrait">
         </activity>
         <service
-            android:name="Tracking"
+            android:name="de.mytfg.jufo.ibis.Tracking"
             android:label="iBis Tracking GPS" />
         <meta-data
             android:name="com.google.android.gms.version"

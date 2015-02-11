@@ -3,14 +3,14 @@
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     android:orientation="vertical"
-    tools:context="ibis.jufo.mytfg.de.ibis_intelligentbikeinformationsystem.ShowDataActivity">
+    tools:context="de.mytfg.jufo.ibis.ShowDataActivity">
 
     <fragment
         android:id="@+id/article_fragment"
         android:layout_weight="1"
         android:layout_width="match_parent"
         android:layout_height="match_parent"
-        android:name="ibis.jufo.mytfg.de.ibis_intelligentbikeinformationsystem.MapFragment"/>
+        android:name="de.mytfg.jufo.ibis.MapFragment"/>
 
 
     <TableLayout

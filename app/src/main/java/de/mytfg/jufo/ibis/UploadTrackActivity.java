@@ -1,4 +1,4 @@
-package ibis.jufo.mytfg.de.ibis_intelligentbikeinformationsystem;
+package de.mytfg.jufo.ibis;
 
 import android.app.NotificationManager;
 import android.app.PendingIntent;
@@ -45,7 +45,6 @@ import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.List;
 import java.util.Locale;
-
 
 public class UploadTrackActivity extends ActionBarActivity {
 

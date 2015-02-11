@@ -1,4 +1,4 @@
-package ibis.jufo.mytfg.de.ibis_intelligentbikeinformationsystem;
+package de.mytfg.jufo.ibis;
 
 import android.app.AlertDialog;
 import android.content.DialogInterface;
@@ -10,7 +10,6 @@ import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.widget.TextView;
-
 
 public class ShowDataActivity extends ActionBarActivity {
 
