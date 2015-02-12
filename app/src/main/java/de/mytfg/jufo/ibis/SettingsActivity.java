@@ -19,7 +19,6 @@ import android.widget.TextView;
 public class SettingsActivity extends ActionBarActivity implements TimePickerFragment.OnTimePickedListener {
 
     //Variables declaration
-    public boolean CollectData = false;
     public float FloatDistStartDest;
     double tAnkEingTime;
     float FloatTextSize;
@@ -38,7 +37,7 @@ public class SettingsActivity extends ActionBarActivity implements TimePickerFra
         // Restore preferences
         SharedPreferences settings = getSharedPreferences(getString(R.string.preference_file_key), Context.MODE_PRIVATE);
         //get variables
-        CollectData = settings.getBoolean("CollectData", false);
+        mGlobalVariable.setCollectData(settings.getBoolean("CollectData", false));
         mGlobalVariable.setShowLocationOverlay(settings.getBoolean("showLocationOverlay", true));
         mGlobalVariable.setShowCompassOverlay(settings.getBoolean("showCompassOverlay", true));
         mGlobalVariable.setShowScaleBarOverlay(settings.getBoolean("showScaleBarOverlay", true));
@@ -46,7 +45,7 @@ public class SettingsActivity extends ActionBarActivity implements TimePickerFra
         FloatTextSize = settings.getFloat("FloatTextSize", 8);
         //set check boxes
         final CheckBox CBcollectData = (CheckBox) findViewById(R.id.CBCollectData);
-        CBcollectData.setChecked(CollectData);
+        CBcollectData.setChecked(mGlobalVariable.isCollectData());
         final CheckBox cb_show_compassOverlay = (CheckBox) findViewById(R.id.cb_show_compassOverlay);
         cb_show_compassOverlay.setChecked(mGlobalVariable.isShow_compassOverlay());
         final CheckBox cb_show_locationOverlay = (CheckBox) findViewById(R.id.cb_show_locationOverlay);
@@ -86,7 +85,7 @@ public class SettingsActivity extends ActionBarActivity implements TimePickerFra
         SharedPreferences settings = getSharedPreferences(getString(R.string.preference_file_key), Context.MODE_PRIVATE);
         //creating a editor
         SharedPreferences.Editor editor = settings.edit();
-        editor.putBoolean("CollectData", CollectData);
+        editor.putBoolean("CollectData", mGlobalVariable.isCollectData());
         editor.putBoolean("showCompassOverlay", mGlobalVariable.isShow_compassOverlay());
         editor.putBoolean("showLocationOverlay", mGlobalVariable.isShow_locationOverlay());
         editor.putBoolean("showScaleBarOverlay", mGlobalVariable.isShow_scaleBarOverlay());
@@ -103,7 +102,7 @@ public class SettingsActivity extends ActionBarActivity implements TimePickerFra
         // Check which checkbox was clicked
         switch (view.getId()) {
             case R.id.CBCollectData:
-                CollectData = checked;
+                mGlobalVariable.setCollectData(checked);
                 break;
             case R.id.cb_show_locationOverlay:
                 mGlobalVariable.setShowLocationOverlay(checked);
@@ -145,12 +144,10 @@ public class SettingsActivity extends ActionBarActivity implements TimePickerFra
             //restart Tracking Service starts it's onStartCommand (NOT onCreate),
             //so checkOnline will be executed again
             Intent intent = new Intent(this, Tracking.class);
-            intent.putExtra("Key", CollectData);
             startService(intent);
 
             //start ShowDataActivity
             Intent intent2 = new Intent(this, ShowDataActivity.class);
-            intent2.putExtra("Key", CollectData);
             startActivity(intent2);
         }
     }
@@ -196,13 +193,12 @@ public class SettingsActivity extends ActionBarActivity implements TimePickerFra
 
     public void stopOnlineTracking() {
         //set collect data false
-        CollectData = false;
+        mGlobalVariable.setCollectData(false);
         final CheckBox checkBox = (CheckBox) findViewById(R.id.CBCollectData);
-        checkBox.setChecked(CollectData);
+        checkBox.setChecked(mGlobalVariable.isCollectData());
         //restart Tracking Service starts it's onStartCommand (NOT onCreate),
         //so checkOnline will be executed again
         Intent intent = new Intent(this, Tracking.class);
-        intent.putExtra("Key", CollectData);
         startService(intent);
     }
 

@@ -28,9 +28,6 @@ public class Tracking extends Service implements LocationListener, OnConnectionF
     // Log TAG
     protected static final String TAG = "IBisTracking-class";
 
-    //Variables declaration
-    public boolean CollectData;
-
     // The desired interval for location updates. Inexact. Updates may be more or less frequent.
     public static final long UPDATE_INTERVAL_IN_MILLISECONDS = 5000;
     // The fastest rate for active location updates. Exact. Updates will never be more frequent than this value.
@@ -74,7 +71,7 @@ public class Tracking extends Service implements LocationListener, OnConnectionF
 
     public void checkOnline() {
         Log.i(TAG, "checkOnline()");
-        if (CollectData) {
+        if (mGlobalVariable.isCollectData()) {
             startOnlineTracking();
         } else {
             stopOnlineTracking();
@@ -141,10 +138,6 @@ public class Tracking extends Service implements LocationListener, OnConnectionF
     @Override
     public void onLocationChanged(Location location) {
 
-        // Nur zum testen
-        if (!CollectData) {
-            stopSelf();
-        }
         Log.i(TAG, "onLocationChanged()");
         mCurrentLocation = location;
         mLastUpdateTime = Long.toString(System.currentTimeMillis() / 1000L);
@@ -197,27 +190,13 @@ public class Tracking extends Service implements LocationListener, OnConnectionF
     public void checkAccuracy(Float accuracy) {
         Log.i(TAG, "checkAccuracy " + accuracy);
         Log.i(TAG, accuracy + " Accuracy");
+        mGlobalVariable.setAccuracy(accuracy);
         if (accuracy > 20 && !sendErrorAccuracy) {
             saveData = false;
-            Intent intent = new Intent(this, ShowDataActivity.class);
-            intent.putExtra("KeyAccuracy", accuracy);
-            intent.putExtra("KeyDoNotRestart", true);
-            intent.putExtra("KeyErrOrConfirm", 1);
-            intent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
-            startActivity(intent);
             //sendErrorAccuracy ist to avoid, that ShowDataActivity is recreated at every Location update
-            sendErrorAccuracy = true;
         } else if (accuracy < 20 && !sendConfirmAccuracy) {
             Log.i(TAG, saveData + "saveData && blabla");
             saveData = true;
-            Intent intent = new Intent(this, ShowDataActivity.class);
-            intent.putExtra("KeyAccuracy", accuracy);
-            intent.putExtra("KeyDoNotRestart", true);
-            intent.putExtra("KeyErrOrConfirm", 0);
-            intent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
-            startActivity(intent);
-            //sendConfirmAccuracy ist to avoid, that ShowDataActivity is recreated at every Location update
-            sendConfirmAccuracy = true;
 
         }
     }
@@ -281,13 +260,6 @@ public class Tracking extends Service implements LocationListener, OnConnectionF
     @Override
     public int onStartCommand(Intent intent, int flags, int startId) {
         Log.i(TAG, "onStartCommand()");
-        //read extra
-        try {
-            CollectData = intent.getBooleanExtra("Key", false);
-        } catch (java.lang.NullPointerException e) {
-            stopSelf();
-        }
-
         checkOnline();
         return super.onStartCommand(intent, flags, startId);
     }

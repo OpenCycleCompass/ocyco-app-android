@@ -13,14 +13,8 @@ import android.widget.TextView;
 
 public class ShowDataActivity extends ActionBarActivity {
 
-    boolean CollectData;
-    boolean doNotRestart;
-    float accuracy;
-
-    long startTime = 0;
-
     String tAnkMinStr;
-
+    boolean accuracyAlert, oldAccuracyAlert;
 
     // Log TAG
     protected static final String TAG = "IBisShowDataActivity-class";
@@ -44,28 +38,6 @@ public class ShowDataActivity extends ActionBarActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_show_data);
 
-        //receiving intent
-        Intent incomingIntent = getIntent();
-        CollectData = incomingIntent.getBooleanExtra("Key", false);
-
-        Intent incomingIntent2 = getIntent();
-        accuracy = incomingIntent2.getFloatExtra("KeyAccuracy", 0);
-        doNotRestart = incomingIntent2.getBooleanExtra("KeyDoNotRestart", false);
-        int ErrOrConfirm = incomingIntent2.getIntExtra("KeyErrOrConfirm", 2);
-        Log.i(TAG, ErrOrConfirm + "ErrOrConfirm");
-        if (ErrOrConfirm == 0) {
-            openAccuracyConfirm(accuracy);
-        }
-        if (ErrOrConfirm == 1) {
-            openAccuracyAlert(accuracy);
-
-        }
-        // Start tracking Service, if Activity wasn't started from Tracking service
-        if (!doNotRestart) {
-            /*Intent intent = new Intent(this, Tracking.class);
-            intent.putExtra("Key", CollectData);
-            startService(intent); */
-        }
         //initialize global variable class
         mGlobalVariable = (GlobalVariables) getApplicationContext();
         //info box text fields
@@ -77,7 +49,6 @@ public class ShowDataActivity extends ActionBarActivity {
         tAnkUntBox = (TextView) findViewById(R.id.tAnkUntBox);
         vDMussBox = (TextView) findViewById(R.id.vDMussBox);
         vDUntBox = (TextView) findViewById(R.id.vDUntBox);
-
 
         setTextSize();
         updateUI();
@@ -97,24 +68,24 @@ public class ShowDataActivity extends ActionBarActivity {
     }
 
 
-    private void openAccuracyAlert(Float accuracy) {
+    private void openAccuracyAlert() {
         Log.i(TAG, "Err");
         //set up a new alert dialog
         AlertDialog.Builder alertDialogBuilder = new AlertDialog.Builder(ShowDataActivity.this);
         alertDialogBuilder.setTitle("Positionsbestimmung zu ungenau!");
-        alertDialogBuilder.setMessage(accuracy + "m Abweichung sind zu ungenau zum Navigieren! Haben Sie GPS aktiviert? Signal wird gesucht...");
+        alertDialogBuilder.setMessage(mGlobalVariable.getAccuracy() + "m Abweichung sind zu ungenau zum Navigieren! Haben Sie GPS aktiviert? Signal wird gesucht...");
 
         //create and show alert dialog
         AlertDialog alertDialog = alertDialogBuilder.create();
         alertDialog.show();
     }
 
-    private void openAccuracyConfirm(Float accuracy) {
+    private void openAccuracyConfirm() {
         Log.i(TAG, "Confirm");
         //set up a new alert dialog
         AlertDialog.Builder alertDialogBuilder = new AlertDialog.Builder(ShowDataActivity.this);
         alertDialogBuilder.setTitle("Positionsbestimmung erfolgreich!");
-        alertDialogBuilder.setMessage(accuracy + "m Abweichung ist akzeptabel für die Navigation, sie können nun beginnen!");
+        alertDialogBuilder.setMessage(mGlobalVariable.getAccuracy() + "m Abweichung ist akzeptabel für die Navigation, sie können nun beginnen!");
         //create the OK Button and onClickListener
         alertDialogBuilder.setPositiveButton("OK", new DialogInterface.OnClickListener() {
             //close dialog when clicked
@@ -133,18 +104,30 @@ public class ShowDataActivity extends ActionBarActivity {
 
         @Override
         public void run() {
+            oldAccuracyAlert = accuracyAlert;
             Log.i(TAG, "run()");
-            if (accuracy < 20) {
+            if (mGlobalVariable.getAccuracy() < 20) {
                 showData();
+                accuracyAlert = false;
+            } else {
+                accuracyAlert = true;
             }
-
+            //check, if accuracy alert is necessary
+            if (accuracyAlert != oldAccuracyAlert) {
+                //check which accuracy alert
+                //TODO: close first dialog, when second one is opened (or put both in one dialog)
+                if (accuracyAlert) {
+                    openAccuracyAlert();
+                } else {
+                    openAccuracyConfirm();
+                }
+            }
             timerHandler.postDelayed(this, 500);
         }
     };
 
     public void updateUI() {
         Log.i(TAG, "updateUI()");
-        startTime = System.currentTimeMillis();
         timerHandler.postDelayed(timerRunnable, 0);
     }
 
