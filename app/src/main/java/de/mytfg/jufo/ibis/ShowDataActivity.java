@@ -13,9 +13,6 @@ import android.widget.TextView;
 
 public class ShowDataActivity extends ActionBarActivity {
 
-    String tAnkMinStr;
-    boolean accuracyAlert, oldAccuracyAlert;
-
     // Log TAG
     protected static final String TAG = "IBisShowDataActivity-class";
 
@@ -32,6 +29,8 @@ public class ShowDataActivity extends ActionBarActivity {
     TextView vDMussBox;
     TextView vDUntBox;
 
+    String tAnkMinStr;
+    boolean accuracyAlert, oldAccuracyAlert;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -56,7 +55,6 @@ public class ShowDataActivity extends ActionBarActivity {
 
     private void setTextSize() {
         float textSize = mGlobalVariable.getTextSize();
-        Log.i(TAG, "setTextSize() " + textSize);
         sGefBox.setTextSize(0x00000003, textSize);
         sZufBox.setTextSize(0x00000003, textSize);
         vAktBox.setTextSize(0x00000003, textSize);
@@ -69,7 +67,6 @@ public class ShowDataActivity extends ActionBarActivity {
 
 
     private void openAccuracyAlert() {
-        Log.i(TAG, "Err");
         //set up a new alert dialog
         AlertDialog.Builder alertDialogBuilder = new AlertDialog.Builder(ShowDataActivity.this);
         alertDialogBuilder.setTitle("Positionsbestimmung zu ungenau!");
@@ -81,7 +78,6 @@ public class ShowDataActivity extends ActionBarActivity {
     }
 
     private void openAccuracyConfirm() {
-        Log.i(TAG, "Confirm");
         //set up a new alert dialog
         AlertDialog.Builder alertDialogBuilder = new AlertDialog.Builder(ShowDataActivity.this);
         alertDialogBuilder.setTitle("Positionsbestimmung erfolgreich!");
@@ -105,7 +101,6 @@ public class ShowDataActivity extends ActionBarActivity {
         @Override
         public void run() {
             oldAccuracyAlert = accuracyAlert;
-            Log.i(TAG, "run()");
             if (mGlobalVariable.getAccuracy() < 20) {
                 showData();
                 accuracyAlert = false;
@@ -135,15 +130,14 @@ public class ShowDataActivity extends ActionBarActivity {
         return String.format("%.2f", d);
     }
 
-    //read data from interface and write to info boxes
+    //read data from global var class and write to info boxes
     public void showData() {
-        Log.i(TAG, "showData()");
         //get variables from global class and round
         String sGef = roundDecimals(mGlobalVariable.getsGef()) + " km";
         String sZuf = roundDecimals(mGlobalVariable.getsZuf()) + " km";
         String vAkt = roundDecimals(mGlobalVariable.getvAkt()) + " km/h";
         String vD = roundDecimals(mGlobalVariable.getvD()) + " km/h";
-        //get the time and format it
+        //get the time and format it (tAnk)
         double tAnkD = mGlobalVariable.gettAnk();
         int tAnkStd = (int) tAnkD;
         int tAnkMin = (int) Math.round(((tAnkD - tAnkStd) * 60));
@@ -157,14 +151,14 @@ public class ShowDataActivity extends ActionBarActivity {
             tAnkStd = tAnkStd - tAnkDays * 24;
             tAnk = tAnkStd + ":" + tAnkMinStr + " Uhr" + System.getProperty("line.separator") + "in " + tAnkDays + " Tagen";
         }
-        //get the time and format it
+        //get the time and format it (tAnkUnt)
         double tAnkUntD = mGlobalVariable.gettAnkUnt();
         int tAnkUntStd = (int) tAnkUntD;
         int tAnkUntMin = (int) Math.round(((tAnkUntD - tAnkUntStd) * 60));
         String tAnkUnt = tAnkUntStd + "h " + tAnkUntMin + "min";
         String vDMuss = roundDecimals(mGlobalVariable.getvDMuss()) + " km/h";
         String vDunt = roundDecimals(mGlobalVariable.getvDunt()) + " km/h";
-        //show in infoboxes
+        //show in info boxes
         sGefBox.setText(sGef + "");
         sZufBox.setText(sZuf + "");
         vAktBox.setText(vAkt + "");
@@ -184,7 +178,7 @@ public class ShowDataActivity extends ActionBarActivity {
         } else if (mGlobalVariable.getvDunt() > 0) {
             vDUntBox.setTextColor(getResources().getColor(R.color.bad_value));
         }
-        //set vDMuss & vDunt ---, if it is later then the wanted arrival time
+        //set vDMuss & vDunt "---", if it is later then the wanted arrival time
         if (mGlobalVariable.getvDMuss() < 0) {
             vDMussBox.setText("---");
             vDUntBox.setText("---");

@@ -36,7 +36,7 @@ public class SettingsActivity extends ActionBarActivity implements TimePickerFra
 
         // Restore preferences
         SharedPreferences settings = getSharedPreferences(getString(R.string.preference_file_key), Context.MODE_PRIVATE);
-        //get variables
+        //get variables and set to global class
         mGlobalVariable.setCollectData(settings.getBoolean("CollectData", false));
         mGlobalVariable.setShowLocationOverlay(settings.getBoolean("showLocationOverlay", true));
         mGlobalVariable.setShowCompassOverlay(settings.getBoolean("showCompassOverlay", true));
@@ -80,10 +80,8 @@ public class SettingsActivity extends ActionBarActivity implements TimePickerFra
         super.onStop();
 
         //saving settings
-        //ATTENTION! onStop() is executed AFTER onCreate(), with onStop() saved data
-        //can NOT be read by the next Activity's onCreate()!!!
         SharedPreferences settings = getSharedPreferences(getString(R.string.preference_file_key), Context.MODE_PRIVATE);
-        //creating a editor
+        //creating a editor and add variables
         SharedPreferences.Editor editor = settings.edit();
         editor.putBoolean("CollectData", mGlobalVariable.isCollectData());
         editor.putBoolean("showCompassOverlay", mGlobalVariable.isShow_compassOverlay());
@@ -96,7 +94,7 @@ public class SettingsActivity extends ActionBarActivity implements TimePickerFra
     }
 
     public void onCheckboxClicked(View view) {
-        // Check if the CheckBox is checked
+        //check if the CheckBox is checked
         boolean checked = ((CheckBox) view).isChecked();
 
         // Check which checkbox was clicked
@@ -196,8 +194,8 @@ public class SettingsActivity extends ActionBarActivity implements TimePickerFra
         mGlobalVariable.setCollectData(false);
         final CheckBox checkBox = (CheckBox) findViewById(R.id.CBCollectData);
         checkBox.setChecked(mGlobalVariable.isCollectData());
-        //restart Tracking Service starts it's onStartCommand (NOT onCreate),
-        //so checkOnline will be executed again
+        /*restart Tracking Service starts it's onStartCommand (NOT onCreate),
+        so checkOnline will be executed again */
         Intent intent = new Intent(this, Tracking.class);
         startService(intent);
     }

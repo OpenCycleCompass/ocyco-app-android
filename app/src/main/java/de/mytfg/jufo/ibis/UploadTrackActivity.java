@@ -124,7 +124,7 @@ public class UploadTrackActivity extends ActionBarActivity {
 
     // Update GUI (enable/disable name and comment editText)
     private void updateUI() {
-        if(!uploadPublic) {
+        if (!uploadPublic) {
             editText_UploadTrackName.setEnabled(false);
             editText_UploadTrackCom.setEnabled(false);
             textView_UploadTrackName.setEnabled(false);
@@ -142,7 +142,7 @@ public class UploadTrackActivity extends ActionBarActivity {
         // Load SharedPrefs
         SharedPreferences prefs = getSharedPreferences(getString(R.string.preference_file_key), (Context.MODE_MULTI_PROCESS));
 
-        editText_UploadTrackDuration.setText(Long.toString(stopTst-startTst));
+        editText_UploadTrackDuration.setText(Long.toString(stopTst - startTst));
 
         long llength = calcLength();
         editText_UploadTrackLength.setText(Long.toString(llength));
@@ -150,21 +150,21 @@ public class UploadTrackActivity extends ActionBarActivity {
         uploadPublic = prefs.getBoolean("upload_public", false);
 
         String lname = prefs.getString("upload_name", null);
-        if(lname!=null) {
+        if (lname != null) {
             editText_UploadTrackName.setText(lname);
         } else {
             editText_UploadTrackName.setText(this.getString(R.string.upload_track_name_default));
         }
 
         String lcom = prefs.getString("upload_com", null);
-        if(lcom!=null) {
+        if (lcom != null) {
             editText_UploadTrackCom.setText(lcom);
         } else {
             editText_UploadTrackCom.setText(this.getString(R.string.upload_track_com_default));
         }
 
         String ltoken = prefs.getString("upload_token", null);
-        if(ltoken!=null) {
+        if (ltoken != null) {
             editText_UploadTrackToken.setText(ltoken);
             button_UploadTrack.setEnabled(true);
         }
@@ -176,7 +176,7 @@ public class UploadTrackActivity extends ActionBarActivity {
     }
 
     public void onSwitchPublic(View v) {
-        if(switch_UploadTrackPublic.isChecked()) {
+        if (switch_UploadTrackPublic.isChecked()) {
             uploadPublic = true;
             Log.i(TAG, "onSwitchPublic(): checked");
         } else {
@@ -191,12 +191,12 @@ public class UploadTrackActivity extends ActionBarActivity {
         long llength = calcLength();
         String lurlstr;
         Uri.Builder lurl;
-        lurl = Uri.parse(this.getString(R.string.api1_base_url)+this.getString(R.string.api1_pushtrack_new))
-            .buildUpon()
-            .appendQueryParameter("duration", Long.toString(stopTst - startTst))
-            .appendQueryParameter("length", Long.toString(llength))
-            .appendQueryParameter("user_token", getTokenFromPrefs());
-        if(uploadPublic) {
+        lurl = Uri.parse(this.getString(R.string.api1_base_url) + this.getString(R.string.api1_pushtrack_new))
+                .buildUpon()
+                .appendQueryParameter("duration", Long.toString(stopTst - startTst))
+                .appendQueryParameter("length", Long.toString(llength))
+                .appendQueryParameter("user_token", getTokenFromPrefs());
+        if (uploadPublic) {
             lurl.appendQueryParameter("name", editText_UploadTrackName.getText().toString())
                     .appendQueryParameter("comment", editText_UploadTrackCom.getText().toString())
                     .appendQueryParameter("public", "true");
@@ -247,7 +247,7 @@ public class UploadTrackActivity extends ActionBarActivity {
     }
 
     public void getToken(View v) {
-        String lurl = this.getString(R.string.api1_base_url)+this.getString(R.string.api1_token_new);
+        String lurl = this.getString(R.string.api1_base_url) + this.getString(R.string.api1_token_new);
         Log.i(TAG, lurl);
         ConnectivityManager connMgr = (ConnectivityManager) getSystemService(Context.CONNECTIVITY_SERVICE);
         NetworkInfo networkInfo = connMgr.getActiveNetworkInfo();
@@ -307,7 +307,6 @@ public class UploadTrackActivity extends ActionBarActivity {
 
             if (ldata != null) {
                 conn.setRequestMethod("POST");
-                //conn.addRequestProperty("data", ldata); // wrong
                 Log.i(TAG, "POST: " + ldata);
 
                 // Write POST Data:
@@ -375,11 +374,11 @@ public class UploadTrackActivity extends ActionBarActivity {
         return new String(buffer);
     }
 
-    // Uses AsyncTask to create a task away from the main UI thread. This task takes a
-    // URL string and uses it to create an HttpUrlConnection. Once the connection
-    // has been established, the AsyncTask downloads the contents of the webpage as
-    // an InputStream. Finally, the InputStream is converted into a string, which is
-    // displayed in the UI by the AsyncTask's onPostExecute method.
+    /*Uses AsyncTask to create a task away from the main UI thread. This task takes a
+    URL string and uses it to create an HttpUrlConnection. Once the connection
+    has been established, the AsyncTask downloads the contents of the webpage as
+    an InputStream. Finally, the InputStream is converted into a string, which is
+    displayed in the UI by the AsyncTask's onPostExecute method.*/
     private class GetHttpTask extends AsyncTask<String, Void, String> {
         String type = "";
 
@@ -443,10 +442,10 @@ public class UploadTrackActivity extends ActionBarActivity {
                             // Prepare notification string with track_id, date and nodes:
                             String created_s = "";
                             String nodes_s = "";
-                            if(json.has("created")) {
+                            if (json.has("created")) {
                                 created_s = getDate(json.getLong("created"));
                             }
-                            if(json.has("nodes")) {
+                            if (json.has("nodes")) {
                                 nodes_s = Long.toString(json.getLong("nodes"));
                             }
 
@@ -508,10 +507,10 @@ public class UploadTrackActivity extends ActionBarActivity {
     private void saveToken(String t) {
         SharedPreferences prefs = getSharedPreferences(getString(R.string.preference_file_key), (Context.MODE_MULTI_PROCESS));
         SharedPreferences.Editor prefs_edit = prefs.edit();
-        if(prefs.contains("upload_token")) {
+        if (prefs.contains("upload_token")) {
             String old_token = prefs.getString("upload_token", "");
             String old_tokenlist = prefs.getString("upload_oldtokenlist", "");
-            prefs_edit.putString("upload_oldtokenlist", old_tokenlist+";"+old_token);
+            prefs_edit.putString("upload_oldtokenlist", old_tokenlist + ";" + old_token);
         }
         prefs_edit.putString("upload_token", t);
         prefs_edit.apply();

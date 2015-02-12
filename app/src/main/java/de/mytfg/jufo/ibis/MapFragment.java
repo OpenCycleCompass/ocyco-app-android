@@ -22,15 +22,15 @@ import org.osmdroid.views.overlay.mylocation.MyLocationNewOverlay;
 
 public class MapFragment extends Fragment {
 
+    //map view and overlays
     private MapView mMapView;
     private ResourceProxy mResourceProxy;
     private MyLocationNewOverlay mLocationOverlay;
     private CompassOverlay mCompassOverlay;
     private ScaleBarOverlay mScaleBarOverlay;
-
     // Log TAG
     protected static final String TAG = "IBis-MapFragment";
-
+    //global var class
     GlobalVariables mGlobalVariables;
 
 
@@ -91,7 +91,6 @@ public class MapFragment extends Fragment {
     };
 
     public void startMapUpdates() {
-        Log.i(TAG, "startMapUpdates()");
         timerHandler.postDelayed(timerRunnable, 0);
     }
 

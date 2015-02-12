@@ -4,11 +4,13 @@ import android.app.Application;
 import android.location.Location;
 
 public class GlobalVariables extends Application {
+
     //The variables can be set and read from every Activity or Service!
-    double sGef, sZuf, vAkt, vD, tAnk, tAnkUnt, vDMuss, vDunt, tAnkEingTime, sEing,accuracy;
+    double sGef, sZuf, vAkt, vD, tAnk, tAnkUnt, vDMuss, vDunt, tAnkEingTime, sEing, accuracy;
     float textSize;
     Location location;
     boolean show_locationOverlay, show_compassOverlay, show_scaleBarOverlay, collectData;
+
 
     public void setCalculationVars(double sGefIn, double sZufIn, double vAktIn, double vDIn, double tAnkIn, double tAnkUntIn, double vDMussIn, double vDuntIn) {
         sGef = sGefIn;
@@ -43,7 +45,7 @@ public class GlobalVariables extends Application {
         show_scaleBarOverlay = show_scaleBarOverlay_in;
     }
 
-    public void setAccuracy (double accuracyIn) {
+    public void setAccuracy(double accuracyIn) {
         accuracy = accuracyIn;
     }
 
@@ -71,7 +73,9 @@ public class GlobalVariables extends Application {
         return location;
     }
 
-    public double getAccuracy () { return accuracy; }
+    public double getAccuracy() {
+        return accuracy;
+    }
 
     public double getsEing() {
         return sEing;
