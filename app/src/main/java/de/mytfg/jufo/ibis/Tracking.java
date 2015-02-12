@@ -3,7 +3,7 @@
  * iBis Tracking Service
  * receives location updates, save to SQLite.
  */
-package ibis.jufo.mytfg.de.ibis_intelligentbikeinformationsystem;
+package de.mytfg.jufo.ibis;
 
 import android.app.NotificationManager;
 import android.app.PendingIntent;
@@ -23,36 +23,25 @@ import com.google.android.gms.location.LocationListener;
 import com.google.android.gms.location.LocationRequest;
 import com.google.android.gms.location.LocationServices;
 
-
 public class Tracking extends Service implements LocationListener, OnConnectionFailedListener, ConnectionCallbacks {
 
     // Log TAG
     protected static final String TAG = "IBisTracking-class";
-
-    //Variables declaration
-    public boolean CollectData;
-
     // The desired interval for location updates. Inexact. Updates may be more or less frequent.
     public static final long UPDATE_INTERVAL_IN_MILLISECONDS = 5000;
     // The fastest rate for active location updates. Exact. Updates will never be more frequent than this value.
     public static final long FASTEST_UPDATE_INTERVAL_IN_MILLISECONDS =
             UPDATE_INTERVAL_IN_MILLISECONDS / 2;
-
     // Provides the entry point to Google Play services.
     protected GoogleApiClient mGoogleApiClient;
-
     //Stores parameters for requests to the FusedLocationProviderApi.
     protected LocationRequest mLocationRequest;
-
-    //Represents a geographical location.
+    //location vars
     protected Location mCurrentLocation;
-
     protected String mLastUpdateTime;
 
     public GPSDatabase mGPSDb;
 
-    boolean sendErrorAccuracy = false;
-    boolean sendConfirmAccuracy = false;
     boolean saveData = true;
 
     // Notification
@@ -68,14 +57,13 @@ public class Tracking extends Service implements LocationListener, OnConnectionF
 
 
     @Override
-    //Very mystical code...
     public IBinder onBind(Intent intent) {
         return null;
     }
 
     public void checkOnline() {
         Log.i(TAG, "checkOnline()");
-        if (CollectData) {
+        if (mGlobalVariable.isCollectData()) {
             startOnlineTracking();
         } else {
             stopOnlineTracking();
@@ -92,11 +80,8 @@ public class Tracking extends Service implements LocationListener, OnConnectionF
 
     public void stopOnlineTracking() {
         //TODO: stop uploading track data
-
         Log.i(TAG, "stopOnlineTracking()");
-
         //cancel notification
-        // Remove Notification
         int mNotificationId = 42;
         NotificationManager mNotifyMgr = (NotificationManager) getSystemService(NOTIFICATION_SERVICE);
         mNotifyMgr.cancel(mNotificationId);
@@ -129,7 +114,6 @@ public class Tracking extends Service implements LocationListener, OnConnectionF
     }
 
     protected void createLocationRequest() {
-        Log.i(TAG, "createLocationRequest()");
         mLocationRequest = new LocationRequest();
         // Positionsbestimmung mindestens ca. alle 5 Sekunden (5000ms)
         mLocationRequest.setInterval(UPDATE_INTERVAL_IN_MILLISECONDS);
@@ -142,16 +126,11 @@ public class Tracking extends Service implements LocationListener, OnConnectionF
     @Override
     public void onLocationChanged(Location location) {
 
-        // Nur zum testen
-        if (!CollectData) {
-            stopSelf();
-        }
         Log.i(TAG, "onLocationChanged()");
         mCurrentLocation = location;
         mLastUpdateTime = Long.toString(System.currentTimeMillis() / 1000L);
         checkAccuracy(location.getAccuracy());
         //only save data, if accuracy is ok
-        Log.i(TAG, saveData + "saveData");
         if (saveData) {
             updateDatabase();
         }
@@ -169,7 +148,6 @@ public class Tracking extends Service implements LocationListener, OnConnectionF
     }
 
     public void callCalculate() {
-        Log.i(TAG, "callCalculate()");
         mCalculate.getData(mCurrentLocation, mGlobalVariable.getsEing());
         //only call mathematical methods, if this is not the first location - else there will be a NPE
         if (!mCalculate.checkFirstLoc()) {
@@ -197,28 +175,11 @@ public class Tracking extends Service implements LocationListener, OnConnectionF
 
     public void checkAccuracy(Float accuracy) {
         Log.i(TAG, "checkAccuracy " + accuracy);
-        Log.i(TAG, accuracy + " Accuracy");
-        if (accuracy > 20 && !sendErrorAccuracy) {
+        mGlobalVariable.setAccuracy(accuracy);
+        if (accuracy > 20) {
             saveData = false;
-            Intent intent = new Intent(this, ShowDataActivity.class);
-            intent.putExtra("KeyAccuracy", accuracy);
-            intent.putExtra("KeyDoNotRestart", true);
-            intent.putExtra("KeyErrOrConfirm", 1);
-            intent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
-            startActivity(intent);
-            //sendErrorAccuracy ist to avoid, that ShowDataActivity is recreated at every Location update
-            sendErrorAccuracy = true;
-        } else if (accuracy < 20 && !sendConfirmAccuracy) {
-            Log.i(TAG, saveData + "saveData && blabla");
+        } else if (accuracy < 20) {
             saveData = true;
-            Intent intent = new Intent(this, ShowDataActivity.class);
-            intent.putExtra("KeyAccuracy", accuracy);
-            intent.putExtra("KeyDoNotRestart", true);
-            intent.putExtra("KeyErrOrConfirm", 0);
-            intent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
-            startActivity(intent);
-            //sendConfirmAccuracy ist to avoid, that ShowDataActivity is recreated at every Location update
-            sendConfirmAccuracy = true;
 
         }
     }
@@ -282,13 +243,6 @@ public class Tracking extends Service implements LocationListener, OnConnectionF
     @Override
     public int onStartCommand(Intent intent, int flags, int startId) {
         Log.i(TAG, "onStartCommand()");
-        //read extra
-        try {
-            CollectData = intent.getBooleanExtra("Key", false);
-        } catch (java.lang.NullPointerException e) {
-            stopSelf();
-        }
-
         checkOnline();
         return super.onStartCommand(intent, flags, startId);
     }
@@ -334,9 +288,9 @@ public class Tracking extends Service implements LocationListener, OnConnectionF
     @Override
     public void onConnectionFailed(ConnectionResult connectionResult) {
         Log.i(TAG, "onConnectionFailed()");
-        // Refer to the javadoc for ConnectionResult to see what error codes might be returned in
-        // onConnectionFailed.
-        // -> Wir tun nix
+        /* Refer to the javadoc for ConnectionResult to see what error codes might be returned in
+        onConnectionFailed.
+        -> Wir tun nix */
     }
 
 }

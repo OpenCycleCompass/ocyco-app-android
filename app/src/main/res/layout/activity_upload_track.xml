@@ -4,7 +4,7 @@
     android:paddingRight="@dimen/activity_horizontal_margin"
     android:paddingTop="@dimen/activity_vertical_margin"
     android:paddingBottom="@dimen/activity_vertical_margin"
-    tools:context="ibis.jufo.mytfg.de.ibis_intelligentbikeinformationsystem.UploadTrackActivity">
+    tools:context="de.mytfg.jufo.ibis.UploadTrackActivity">
 
     <Switch
         android:layout_width="wrap_content"

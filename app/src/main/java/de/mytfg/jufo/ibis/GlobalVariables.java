@@ -1,14 +1,16 @@
-package ibis.jufo.mytfg.de.ibis_intelligentbikeinformationsystem;
+package de.mytfg.jufo.ibis;
 
 import android.app.Application;
 import android.location.Location;
 
 public class GlobalVariables extends Application {
+
     //The variables can be set and read from every Activity or Service!
-    double sGef, sZuf, vAkt, vD, tAnk, tAnkUnt, vDMuss, vDunt, tAnkEingTime, sEing;
+    double sGef, sZuf, vAkt, vD, tAnk, tAnkUnt, vDMuss, vDunt, tAnkEingTime, sEing, accuracy;
     float textSize;
     Location location;
-    boolean show_locationOverlay, show_compassOverlay, show_scaleBarOverlay;
+    boolean show_locationOverlay, show_compassOverlay, show_scaleBarOverlay, collectData;
+
 
     public void setCalculationVars(double sGefIn, double sZufIn, double vAktIn, double vDIn, double tAnkIn, double tAnkUntIn, double vDMussIn, double vDuntIn) {
         sGef = sGefIn;
@@ -43,6 +45,18 @@ public class GlobalVariables extends Application {
         show_scaleBarOverlay = show_scaleBarOverlay_in;
     }
 
+    public void setAccuracy(double accuracyIn) {
+        accuracy = accuracyIn;
+    }
+
+    public void setCollectData(boolean collectDataIn) {
+        collectData = collectDataIn;
+    }
+
+    public boolean isCollectData() {
+        return collectData;
+    }
+
     public boolean isShow_locationOverlay() {
         return show_locationOverlay;
     }
@@ -57,6 +71,10 @@ public class GlobalVariables extends Application {
 
     public Location getLocation() {
         return location;
+    }
+
+    public double getAccuracy() {
+        return accuracy;
     }
 
     public double getsEing() {

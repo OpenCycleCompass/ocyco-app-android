@@ -1,4 +1,4 @@
-package ibis.jufo.mytfg.de.ibis_intelligentbikeinformationsystem;
+package de.mytfg.jufo.ibis;
 
 import android.content.ContentValues;
 import android.content.Context;
@@ -16,6 +16,7 @@ import org.json.JSONObject;
 
 public class GPSDatabase {
     private Context context;
+    //database variables
     private DbHelper dbHelper;
     public final String DBNAME = "GPSDatabase";
     public final int DBVERSION = 13;
@@ -28,10 +29,9 @@ public class GPSDatabase {
     public final String COLUMN_TST = "timestamp";
     public final String TABLENAME = "GPSData";
     public final String CREATERDB = "create table GPSData(Id integer primary key autoincrement, latitude text not null, longitude text not null, altitude text, speed text, timestamp text not null);";
-
+    //timestamp vars
     public long startTst;
     public long stopTst;
-
     // Log TAG
     protected static final String TAG = "GPSDatabase-class";
 
@@ -63,26 +63,21 @@ public class GPSDatabase {
     }
 
     public long insertRows(String lat, String lon, String alt, String spe, String tst) {
-        Log.i(TAG, "insertRows()");
         ContentValues value = new ContentValues();
         value.put(COLUMN_LAT, lat);
         value.put(COLUMN_LON, lon);
         value.put(COLUMN_ALT, alt);
         value.put(COLUMN_SPE, spe);
         value.put(COLUMN_TST, tst);
-        Log.i(TAG, value + "value");
         return db.insert(TABLENAME, null, value);
     }
 
     public Cursor getAllRows() {
-        Cursor cursor = db.query(TABLENAME, new String[]{COLUMN_ID, COLUMN_LAT, COLUMN_LON, COLUMN_ALT, COLUMN_SPE, COLUMN_TST}, null, null, null, null, null);
-        Log.i(TAG, cursor + "cursor");
-        return cursor;
-
+        return db.query(TABLENAME, new String[]{COLUMN_ID, COLUMN_LAT, COLUMN_LON, COLUMN_ALT, COLUMN_SPE, COLUMN_TST}, null, null, null, null, null);
     }
 
     public int getNumRows() {
-        int num = 0;
+        int num;
         Cursor mCount = db.rawQuery("SELECT COUNT(*) FROM " + TABLENAME, null);
         mCount.moveToFirst();
         num = mCount.getInt(0);
@@ -123,7 +118,6 @@ public class GPSDatabase {
             cursor.moveToNext();
         }
         String data_string = data.toString();
-        //Log.i(TAG, data_string);
 
         // Return intent to start UploadTrackActivity with track data attached
         Intent intent = new Intent(c, UploadTrackActivity.class);
