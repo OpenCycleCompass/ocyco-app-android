@@ -73,12 +73,11 @@ public class GPSDatabase {
     }
 
     public Cursor getAllRows() {
-        Cursor cursor = db.query(TABLENAME, new String[]{COLUMN_ID, COLUMN_LAT, COLUMN_LON, COLUMN_ALT, COLUMN_SPE, COLUMN_TST}, null, null, null, null, null);
-        return cursor;
+        return db.query(TABLENAME, new String[]{COLUMN_ID, COLUMN_LAT, COLUMN_LON, COLUMN_ALT, COLUMN_SPE, COLUMN_TST}, null, null, null, null, null);
     }
 
     public int getNumRows() {
-        int num = 0;
+        int num;
         Cursor mCount = db.rawQuery("SELECT COUNT(*) FROM " + TABLENAME, null);
         mCount.moveToFirst();
         num = mCount.getInt(0);

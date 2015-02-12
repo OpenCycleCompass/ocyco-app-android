@@ -1,7 +1,6 @@
 package de.mytfg.jufo.ibis;
 
 import android.location.Location;
-import android.util.Log;
 
 import java.util.Calendar;
 
@@ -30,9 +29,6 @@ public class Calculate {
     double tAnk; // Ankunftszeit
     double tAnkEing; //Eingegebene, gewünschte Ankunftszeit
     double tAnkUnt; //Unterschied zwischen realer und gewünschter Ankunftszeit
-
-    // Log TAG
-    protected static final String TAG = "iBis-calculate-class";
 
 
     public void getData(Location location, Double sEingInput) {

@@ -62,7 +62,7 @@ public class SettingsActivity extends ActionBarActivity implements TimePickerFra
         // from notification action "Tracking Beenden"
         Bundle bundle = getIntent().getExtras();
         if (bundle != null) {
-            if (bundle.getString("callMethod") == "stopOnlineTracking") {
+            if (bundle.getString("callMethod").equals("stopOnlineTracking")) {
                 stopOnlineTracking();
             }
         }
