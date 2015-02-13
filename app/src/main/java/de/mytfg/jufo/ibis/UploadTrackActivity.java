@@ -67,13 +67,16 @@ public class UploadTrackActivity extends ActionBarActivity {
     //private String token = "";
     private long startTst;
     private long stopTst;
-    private long length = 0;
+    private double length;
 
     private boolean uploadPublic;
 
     //shared preferences
     SharedPreferences prefs;
     SharedPreferences.Editor prefs_edit;
+
+    //global var class
+    GlobalVariables mGlobalVariables;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -123,7 +126,9 @@ public class UploadTrackActivity extends ActionBarActivity {
             stopTst = incomingIntent.getLongExtra("stopTst", 0);
         }
 
-        length = calcLength();
+        mGlobalVariables = (GlobalVariables) getApplicationContext();
+
+        length = mGlobalVariables.getsGef();
 
         initUI();
         updateUI();
@@ -149,8 +154,7 @@ public class UploadTrackActivity extends ActionBarActivity {
 
         editText_UploadTrackDuration.setText(Long.toString(stopTst - startTst));
 
-        long llength = calcLength();
-        editText_UploadTrackLength.setText(Long.toString(llength));
+        editText_UploadTrackLength.setText(Double.toString(length));
 
         uploadPublic = prefs.getBoolean("upload_public", false);
 
@@ -193,13 +197,12 @@ public class UploadTrackActivity extends ActionBarActivity {
     }
 
     private String makeUrl() {
-        long llength = calcLength();
         String lurlstr;
         Uri.Builder lurl;
         lurl = Uri.parse(this.getString(R.string.api1_base_url) + this.getString(R.string.api1_pushtrack_new))
                 .buildUpon()
                 .appendQueryParameter("duration", Long.toString(stopTst - startTst))
-                .appendQueryParameter("length", Long.toString(llength))
+                .appendQueryParameter("length", Double.toString(length*1000))
                 .appendQueryParameter("user_token", getTokenFromPrefs());
         if (uploadPublic) {
             lurl.appendQueryParameter("name", editText_UploadTrackName.getText().toString())
@@ -212,13 +215,6 @@ public class UploadTrackActivity extends ActionBarActivity {
         }
         lurlstr = lurl.build().toString();
         return lurlstr;
-    }
-
-    public long calcLength() {
-        // TODO: calculate length from GPS points
-        // Evtl. in andere oder eigene Klasse auslagern?
-        length = 42;
-        return length;
     }
 
     @Override
