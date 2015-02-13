@@ -19,7 +19,7 @@ public class GPSDatabase {
     //database variables
     private DbHelper dbHelper;
     public final String DBNAME = "GPSDatabase";
-    public final int DBVERSION = 13;
+    public final int DBVERSION = 15;
     public SQLiteDatabase db;
     public final String COLUMN_ID = "Id";
     public final String COLUMN_LAT = "latitude";
@@ -27,8 +27,9 @@ public class GPSDatabase {
     public final String COLUMN_ALT = "altitude";
     public final String COLUMN_SPE = "speed";
     public final String COLUMN_TST = "timestamp";
+    public final String COLUMN_ACC = "accuracy";
     public final String TABLENAME = "GPSData";
-    public final String CREATERDB = "create table GPSData(Id integer primary key autoincrement, latitude text not null, longitude text not null, altitude text, speed text, timestamp text not null);";
+    public final String CREATERDB = "create table GPSData(Id integer primary key autoincrement, latitude text not null, longitude text not null, altitude text, speed text, timestamp text not null, accuracy text);";
     //timestamp vars
     public long startTst;
     public long stopTst;
@@ -62,18 +63,19 @@ public class GPSDatabase {
         }
     }
 
-    public long insertRows(String lat, String lon, String alt, String spe, String tst) {
+    public long insertRows(String lat, String lon, String alt, String spe, String tst, String acc) {
         ContentValues value = new ContentValues();
         value.put(COLUMN_LAT, lat);
         value.put(COLUMN_LON, lon);
         value.put(COLUMN_ALT, alt);
         value.put(COLUMN_SPE, spe);
         value.put(COLUMN_TST, tst);
+        value.put(COLUMN_ACC, acc);
         return db.insert(TABLENAME, null, value);
     }
 
     public Cursor getAllRows() {
-        return db.query(TABLENAME, new String[]{COLUMN_ID, COLUMN_LAT, COLUMN_LON, COLUMN_ALT, COLUMN_SPE, COLUMN_TST}, null, null, null, null, null);
+        return db.query(TABLENAME, new String[]{COLUMN_ID, COLUMN_LAT, COLUMN_LON, COLUMN_ALT, COLUMN_SPE, COLUMN_TST, COLUMN_ACC}, null, null, null, null, null);
     }
 
     public int getNumRows() {
@@ -111,6 +113,7 @@ public class GPSDatabase {
                 point.put("alt", cursor.getString(3));
                 point.put("spe", cursor.getString(4));
                 point.put("tst", cursor.getString(5));
+                point.put("acc", cursor.getString(6));
             } catch (JSONException e) {
                 e.printStackTrace();
             }
@@ -118,7 +121,7 @@ public class GPSDatabase {
             cursor.moveToNext();
         }
         String data_string = data.toString();
-
+        Log.i(TAG, "data_string"+data_string);
         // Return intent to start UploadTrackActivity with track data attached
         Intent intent = new Intent(c, UploadTrackActivity.class);
         intent.putExtra("data", data_string);

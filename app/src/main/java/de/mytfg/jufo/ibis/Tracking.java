@@ -194,8 +194,9 @@ public class Tracking extends Service implements LocationListener, OnConnectionF
         String alt = mCurrentLocation.getAltitude() + "";
         String spe = mCurrentLocation.getSpeed() + "";
         String tst = mLastUpdateTime + "";
+        String acc = mCurrentLocation.getAccuracy() + "";
         mGPSDb.open();
-        mGPSDb.insertRows(lat, lon, alt, spe, tst);
+        mGPSDb.insertRows(lat, lon, alt, spe, tst, acc);
         mGPSDb.close();
         //write position to GlobalVariables class
         mGlobalVariable.setLocation(mCurrentLocation);
