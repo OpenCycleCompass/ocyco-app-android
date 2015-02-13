@@ -97,7 +97,9 @@ public class UploadTrackActivity extends ActionBarActivity {
         prefs_edit = prefs.edit();
 
         uploadPublic = prefs.getBoolean("upload_public", false);
-        button_UploadTrack.setEnabled(uploadPublic);
+        switch_UploadTrackPublic.setChecked(uploadPublic);
+
+        button_UploadTrack.setEnabled(false);
 
         // Only accept a-z, A-Z, "-" and "_" as name
         editText_UploadTrackName.setFilters(new InputFilter[]{
