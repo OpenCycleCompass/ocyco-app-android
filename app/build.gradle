@@ -4,7 +4,7 @@ android {
     compileSdkVersion 21
     buildToolsVersion "21.1.2"
     defaultConfig {
-        applicationId 'ibis.jufo.mytfg.de.ibis_intelligentbikeinformationsystem'
+        applicationId 'de.mytfg.jufo.ibis'
         minSdkVersion 15
         targetSdkVersion 21
         versionCode 1
