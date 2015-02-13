@@ -69,7 +69,11 @@ public class UploadTrackActivity extends ActionBarActivity {
     private long stopTst;
     private long length = 0;
 
-    private boolean uploadPublic = false;
+    private boolean uploadPublic;
+
+    //shared preferences
+    SharedPreferences prefs;
+    SharedPreferences.Editor prefs_edit;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -86,8 +90,11 @@ public class UploadTrackActivity extends ActionBarActivity {
         textView_UploadTrackCom = (TextView) findViewById(R.id.textView_UploadTrackCom);
 
         button_UploadTrack = (Button) findViewById(R.id.button_UploadTrack);
+        prefs = getSharedPreferences(getString(R.string.preference_file_key), (Context.MODE_MULTI_PROCESS));
+        prefs_edit = prefs.edit();
 
-        button_UploadTrack.setEnabled(false);
+        uploadPublic = prefs.getBoolean("upload_public", false);
+        button_UploadTrack.setEnabled(uploadPublic);
 
         // Only accept a-z, A-Z, "-" and "_" as name
         editText_UploadTrackName.setFilters(new InputFilter[]{
@@ -139,8 +146,6 @@ public class UploadTrackActivity extends ActionBarActivity {
 
     // Initialize GUI
     private void initUI() {
-        // Load SharedPrefs
-        SharedPreferences prefs = getSharedPreferences(getString(R.string.preference_file_key), (Context.MODE_MULTI_PROCESS));
 
         editText_UploadTrackDuration.setText(Long.toString(stopTst - startTst));
 
@@ -486,8 +491,6 @@ public class UploadTrackActivity extends ActionBarActivity {
     }
 
     private void saveToken(String t) {
-        SharedPreferences prefs = getSharedPreferences(getString(R.string.preference_file_key), (Context.MODE_MULTI_PROCESS));
-        SharedPreferences.Editor prefs_edit = prefs.edit();
         if (prefs.contains("upload_token")) {
             String old_token = prefs.getString("upload_token", "");
             String old_tokenlist = prefs.getString("upload_oldtokenlist", "");
@@ -498,13 +501,10 @@ public class UploadTrackActivity extends ActionBarActivity {
     }
 
     public String getTokenFromPrefs() {
-        SharedPreferences prefs = getSharedPreferences(getString(R.string.preference_file_key), (Context.MODE_MULTI_PROCESS));
         return prefs.getString("upload_token", null);
     }
 
     private void savePublicToPrefs(Boolean p) {
-        SharedPreferences prefs = getSharedPreferences(getString(R.string.preference_file_key), (Context.MODE_MULTI_PROCESS));
-        SharedPreferences.Editor prefs_edit = prefs.edit();
         prefs_edit.putBoolean("upload_public", p);
         prefs_edit.apply();
     }
