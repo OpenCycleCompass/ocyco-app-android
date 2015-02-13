@@ -15,6 +15,8 @@ import android.widget.CheckBox;
 import android.widget.EditText;
 import android.widget.TextView;
 
+import java.util.Calendar;
+
 
 public class SettingsActivity extends ActionBarActivity implements TimePickerFragment.OnTimePickedListener {
 
@@ -216,6 +218,15 @@ public class SettingsActivity extends ActionBarActivity implements TimePickerFra
             arrivalTime.setText(hour + ":" + minute + " Uhr");
         }
         convertToMilliseconds(hour, minute);
+
+        final Calendar c = Calendar.getInstance();
+        int current_hour = c.get(Calendar.HOUR_OF_DAY);
+        int current_minute = c.get(Calendar.MINUTE);
+
+        //if set time is before current time add a day in milliseconds to set time
+        if ((hour<current_hour)||(current_hour==hour)&&(minute<current_minute)) {
+            tAnkEingTime += 24*60*60*1000;
+        }
     }
 
     //convert hour and minutes to milliseconds for mathematical operations @Calculation
