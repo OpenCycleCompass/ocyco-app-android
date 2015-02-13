@@ -226,25 +226,6 @@ public class UploadTrackActivity extends ActionBarActivity {
         return super.onOptionsItemSelected(item);
     }
 
-    public void debugShowUrl(View v) {
-        // Generate / concatenate url
-        String lurl = makeUrl();
-        // Show url as "Toast" message
-        Context context = getApplicationContext();
-        int duration = Toast.LENGTH_LONG;
-        Toast toast = Toast.makeText(context, lurl, duration);
-        toast.show();
-    }
-
-    public void debugShowData(View v) {
-        // Generate / concatenate url
-        String ldata = data;
-        // Show url as "Toast" message
-        Context context = getApplicationContext();
-        int duration = Toast.LENGTH_LONG;
-        Toast toast = Toast.makeText(context, ldata, duration);
-        toast.show();
-    }
 
     public void getToken(View v) {
         String lurl = this.getString(R.string.api1_base_url) + this.getString(R.string.api1_token_new);

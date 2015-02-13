@@ -1,202 +1,127 @@
-<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:paddingBottom="@dimen/activity_vertical_margin"
-    android:paddingLeft="@dimen/activity_horizontal_margin"
-    android:paddingRight="@dimen/activity_horizontal_margin"
-    android:paddingTop="@dimen/activity_vertical_margin"
+    android:orientation="vertical"
     tools:context="de.mytfg.jufo.ibis.UploadTrackActivity">
 
+    <ScrollView
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content">
 
-    <Switch
-        android:id="@+id/switch_UploadTrackPublic"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_alignParentEnd="true"
-        android:layout_alignParentLeft="true"
-        android:layout_alignParentRight="true"
-        android:layout_alignParentStart="true"
-        android:layout_alignParentTop="true"
-        android:focusableInTouchMode="true"
-        android:onClick="onSwitchPublic"
-        android:text="@string/upload_track_public_visible" />
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:paddingBottom="@dimen/activity_vertical_margin"
+            android:paddingLeft="@dimen/activity_horizontal_margin"
+            android:paddingRight="@dimen/activity_horizontal_margin"
+            android:paddingTop="@dimen/activity_vertical_margin"
+            android:orientation="vertical">
 
-    <TextView
-        android:id="@+id/textView_UploadTrackName"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_alignParentEnd="true"
-        android:layout_alignParentLeft="true"
-        android:layout_alignParentRight="true"
-        android:layout_alignParentStart="true"
-        android:layout_below="@+id/switch_UploadTrackPublic"
-        android:labelFor="@+id/editText_UploadTrackName"
-        android:text="@string/upload_track_name"
-        android:textAppearance="?android:attr/textAppearanceSmall" />
 
-    <EditText
-        android:id="@+id/editText_UploadTrackName"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_alignParentEnd="true"
-        android:layout_alignParentLeft="true"
-        android:layout_alignParentRight="true"
-        android:layout_alignParentStart="true"
-        android:layout_below="@+id/textView_UploadTrackName"
-        android:inputType="text" />
+            <Switch
+                android:id="@+id/switch_UploadTrackPublic"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:focusableInTouchMode="true"
+                android:onClick="onSwitchPublic"
+                android:text="@string/upload_track_public_visible"
+                android:paddingBottom="20px"/>
 
-    <TextView
-        android:id="@+id/textView_UploadTrackCom"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_alignParentEnd="true"
-        android:layout_alignParentLeft="true"
-        android:layout_alignParentRight="true"
-        android:layout_alignParentStart="true"
-        android:layout_below="@+id/editText_UploadTrackName"
-        android:labelFor="@+id/editText_UploadTrackCom"
-        android:text="@string/upload_track_com"
-        android:textAppearance="?android:attr/textAppearanceSmall" />
+            <TextView
+                android:id="@+id/textView_UploadTrackName"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:labelFor="@+id/editText_UploadTrackName"
+                android:text="@string/upload_track_name"
+                android:textAppearance="?android:attr/textAppearanceSmall" />
 
-    <EditText
-        android:id="@+id/editText_UploadTrackCom"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_alignParentEnd="true"
-        android:layout_alignParentLeft="true"
-        android:layout_alignParentRight="true"
-        android:layout_alignParentStart="true"
-        android:layout_below="@+id/textView_UploadTrackCom"
-        android:inputType="textAutoCorrect" />
+            <EditText
+                android:id="@+id/editText_UploadTrackName"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:inputType="text" />
 
-    <TextView
-        android:id="@+id/textView_UploadTrackDuration"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_alignEnd="@+id/editText_UploadTrackCom"
-        android:layout_alignParentLeft="true"
-        android:layout_alignParentStart="true"
-        android:layout_alignRight="@+id/editText_UploadTrackCom"
-        android:layout_below="@+id/editText_UploadTrackCom"
-        android:labelFor="@+id/editText_UploadTrackDuration"
-        android:text="@string/upload_track_duration"
-        android:textAppearance="?android:attr/textAppearanceSmall" />
+            <TextView
+                android:id="@+id/textView_UploadTrackCom"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:labelFor="@+id/editText_UploadTrackCom"
+                android:text="@string/upload_track_com"
+                android:textAppearance="?android:attr/textAppearanceSmall" />
 
-    <EditText
-        android:id="@+id/editText_UploadTrackDuration"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_alignParentEnd="true"
-        android:layout_alignParentLeft="true"
-        android:layout_alignParentRight="true"
-        android:layout_alignParentStart="true"
-        android:layout_below="@+id/textView_UploadTrackDuration"
-        android:ems="10"
-        android:inputType="time|none" />
+            <EditText
+                android:id="@+id/editText_UploadTrackCom"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:inputType="textAutoCorrect" />
 
-    <TextView
-        android:id="@+id/textView_UploadTrackLength"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_alignParentEnd="true"
-        android:layout_alignParentLeft="true"
-        android:layout_alignParentRight="true"
-        android:layout_alignParentStart="true"
-        android:layout_below="@+id/editText_UploadTrackDuration"
-        android:labelFor="@+id/editText_UploadTrackLength"
-        android:text="@string/upload_track_length"
-        android:textAppearance="?android:attr/textAppearanceSmall" />
+            <TextView
+                android:id="@+id/textView_UploadTrackDuration"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:labelFor="@+id/editText_UploadTrackDuration"
+                android:text="@string/upload_track_duration"
+                android:textAppearance="?android:attr/textAppearanceSmall" />
 
-    <EditText
-        android:id="@+id/editText_UploadTrackLength"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_alignParentEnd="true"
-        android:layout_alignParentLeft="true"
-        android:layout_alignParentRight="true"
-        android:layout_alignParentStart="true"
-        android:layout_below="@+id/textView_UploadTrackLength"
-        android:ems="10"
-        android:inputType="none|number" />
+            <EditText
+                android:id="@+id/editText_UploadTrackDuration"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:ems="10"
+                android:inputType="time|none" />
 
-    <TextView
-        android:id="@+id/textView_UploadTrackToken"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_alignParentEnd="true"
-        android:layout_alignParentLeft="true"
-        android:layout_alignParentRight="true"
-        android:layout_alignParentStart="true"
-        android:layout_below="@+id/editText_UploadTrackLength"
-        android:labelFor="@+id/editText_UploadTrackToken"
-        android:text="@string/upload_track_token"
-        android:textAppearance="?android:attr/textAppearanceSmall" />
+            <TextView
+                android:id="@+id/textView_UploadTrackLength"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:labelFor="@+id/editText_UploadTrackLength"
+                android:text="@string/upload_track_length"
+                android:textAppearance="?android:attr/textAppearanceSmall" />
 
-    <EditText
-        android:id="@+id/editText_UploadTrackToken"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_alignParentEnd="true"
-        android:layout_alignParentLeft="true"
-        android:layout_alignParentRight="true"
-        android:layout_alignParentStart="true"
-        android:layout_below="@+id/textView_UploadTrackToken"
-        android:inputType="none" />
+            <EditText
+                android:id="@+id/editText_UploadTrackLength"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:ems="10"
+                android:inputType="none|number" />
 
-    <Button
-        android:id="@+id/button_UploadTrackTokenRegenerate"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_alignParentEnd="true"
-        android:layout_alignParentLeft="true"
-        android:layout_alignParentRight="true"
-        android:layout_alignParentStart="true"
-        android:layout_below="@+id/editText_UploadTrackToken"
-        android:onClick="getToken"
-        android:text="@string/upload_track_token_regenerate" />
+            <TextView
+                android:id="@+id/textView_UploadTrackToken"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:labelFor="@+id/editText_UploadTrackToken"
+                android:text="@string/upload_track_token"
+                android:textAppearance="?android:attr/textAppearanceSmall" />
 
-    <Button
-        android:id="@+id/button_UploadTrack"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_alignParentBottom="true"
-        android:layout_alignParentEnd="true"
-        android:layout_alignParentLeft="true"
-        android:layout_alignParentRight="true"
-        android:layout_alignParentStart="true"
-        android:onClick="uploadTrack"
-        android:text="@string/upload_track" />
+            <EditText
+                android:id="@+id/editText_UploadTrackToken"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:inputType="none" />
 
-    <Button
-        android:id="@+id/button_UploadTrackDebugUrl"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_above="@+id/button_UploadTrack"
-        android:layout_alignParentLeft="true"
-        android:layout_alignParentStart="true"
-        android:onClick="debugShowUrl"
-        android:text="@string/upload_track_debugurl" />
+            <Button
+                android:id="@+id/button_UploadTrackTokenRegenerate"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:onClick="getToken"
+                android:text="@string/upload_track_token_regenerate" />
 
-    <TextView
-        android:id="@+id/textView_UploadTrackId"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_above="@+id/button_UploadTrackDebugUrl"
-        android:layout_alignParentEnd="true"
-        android:layout_alignParentLeft="true"
-        android:layout_alignParentRight="true"
-        android:layout_alignParentStart="true"
-        android:textAppearance="?android:attr/textAppearanceMedium" />
+            <Button
+                android:id="@+id/button_UploadTrack"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:onClick="uploadTrack"
+                android:text="@string/upload_track" />
 
-    <Button
-        android:id="@+id/button_UploadTrackDebugData"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_above="@+id/button_UploadTrack"
-        android:layout_alignParentEnd="true"
-        android:layout_alignParentRight="true"
-        android:onClick="debugShowData"
-        android:text="@string/upload_track_debugdata" />
+            <TextView
+                android:id="@+id/textView_UploadTrackId"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:textAppearance="?android:attr/textAppearanceMedium" />
 
-</RelativeLayout>
+        </LinearLayout>
+
+    </ScrollView>
+
+</LinearLayout>
