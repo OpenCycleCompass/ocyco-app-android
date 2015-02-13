@@ -31,6 +31,11 @@ public class ShowDataActivity extends ActionBarActivity {
 
     String tAnkMinStr;
     boolean accuracyAlert, oldAccuracyAlert;
+    //alert dialog vars
+    AlertDialog.Builder alertDialogBuilder;
+    AlertDialog alertDialog;
+    boolean dialogExists = false;
+
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -39,6 +44,8 @@ public class ShowDataActivity extends ActionBarActivity {
 
         //initialize global variable class
         mGlobalVariable = (GlobalVariables) getApplicationContext();
+        //alert dialog for accuracy alerts
+        alertDialogBuilder = new AlertDialog.Builder(ShowDataActivity.this);
         //info box text fields
         sGefBox = (TextView) findViewById(R.id.sGefBox);
         sZufBox = (TextView) findViewById(R.id.sZufBox);
@@ -66,32 +73,31 @@ public class ShowDataActivity extends ActionBarActivity {
     }
 
 
-    private void openAccuracyAlert() {
-        //set up a new alert dialog
-        AlertDialog.Builder alertDialogBuilder = new AlertDialog.Builder(ShowDataActivity.this);
-        alertDialogBuilder.setTitle("Positionsbestimmung zu ungenau!");
-        alertDialogBuilder.setMessage(mGlobalVariable.getAccuracy() + "m Abweichung sind zu ungenau zum Navigieren! Haben Sie GPS aktiviert? Signal wird gesucht...");
+    private void openAccuracyAlert(boolean confirm) {
+        if (dialogExists) {
+            alertDialog.dismiss();
+            dialogExists=false;
+        }
+        if (confirm) {
+            alertDialogBuilder.setTitle("Positionsbestimmung erfolgreich!");
+            alertDialogBuilder.setMessage((int)mGlobalVariable.getAccuracy() + "m Abweichung ist akzeptabel für die Navigation, sie können nun beginnen!");
+            //create the OK Button and onClickListener
+            alertDialogBuilder.setPositiveButton("OK", new DialogInterface.OnClickListener() {
+                //close dialog when clicked
+                public void onClick(DialogInterface dialog, int id) {
+                    dialog.cancel();
+                    dialogExists = false;
+                }
+            });
 
+        } else {
+            alertDialogBuilder.setTitle("Positionsbestimmung zu ungenau!");
+            alertDialogBuilder.setMessage((int)mGlobalVariable.getAccuracy() + "m Abweichung sind zu ungenau zum Navigieren! Haben Sie GPS aktiviert? Signal wird gesucht...");
+        }
         //create and show alert dialog
-        AlertDialog alertDialog = alertDialogBuilder.create();
+        alertDialog = alertDialogBuilder.create();
         alertDialog.show();
-    }
-
-    private void openAccuracyConfirm() {
-        //set up a new alert dialog
-        AlertDialog.Builder alertDialogBuilder = new AlertDialog.Builder(ShowDataActivity.this);
-        alertDialogBuilder.setTitle("Positionsbestimmung erfolgreich!");
-        alertDialogBuilder.setMessage(mGlobalVariable.getAccuracy() + "m Abweichung ist akzeptabel für die Navigation, sie können nun beginnen!");
-        //create the OK Button and onClickListener
-        alertDialogBuilder.setPositiveButton("OK", new DialogInterface.OnClickListener() {
-            //close dialog when clicked
-            public void onClick(DialogInterface dialog, int id) {
-                dialog.cancel();
-            }
-        });
-        //create and show alert dialog
-        AlertDialog alertDialog = alertDialogBuilder.create();
-        alertDialog.show();
+        dialogExists = true;
     }
 
     //Timer for updating the info boxes
@@ -112,9 +118,9 @@ public class ShowDataActivity extends ActionBarActivity {
                 //check which accuracy alert
                 //TODO: close first dialog, when second one is opened (or put both in one dialog)
                 if (accuracyAlert) {
-                    openAccuracyAlert();
+                    openAccuracyAlert(false);
                 } else {
-                    openAccuracyConfirm();
+                    openAccuracyAlert(true);
                 }
             }
             timerHandler.postDelayed(this, 500);
