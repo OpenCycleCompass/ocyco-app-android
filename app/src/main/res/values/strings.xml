@@ -37,7 +37,7 @@
     <string name="upload_track_name_default">Insert-Name-Here</string>
     <string name="upload_track_com_default">Hier könnte Ihre Werbung stehen</string>
     <string name="upload_track_duration">Dauer (s)</string>
-    <string name="upload_track_length">Länge (m)</string>
+    <string name="upload_track_length">Länge (km)</string>
     <string name="upload_track_token">Token</string>
     <string name="upload_track_token_regenerate">Token neu generieren</string>
     <string name="upload_track">Hochladen</string>

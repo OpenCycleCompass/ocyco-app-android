@@ -30,6 +30,7 @@ public class Calculate {
     double tAnkEing; //Eingegebene, gewünschte Ankunftszeit
     double tAnkUnt; //Unterschied zwischen realer und gewünschter Ankunftszeit
 
+    double dateInMilliseconds;
 
     public void getData(Location location, Double sEingInput) {
         //get location
@@ -64,17 +65,17 @@ public class Calculate {
 
 
     public void calculateTimeVars(double tAnkEingTimeInput) {
-        tAnkEing = ((tAnkEingTimeInput / 1000) / 60) / 60;
         //get date in milliseconds
         final Calendar c = Calendar.getInstance();
         int current_hour = c.get(Calendar.HOUR_OF_DAY);
         int current_minute = c.get(Calendar.MINUTE);
         double milliSeconds = System.currentTimeMillis();
         double timeInMillis = (double) ((current_hour * 60 + current_minute) * 60 * 1000);
-        double dateInMilliseconds = (milliSeconds - timeInMillis);
-
+        dateInMilliseconds = (milliSeconds - timeInMillis);
+        //add date to time
+        tAnkEing = (((tAnkEingTimeInput + dateInMilliseconds)/1000)/60)/60;
         //get actual time in hours
-        tAkt = (((milliSeconds - dateInMilliseconds) / 1000) / 60) / 60;
+        tAkt = (((timeInMillis + dateInMilliseconds)/1000)/60)/60;
     }
 
 
@@ -102,7 +103,7 @@ public class Calculate {
         //time to drive
         tZuf = sZuf / vD;
         //arrival time
-        tAnk = tAkt + tZuf;
+        tAnk = (tAkt + tZuf);
         //difference between arrival and planed arrival time
         tAnkUnt = tAnk - tAnkEing;
         //necessary speed for arriving in time
@@ -129,7 +130,8 @@ public class Calculate {
     }
 
     public double gettAnk() {
-        return tAnk;
+        //convert to hours
+        return (tAnk-((((dateInMilliseconds)/1000)/60)/60));
     }
 
     public double gettAnkUnt() {

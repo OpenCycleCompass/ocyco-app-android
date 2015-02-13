@@ -67,9 +67,16 @@ public class UploadTrackActivity extends ActionBarActivity {
     //private String token = "";
     private long startTst;
     private long stopTst;
-    private long length = 0;
+    private double length;
 
-    private boolean uploadPublic = false;
+    private boolean uploadPublic;
+
+    //shared preferences
+    SharedPreferences prefs;
+    SharedPreferences.Editor prefs_edit;
+
+    //global var class
+    GlobalVariables mGlobalVariables;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -86,6 +93,11 @@ public class UploadTrackActivity extends ActionBarActivity {
         textView_UploadTrackCom = (TextView) findViewById(R.id.textView_UploadTrackCom);
 
         button_UploadTrack = (Button) findViewById(R.id.button_UploadTrack);
+        prefs = getSharedPreferences(getString(R.string.preference_file_key), (Context.MODE_MULTI_PROCESS));
+        prefs_edit = prefs.edit();
+
+        uploadPublic = prefs.getBoolean("upload_public", false);
+        switch_UploadTrackPublic.setChecked(uploadPublic);
 
         button_UploadTrack.setEnabled(false);
 
@@ -116,7 +128,9 @@ public class UploadTrackActivity extends ActionBarActivity {
             stopTst = incomingIntent.getLongExtra("stopTst", 0);
         }
 
-        length = calcLength();
+        mGlobalVariables = (GlobalVariables) getApplicationContext();
+
+        length = mGlobalVariables.getsGef();
 
         initUI();
         updateUI();
@@ -139,13 +153,10 @@ public class UploadTrackActivity extends ActionBarActivity {
 
     // Initialize GUI
     private void initUI() {
-        // Load SharedPrefs
-        SharedPreferences prefs = getSharedPreferences(getString(R.string.preference_file_key), (Context.MODE_MULTI_PROCESS));
 
         editText_UploadTrackDuration.setText(Long.toString(stopTst - startTst));
 
-        long llength = calcLength();
-        editText_UploadTrackLength.setText(Long.toString(llength));
+        editText_UploadTrackLength.setText(Double.toString(length));
 
         uploadPublic = prefs.getBoolean("upload_public", false);
 
@@ -188,13 +199,12 @@ public class UploadTrackActivity extends ActionBarActivity {
     }
 
     private String makeUrl() {
-        long llength = calcLength();
         String lurlstr;
         Uri.Builder lurl;
         lurl = Uri.parse(this.getString(R.string.api1_base_url) + this.getString(R.string.api1_pushtrack_new))
                 .buildUpon()
                 .appendQueryParameter("duration", Long.toString(stopTst - startTst))
-                .appendQueryParameter("length", Long.toString(llength))
+                .appendQueryParameter("length", Double.toString(length*1000))
                 .appendQueryParameter("user_token", getTokenFromPrefs());
         if (uploadPublic) {
             lurl.appendQueryParameter("name", editText_UploadTrackName.getText().toString())
@@ -209,13 +219,6 @@ public class UploadTrackActivity extends ActionBarActivity {
         return lurlstr;
     }
 
-    public long calcLength() {
-        // TODO: calculate length from GPS points
-        // Evtl. in andere oder eigene Klasse auslagern?
-        length = 42;
-        return length;
-    }
-
     @Override
     public boolean onCreateOptionsMenu(Menu menu) {
         return true;
@@ -226,25 +229,6 @@ public class UploadTrackActivity extends ActionBarActivity {
         return super.onOptionsItemSelected(item);
     }
 
-    public void debugShowUrl(View v) {
-        // Generate / concatenate url
-        String lurl = makeUrl();
-        // Show url as "Toast" message
-        Context context = getApplicationContext();
-        int duration = Toast.LENGTH_LONG;
-        Toast toast = Toast.makeText(context, lurl, duration);
-        toast.show();
-    }
-
-    public void debugShowData(View v) {
-        // Generate / concatenate url
-        String ldata = data;
-        // Show url as "Toast" message
-        Context context = getApplicationContext();
-        int duration = Toast.LENGTH_LONG;
-        Toast toast = Toast.makeText(context, ldata, duration);
-        toast.show();
-    }
 
     public void getToken(View v) {
         String lurl = this.getString(R.string.api1_base_url) + this.getString(R.string.api1_token_new);
@@ -505,8 +489,6 @@ public class UploadTrackActivity extends ActionBarActivity {
     }
 
     private void saveToken(String t) {
-        SharedPreferences prefs = getSharedPreferences(getString(R.string.preference_file_key), (Context.MODE_MULTI_PROCESS));
-        SharedPreferences.Editor prefs_edit = prefs.edit();
         if (prefs.contains("upload_token")) {
             String old_token = prefs.getString("upload_token", "");
             String old_tokenlist = prefs.getString("upload_oldtokenlist", "");
@@ -517,13 +499,10 @@ public class UploadTrackActivity extends ActionBarActivity {
     }
 
     public String getTokenFromPrefs() {
-        SharedPreferences prefs = getSharedPreferences(getString(R.string.preference_file_key), (Context.MODE_MULTI_PROCESS));
         return prefs.getString("upload_token", null);
     }
 
     private void savePublicToPrefs(Boolean p) {
-        SharedPreferences prefs = getSharedPreferences(getString(R.string.preference_file_key), (Context.MODE_MULTI_PROCESS));
-        SharedPreferences.Editor prefs_edit = prefs.edit();
         prefs_edit.putBoolean("upload_public", p);
         prefs_edit.apply();
     }
