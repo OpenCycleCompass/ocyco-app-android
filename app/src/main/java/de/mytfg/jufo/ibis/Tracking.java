@@ -79,13 +79,11 @@ public class Tracking extends Service implements LocationListener, OnConnectionF
     }
 
     public void stopOnlineTracking() {
-        //TODO: stop uploading track data
         Log.i(TAG, "stopOnlineTracking()");
         //cancel notification
         int mNotificationId = 42;
         NotificationManager mNotifyMgr = (NotificationManager) getSystemService(NOTIFICATION_SERVICE);
         mNotifyMgr.cancel(mNotificationId);
-        stopSelf();
     }
 
     public void stopLocationUpdates() {
