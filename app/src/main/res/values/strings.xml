@@ -41,6 +41,8 @@
     <string name="upload_track_token">Token</string>
     <string name="upload_track_token_regenerate">Token neu generieren</string>
     <string name="upload_track">Hochladen</string>
+    <string name="upload_track_delete">Track löschen</string>
+    <string name="upload_track_deleted">Track gelöscht</string>
     <string name="upload_track_debugurl">DEBUG: URL</string>
     <string name="upload_track_debugdata">DEBUG: DATA</string>
 
