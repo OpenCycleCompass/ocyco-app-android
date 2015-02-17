@@ -38,7 +38,6 @@ public class Tracking extends Service implements LocationListener, OnConnectionF
     protected LocationRequest mLocationRequest;
     //location vars
     protected Location mCurrentLocation;
-    protected String mLastUpdateTime;
 
     public GPSDatabase mGPSDb;
 
@@ -129,7 +128,6 @@ public class Tracking extends Service implements LocationListener, OnConnectionF
 
         Log.i(TAG, "onLocationChanged()");
         mCurrentLocation = location;
-        mLastUpdateTime = Long.toString(System.currentTimeMillis() / 1000L);
         checkAccuracy(location.getAccuracy());
         //only save data, if accuracy is ok
         if (saveData) {
@@ -189,12 +187,12 @@ public class Tracking extends Service implements LocationListener, OnConnectionF
     public void updateDatabase() {
         Log.i(TAG, "updateDatabase()");
         //Convert to String for Database
-        String lat = mCurrentLocation.getLatitude() + "";
-        String lon = mCurrentLocation.getLongitude() + "";
-        String alt = mCurrentLocation.getAltitude() + "";
-        String spe = mCurrentLocation.getSpeed() + "";
-        String tst = mLastUpdateTime + "";
-        String acc = mCurrentLocation.getAccuracy() + "";
+        double lat = mCurrentLocation.getLatitude();
+        double lon = mCurrentLocation.getLongitude();
+        double alt = mCurrentLocation.getAltitude();
+        double spe = mCurrentLocation.getSpeed();
+        long tst = mCurrentLocation.getTime();
+        double acc = mCurrentLocation.getAccuracy();
         mGPSDb.open();
         mGPSDb.insertRows(lat, lon, alt, spe, tst, acc);
         mGPSDb.close();
