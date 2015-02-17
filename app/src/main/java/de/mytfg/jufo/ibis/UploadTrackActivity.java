@@ -121,16 +121,12 @@ public class UploadTrackActivity extends ActionBarActivity {
         if (incomingIntent.hasExtra("data")) {
             data = incomingIntent.getStringExtra("data");
         }
-        if (incomingIntent.hasExtra("startTst")) {
-            startTst = incomingIntent.getLongExtra("startTst", 0);
-        }
-        if (incomingIntent.hasExtra("stopTst")) {
-            stopTst = incomingIntent.getLongExtra("stopTst", 0);
-        }
+        startTst = incomingIntent.getLongExtra("startTst", 0);
+        stopTst = incomingIntent.getLongExtra("stopTst", 0);
+        length = incomingIntent.getDoubleExtra("totalDist",0)/1000;
 
-        mGlobalVariables = (GlobalVariables) getApplicationContext();
-
-        length = mGlobalVariables.getsGef();
+        //mGlobalVariables = (GlobalVariables) getApplicationContext();
+        //length = mGlobalVariables.getsGef();
 
         initUI();
         updateUI();
