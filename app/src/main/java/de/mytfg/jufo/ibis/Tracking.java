@@ -123,6 +123,10 @@ public class Tracking extends Service implements LocationListener, OnConnectionF
         mLocationRequest.setPriority(LocationRequest.PRIORITY_HIGH_ACCURACY);
     }
 
+    private String roundDecimals(double d) {
+        return String.format("%.2f", d);
+    }
+
     @Override
     public void onLocationChanged(Location location) {
 
@@ -133,11 +137,13 @@ public class Tracking extends Service implements LocationListener, OnConnectionF
         if (saveData) {
             updateDatabase();
         }
-        mGPSDb.open();
+        //mGPSDb.open();
         int num_rows = mGPSDb.getNumRows();
-        mGPSDb.close();
+        double total_dist = mGPSDb.getTotalDist();
+        String s_total_dist = roundDecimals(total_dist/1000);
+        //mGPSDb.close();
         // Update notification
-        mBuilder.setContentText(getString(R.string.tracking_status_active) + " - " + num_rows + " GPS Punkte aufgezeichnet");
+        mBuilder.setContentText(getString(R.string.tracking_status_active) + " - " + num_rows + " Koordinaten / " + s_total_dist + " km");
         // Sets an ID for the notification
         int mNotificationId = 42;
         // Builds the notification and issues it.
@@ -186,16 +192,9 @@ public class Tracking extends Service implements LocationListener, OnConnectionF
 
     public void updateDatabase() {
         Log.i(TAG, "updateDatabase()");
-        //Convert to String for Database
-        double lat = mCurrentLocation.getLatitude();
-        double lon = mCurrentLocation.getLongitude();
-        double alt = mCurrentLocation.getAltitude();
-        double spe = mCurrentLocation.getSpeed();
-        long tst = mCurrentLocation.getTime();
-        double acc = mCurrentLocation.getAccuracy();
-        mGPSDb.open();
-        mGPSDb.insertRows(lat, lon, alt, spe, tst, acc);
-        mGPSDb.close();
+        //mGPSDb.open();
+        mGPSDb.insertLocation(mCurrentLocation);
+        //mGPSDb.close();
         //write position to GlobalVariables class
         mGlobalVariable.setLocation(mCurrentLocation);
     }
@@ -252,13 +251,15 @@ public class Tracking extends Service implements LocationListener, OnConnectionF
         Log.i(TAG, "onDestroy()");
         // Save Data: sendToServer()
         if (true) {
-            mGPSDb.open();
+            //mGPSDb.open();
             // Start Intent returned by mGPSDb.sendToServer()
             // intent has track data as "Extra"
+            int d_rows = mGPSDb.prepareDB();
+            Log.i(TAG, Integer.toString(d_rows)+" coordinates where tdiff<0.5 oder dist<0.5 removed");
             Intent intent = mGPSDb.sendToServer(this);
             intent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
             startActivity(intent);
-            mGPSDb.close();
+            //mGPSDb.close();
         }
         stopLocationUpdates();
         mGPSDb.deleteDatabase();

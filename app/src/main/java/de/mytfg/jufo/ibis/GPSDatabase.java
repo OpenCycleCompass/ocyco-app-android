@@ -7,6 +7,7 @@ import android.database.Cursor;
 import android.database.SQLException;
 import android.database.sqlite.SQLiteDatabase;
 import android.database.sqlite.SQLiteOpenHelper;
+import android.location.Location;
 import android.util.Log;
 
 import org.json.JSONArray;
@@ -19,7 +20,7 @@ public class GPSDatabase {
     //database variables
     private DbHelper dbHelper;
     public final String DBNAME = "GPSDatabase";
-    public final int DBVERSION = 16;
+    public final int DBVERSION = 20;
     public SQLiteDatabase db;
     public final String COLUMN_ID = "Id";
     public final String COLUMN_LAT = "latitude";
@@ -28,17 +29,23 @@ public class GPSDatabase {
     public final String COLUMN_SPE = "speed";
     public final String COLUMN_TST = "timestamp";
     public final String COLUMN_ACC = "accuracy";
+    public final String COLUMN_DIST = "distance"; ///distance to last point in meters
+    public final String COLUMN_TDIFF = "tdiff"; ///time difference to last point in milliseconds
     public final String TABLENAME = "GPSData";
     public final String CREATERDB = "CREATE TABLE "+TABLENAME+"("+COLUMN_ID+" INTEGER PRIMARY KEY AUTOINCREMENT," +
-            " "+COLUMN_LAT+" REAL NOT NULL," +
-            " "+COLUMN_LON+" REAL NOT NULL," +
-            " "+COLUMN_ALT+" REAL," +
-            " "+COLUMN_SPE+" REAL," +
-            " "+COLUMN_TST+" INTEGER NOT NULL," +
-            " "+COLUMN_ACC+" REAL);";
+            COLUMN_LAT+" REAL NOT NULL, " +
+            COLUMN_LON+" REAL NOT NULL, " +
+            COLUMN_ALT+" REAL, " +
+            COLUMN_SPE+" REAL, " +
+            COLUMN_TST+" INTEGER NOT NULL, " +
+            COLUMN_ACC+" REAL, " +
+            COLUMN_DIST+" REAL, " +
+            COLUMN_TDIFF+" INTEGER);";
     //timestamp vars
     public long startTst;
     public long stopTst;
+    // Last location
+    private Location lastLocation = null;
     // Log TAG
     protected static final String TAG = "GPSDatabase-class";
 
@@ -48,6 +55,7 @@ public class GPSDatabase {
         this.context = context;
         dbHelper = new DbHelper(context);
         startTst = System.currentTimeMillis() / 1000;
+        open();
     }
 
     //creating a DbHelper
@@ -69,19 +77,47 @@ public class GPSDatabase {
         }
     }
 
-    public long insertRows(double lat, double lon, double alt, double spe, long tst, double acc) {
+    public long insertLocation(Location loc) {
         ContentValues value = new ContentValues();
-        value.put(COLUMN_LAT, lat);
-        value.put(COLUMN_LON, lon);
-        value.put(COLUMN_ALT, alt);
-        value.put(COLUMN_SPE, spe);
-        value.put(COLUMN_TST, tst);
-        value.put(COLUMN_ACC, acc);
+        value.put(COLUMN_LAT, loc.getLatitude());
+        value.put(COLUMN_LON, loc.getLongitude());
+        value.put(COLUMN_ALT, loc.getAltitude());
+        value.put(COLUMN_SPE, loc.getSpeed());
+        value.put(COLUMN_TST, loc.getTime());
+        value.put(COLUMN_ACC, loc.getAccuracy());
+        double dist;
+        long tdiff;
+        if(lastLocation==null) {
+            dist = 0;
+            tdiff = 0;
+            lastLocation = loc;
+        } else {
+            dist = loc.distanceTo(lastLocation);
+            tdiff = loc.getTime()-lastLocation.getTime();
+            lastLocation = loc;
+        }
+        value.put(COLUMN_DIST, dist);
+        value.put(COLUMN_TDIFF, tdiff);
         return db.insert(TABLENAME, null, value);
+    }
+
+    public int prepareDB() {
+        int d_rows = db.delete(TABLENAME, COLUMN_TDIFF+" < 0.5", null);
+        d_rows += db.delete(TABLENAME, COLUMN_DIST+" < 0.5", null);
+        return d_rows;
     }
 
     public Cursor getAllRows() {
         return db.query(TABLENAME, new String[]{COLUMN_ID, COLUMN_LAT, COLUMN_LON, COLUMN_ALT, COLUMN_SPE, COLUMN_TST, COLUMN_ACC}, null, null, null, null, null);
+    }
+
+    public double getTotalDist() {
+        double tdist;
+        Cursor mCount = db.rawQuery("SELECT SUM("+COLUMN_DIST+") FROM " + TABLENAME, null);
+        mCount.moveToFirst();
+        tdist = mCount.getDouble(0);
+        mCount.close();
+        return tdist;
     }
 
     public int getNumRows() {
@@ -93,12 +129,12 @@ public class GPSDatabase {
         return num;
     }
 
-    public void open() throws SQLException {
+    private void open() throws SQLException {
         Log.i(TAG, "open()");
         db = dbHelper.getWritableDatabase();
     }
 
-    public void close() {
+    private void close() {
         Log.i(TAG, "close()");
         dbHelper.close();
     }
@@ -131,6 +167,8 @@ public class GPSDatabase {
         intent.putExtra("data", data_string);
         intent.putExtra("stopTst", stopTst);
         intent.putExtra("startTst", startTst);
+        intent.putExtra("totalDist", getTotalDist());
+        intent.putExtra("coordCnt", getNumRows());
         return intent;
     }
 
@@ -138,5 +176,6 @@ public class GPSDatabase {
         //delete database
         context.deleteDatabase(DBNAME);
         Log.i(TAG, "database deleted");
+        close();
     }
 }

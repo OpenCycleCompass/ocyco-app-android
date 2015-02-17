@@ -45,11 +45,7 @@ public class Calculate {
     }
 
     public boolean checkFirstLoc() {
-        if (oldLoc == null) {
-            return true;
-        } else {
-            return false;
-        }
+        return (oldLoc == null);
     }
 
     public void calculateSpeed() {

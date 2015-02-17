@@ -62,6 +62,7 @@ public class UploadTrackActivity extends ActionBarActivity {
     private TextView textView_UploadTrackCom;
 
     private Button button_UploadTrack;
+    private Button button_DeleteTrack;
 
     private String data = "[]"; // empty, but valid JSON
     //private String token = "";
@@ -91,8 +92,9 @@ public class UploadTrackActivity extends ActionBarActivity {
         switch_UploadTrackPublic = (Switch) findViewById(R.id.switch_UploadTrackPublic);
         textView_UploadTrackName = (TextView) findViewById(R.id.textView_UploadTrackName);
         textView_UploadTrackCom = (TextView) findViewById(R.id.textView_UploadTrackCom);
-
+        button_DeleteTrack = (Button) findViewById(R.id.button_DeleteTrack);
         button_UploadTrack = (Button) findViewById(R.id.button_UploadTrack);
+
         prefs = getSharedPreferences(getString(R.string.preference_file_key), (Context.MODE_MULTI_PROCESS));
         prefs_edit = prefs.edit();
 
@@ -121,16 +123,12 @@ public class UploadTrackActivity extends ActionBarActivity {
         if (incomingIntent.hasExtra("data")) {
             data = incomingIntent.getStringExtra("data");
         }
-        if (incomingIntent.hasExtra("startTst")) {
-            startTst = incomingIntent.getLongExtra("startTst", 0);
-        }
-        if (incomingIntent.hasExtra("stopTst")) {
-            stopTst = incomingIntent.getLongExtra("stopTst", 0);
-        }
+        startTst = incomingIntent.getLongExtra("startTst", 0);
+        stopTst = incomingIntent.getLongExtra("stopTst", 0);
+        length = incomingIntent.getDoubleExtra("totalDist",0)/1000;
 
-        mGlobalVariables = (GlobalVariables) getApplicationContext();
-
-        length = mGlobalVariables.getsGef();
+        //mGlobalVariables = (GlobalVariables) getApplicationContext();
+        //length = mGlobalVariables.getsGef();
 
         initUI();
         updateUI();
@@ -250,6 +248,7 @@ public class UploadTrackActivity extends ActionBarActivity {
     // Upload Track
     public void uploadTrack(View v) {
         // Disable Button to prevent multiple uploads
+        button_DeleteTrack.setEnabled(false);
         button_UploadTrack.setEnabled(false);
         String lurl = makeUrl();
         Log.i(TAG, lurl);
@@ -265,6 +264,15 @@ public class UploadTrackActivity extends ActionBarActivity {
             Toast toast = Toast.makeText(context, getString(R.string.upload_error_no_network_try_again_later), duration);
             toast.show();
         }
+    }
+
+    // delete Track
+    public void deleteTrack(View v) {
+        // Disable Button to prevent empty upload
+        button_DeleteTrack.setEnabled(false);
+        button_UploadTrack.setEnabled(false);
+        Toast toast = Toast.makeText(getApplicationContext(), getString(R.string.upload_track_deleted), Toast.LENGTH_LONG);
+        toast.show();
     }
 
 
