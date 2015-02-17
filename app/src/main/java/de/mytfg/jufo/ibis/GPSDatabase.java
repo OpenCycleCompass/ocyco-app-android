@@ -19,7 +19,7 @@ public class GPSDatabase {
     //database variables
     private DbHelper dbHelper;
     public final String DBNAME = "GPSDatabase";
-    public final int DBVERSION = 15;
+    public final int DBVERSION = 16;
     public SQLiteDatabase db;
     public final String COLUMN_ID = "Id";
     public final String COLUMN_LAT = "latitude";
@@ -29,7 +29,13 @@ public class GPSDatabase {
     public final String COLUMN_TST = "timestamp";
     public final String COLUMN_ACC = "accuracy";
     public final String TABLENAME = "GPSData";
-    public final String CREATERDB = "create table GPSData(Id integer primary key autoincrement, latitude text not null, longitude text not null, altitude text, speed text, timestamp text not null, accuracy text);";
+    public final String CREATERDB = "CREATE TABLE "+TABLENAME+"("+COLUMN_ID+" INTEGER PRIMARY KEY AUTOINCREMENT," +
+            " "+COLUMN_LAT+" REAL NOT NULL," +
+            " "+COLUMN_LON+" REAL NOT NULL," +
+            " "+COLUMN_ALT+" REAL," +
+            " "+COLUMN_SPE+" REAL," +
+            " "+COLUMN_TST+" INTEGER NOT NULL," +
+            " "+COLUMN_ACC+" REAL);";
     //timestamp vars
     public long startTst;
     public long stopTst;
@@ -63,7 +69,7 @@ public class GPSDatabase {
         }
     }
 
-    public long insertRows(String lat, String lon, String alt, String spe, String tst, String acc) {
+    public long insertRows(double lat, double lon, double alt, double spe, long tst, double acc) {
         ContentValues value = new ContentValues();
         value.put(COLUMN_LAT, lat);
         value.put(COLUMN_LON, lon);
@@ -90,13 +96,11 @@ public class GPSDatabase {
     public void open() throws SQLException {
         Log.i(TAG, "open()");
         db = dbHelper.getWritableDatabase();
-        //return true;
     }
 
     public void close() {
         Log.i(TAG, "close()");
         dbHelper.close();
-        //return true;
     }
 
     public Intent sendToServer(Context c) {
@@ -108,12 +112,12 @@ public class GPSDatabase {
         while (!cursor.isAfterLast()) {
             JSONObject point = new JSONObject();
             try {
-                point.put("lat", cursor.getString(1));
-                point.put("lon", cursor.getString(2));
-                point.put("alt", cursor.getString(3));
-                point.put("spe", cursor.getString(4));
-                point.put("tst", cursor.getString(5));
-                point.put("acc", cursor.getString(6));
+                point.put("lat", cursor.getDouble(1));
+                point.put("lon", cursor.getDouble(2));
+                point.put("alt", cursor.getDouble(3));
+                point.put("spe", cursor.getDouble(4));
+                point.put("tst", (double)cursor.getLong(5)/1000);
+                point.put("acc", cursor.getDouble(6));
             } catch (JSONException e) {
                 e.printStackTrace();
             }

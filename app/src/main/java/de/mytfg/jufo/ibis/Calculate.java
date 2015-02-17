@@ -1,6 +1,7 @@
 package de.mytfg.jufo.ibis;
 
 import android.location.Location;
+import android.util.Log;
 
 import java.util.Calendar;
 
@@ -44,11 +45,11 @@ public class Calculate {
     }
 
     public boolean checkFirstLoc() {
-        boolean firstLoc = false;
         if (oldLoc == null) {
-            firstLoc = true;
+            return true;
+        } else {
+            return false;
         }
-        return firstLoc;
     }
 
     public void calculateSpeed() {
@@ -62,7 +63,6 @@ public class Calculate {
             vAkt = lastDistance / timeDiff;
         }
     }
-
 
     public void calculateTimeVars(double tAnkEingTimeInput) {
         //get date in milliseconds
@@ -78,22 +78,16 @@ public class Calculate {
         tAkt = (((timeInMillis + dateInMilliseconds)/1000)/60)/60;
     }
 
-
     public void calculateDrivenDistance() {
-        //Calculate the distance between old and newLoc and add to sGef
-        double dLon = 111.3 * (oldLoc.getLongitude() - newLoc.getLongitude());
-        double dLat = 71.5 * (oldLoc.getLatitude() - newLoc.getLatitude());
-        lastDistance = Math.sqrt(dLon * dLon + dLat * dLat);
+        //Calculate the distance between old and newLoc in kilometers and add to sGef
+        lastDistance = newLoc.distanceTo(oldLoc)/1000;
         sGef += lastDistance;
     }
 
     public void calculateDrivenTime() {
         //calculate driven time and convert to hours
-        double newTime = newLoc.getTime();
-        double firstTime = firstLoc.getTime();
-        tGef = ((((newTime - firstTime) / 1000) / 60) / 60);
+        tGef = ((((newLoc.getTime() - firstLoc.getTime()) / 1000) / 60) / 60);
     }
-
 
     public void math() {
         //average speed
