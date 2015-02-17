@@ -114,6 +114,13 @@
                 android:onClick="uploadTrack"
                 android:text="@string/upload_track" />
 
+            <Button
+                android:id="@+id/button_DeleteTrack"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:onClick="deleteTrack"
+                android:text="@string/upload_track_delete" />
+
             <TextView
                 android:id="@+id/textView_UploadTrackId"
                 android:layout_width="match_parent"
