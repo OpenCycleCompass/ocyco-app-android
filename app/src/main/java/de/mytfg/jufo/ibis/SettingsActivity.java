@@ -39,7 +39,10 @@ public class SettingsActivity extends ActionBarActivity implements TimePickerFra
         // Restore preferences
         SharedPreferences settings = getSharedPreferences(getString(R.string.preference_file_key), Context.MODE_PRIVATE);
         //get variables and set to global class
-        mGlobalVariable.setCollectData(settings.getBoolean("CollectData", false));
+        //check, if collectData was set by another activity, else read from preferences
+        if (!mGlobalVariable.isCollectDataSet()) {
+            mGlobalVariable.setCollectData(settings.getBoolean("CollectData", false));
+        }
         mGlobalVariable.setShowLocationOverlay(settings.getBoolean("showLocationOverlay", true));
         mGlobalVariable.setShowCompassOverlay(settings.getBoolean("showCompassOverlay", true));
         mGlobalVariable.setShowScaleBarOverlay(settings.getBoolean("showScaleBarOverlay", true));
@@ -59,15 +62,6 @@ public class SettingsActivity extends ActionBarActivity implements TimePickerFra
         editDistance.setText(Float.toString(FloatDistStartDest));
         EditText enter_text_size = (EditText) findViewById(R.id.enter_text_size);
         enter_text_size.setText(Float.toString(FloatTextSize));
-
-        // call stopOnlineTracking() if SettingsActivity has benn started
-        // from notification action "Tracking Beenden"
-        Bundle bundle = getIntent().getExtras();
-        if (bundle != null) {
-            if (bundle.getString("callMethod").equals("stopOnlineTracking")) {
-                stopOnlineTracking();
-            }
-        }
     }
 
 
@@ -188,18 +182,12 @@ public class SettingsActivity extends ActionBarActivity implements TimePickerFra
     }
 
     public void onClickstopOnlineTracking(View view) {
-        stopOnlineTracking();
-    }
-
-    public void stopOnlineTracking() {
         //set collect data false
         mGlobalVariable.setCollectData(false);
         final CheckBox checkBox = (CheckBox) findViewById(R.id.CBCollectData);
         checkBox.setChecked(mGlobalVariable.isCollectData());
-        /*restart Tracking Service starts it's onStartCommand (NOT onCreate),
-        so checkOnline will be executed again */
-        Intent intent = new Intent(this, Tracking.class);
-        startService(intent);
+        Intent stopOnlineTrackingIntent = new Intent(this, Tracking.class);
+        startService(stopOnlineTrackingIntent);
     }
 
     //create and show the TimePickerFragment

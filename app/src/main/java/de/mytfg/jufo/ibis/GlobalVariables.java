@@ -9,8 +9,7 @@ public class GlobalVariables extends Application {
     double sGef, sZuf, vAkt, vD, tAnk, tAnkUnt, vDMuss, vDunt, tAnkEingTime, sEing, accuracy;
     float textSize;
     Location location;
-    boolean show_locationOverlay, show_compassOverlay, show_scaleBarOverlay, collectData;
-
+    boolean show_locationOverlay, show_compassOverlay, show_scaleBarOverlay, collectData, collectDataSet;
 
     public void setCalculationVars(double sGefIn, double sZufIn, double vAktIn, double vDIn, double tAnkIn, double tAnkUntIn, double vDMussIn, double vDuntIn) {
         sGef = sGefIn;
@@ -22,6 +21,7 @@ public class GlobalVariables extends Application {
         vDMuss = vDMussIn;
         vDunt = vDuntIn;
     }
+
 
     public void setLocation(Location locationIn) {
         location = locationIn;
@@ -51,11 +51,14 @@ public class GlobalVariables extends Application {
 
     public void setCollectData(boolean collectDataIn) {
         collectData = collectDataIn;
+        collectDataSet = true;
     }
 
     public boolean isCollectData() {
         return collectData;
     }
+
+    public  boolean isCollectDataSet() { return collectDataSet; }
 
     public boolean isShow_locationOverlay() {
         return show_locationOverlay;

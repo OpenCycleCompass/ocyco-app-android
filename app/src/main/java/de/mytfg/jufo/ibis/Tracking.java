@@ -71,6 +71,7 @@ public class Tracking extends Service implements LocationListener, OnConnectionF
 
     public void startOnlineTracking() {
         Log.i(TAG, "startOnlineTracking()");
+        mGlobalVariable.setCollectData(true);
         // Create Notification with track info
         mBuilder.setContentText(getString(R.string.tracking_status_active));
         // Builds the notification and issues it.
@@ -78,20 +79,30 @@ public class Tracking extends Service implements LocationListener, OnConnectionF
     }
 
     public void stopOnlineTracking() {
-        //TODO: stop uploading track data
         Log.i(TAG, "stopOnlineTracking()");
-        //cancel notification
+        //cancel notificationStopOnlineTracking
         int mNotificationId = 42;
         NotificationManager mNotifyMgr = (NotificationManager) getSystemService(NOTIFICATION_SERVICE);
         mNotifyMgr.cancel(mNotificationId);
-        stopSelf();
+        mGPSDb.open();
+        // Start Intent returned by mGPSDb.sendToServer()
+        // intent has track data as "Extra"
+        Intent intent = mGPSDb.sendToServer(this);
+        intent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
+        //only start activity, if data isn't empty
+        if (!intent.getStringExtra("data").equals("[]")) {
+            startActivity(intent);
+        }
+        mGPSDb.deleteDatabase();
+        mGPSDb.close();
     }
 
     public void stopLocationUpdates() {
-        Log.i(TAG, "stopTracking()");
+        Log.i(TAG, "stopLocationUpdates()");
         // Stop LocationListener
-        LocationServices.FusedLocationApi.removeLocationUpdates(mGoogleApiClient, this);
-
+        if (mGoogleApiClient.isConnected()) {
+            LocationServices.FusedLocationApi.removeLocationUpdates(mGoogleApiClient, this);
+        }
     }
 
     protected void startLocationUpdates() {
@@ -134,21 +145,19 @@ public class Tracking extends Service implements LocationListener, OnConnectionF
         mCurrentLocation = location;
         checkAccuracy(location.getAccuracy());
         //only save data, if accuracy is ok
-        if (saveData) {
+        if (saveData && mGlobalVariable.isCollectData()) {
             updateDatabase();
+            //update Notification
+            mGPSDb.open();
+            int num_rows = mGPSDb.getNumRows();
+            mGPSDb.close();
+            // Update notification
+            mBuilder.setContentText(getString(R.string.tracking_status_active) + " - " + num_rows + " GPS Punkte aufgezeichnet");
+            // Sets an ID for the notification
+            int mNotificationId = 42;
+            // Builds the notification and issues it.
+            mNotifyMgr.notify(mNotificationId, mBuilder.build());
         }
-        //mGPSDb.open();
-        int num_rows = mGPSDb.getNumRows();
-        double total_dist = mGPSDb.getTotalDist();
-        String s_total_dist = roundDecimals(total_dist/1000);
-        //mGPSDb.close();
-        // Update notification
-        mBuilder.setContentText(getString(R.string.tracking_status_active) + " - " + num_rows + " Koordinaten / " + s_total_dist + " km");
-        // Sets an ID for the notification
-        int mNotificationId = 42;
-        // Builds the notification and issues it.
-        mNotifyMgr.notify(mNotificationId, mBuilder.build());
-
         callCalculate();
     }
 
@@ -207,12 +216,12 @@ public class Tracking extends Service implements LocationListener, OnConnectionF
 
         // Create Notification
         Intent tracking_showIntent = new Intent(this, ShowDataActivity.class);
+        tracking_showIntent.setFlags(tracking_showIntent.getFlags() | Intent.FLAG_ACTIVITY_NO_HISTORY);
         PendingIntent tracking_showPendingIntent = PendingIntent.getActivity(this, 0, tracking_showIntent, 0);
 
-        Intent tracking_stopIntent = new Intent(this, SettingsActivity.class);
-        tracking_stopIntent.putExtra("callMethod", "stopOnlineTracking");
-        // TODO SettingsActivity should call stopOnlineTracking() in onCreate if intent.getExtra("callMethod") is "stopOnlineTracking"
-        PendingIntent tracking_stopPendingIntent = PendingIntent.getActivity(this, 0, tracking_stopIntent, 0);
+        Intent tracking_stopIntent = new Intent(this, Tracking.class);
+        tracking_stopIntent.putExtra("stopOnlineTracking", true);
+        PendingIntent tracking_stopPendingIntent = PendingIntent.getService(this, 0, tracking_stopIntent, 0);
 
         mBuilder = new NotificationCompat.Builder(this);
 
@@ -235,6 +244,9 @@ public class Tracking extends Service implements LocationListener, OnConnectionF
 
         //create Database
         mGPSDb = new GPSDatabase(this.getApplicationContext());
+        //delete old database, if exists
+        //delete database
+        mGPSDb.deleteDatabase();
         //initialize global variable class
         mGlobalVariable = (GlobalVariables) getApplicationContext();
     }
@@ -242,6 +254,16 @@ public class Tracking extends Service implements LocationListener, OnConnectionF
     @Override
     public int onStartCommand(Intent intent, int flags, int startId) {
         Log.i(TAG, "onStartCommand()");
+        //read Extra data from intent. If Service was started by the system, there will be a RuntimeExc.
+        try {
+            if (intent.hasExtra("stopOnlineTracking")) {
+                if (intent.getBooleanExtra("stopOnlineTracking", false)) {
+                    mGlobalVariable.setCollectData(false);
+                }
+            }
+        } catch (RuntimeException e) {
+            stopSelf();
+        }
         checkOnline();
         return super.onStartCommand(intent, flags, startId);
     }
@@ -249,26 +271,12 @@ public class Tracking extends Service implements LocationListener, OnConnectionF
     @Override
     public void onDestroy() {
         Log.i(TAG, "onDestroy()");
-        // Save Data: sendToServer()
-        if (true) {
-            //mGPSDb.open();
-            // Start Intent returned by mGPSDb.sendToServer()
-            // intent has track data as "Extra"
-            int d_rows = mGPSDb.prepareDB();
-            Log.i(TAG, Integer.toString(d_rows)+" coordinates where tdiff<0.5 oder dist<0.5 removed");
-            Intent intent = mGPSDb.sendToServer(this);
-            intent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
-            startActivity(intent);
-            //mGPSDb.close();
+        super.onDestroy();
+        if (mGlobalVariable.isCollectData()) {
+            stopOnlineTracking();
         }
         stopLocationUpdates();
-        mGPSDb.deleteDatabase();
         mGoogleApiClient.disconnect();
-
-        // remove tracking notification
-        mNotifyMgr.cancel(mNotificationId);
-
-        super.onDestroy();
     }
 
     @Override
