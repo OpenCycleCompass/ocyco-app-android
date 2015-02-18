@@ -84,7 +84,6 @@ public class Tracking extends Service implements LocationListener, OnConnectionF
         int mNotificationId = 42;
         NotificationManager mNotifyMgr = (NotificationManager) getSystemService(NOTIFICATION_SERVICE);
         mNotifyMgr.cancel(mNotificationId);
-        mGPSDb.open();
         // Start Intent returned by mGPSDb.sendToServer()
         // intent has track data as "Extra"
         Intent intent = mGPSDb.sendToServer(this);
@@ -94,7 +93,6 @@ public class Tracking extends Service implements LocationListener, OnConnectionF
             startActivity(intent);
         }
         mGPSDb.deleteDatabase();
-        mGPSDb.close();
     }
 
     public void stopLocationUpdates() {
@@ -148,9 +146,7 @@ public class Tracking extends Service implements LocationListener, OnConnectionF
         if (saveData && mGlobalVariable.isCollectData()) {
             updateDatabase();
             //update Notification
-            mGPSDb.open();
             int num_rows = mGPSDb.getNumRows();
-            mGPSDb.close();
             // Update notification
             mBuilder.setContentText(getString(R.string.tracking_status_active) + " - " + num_rows + " GPS Punkte aufgezeichnet");
             // Sets an ID for the notification
@@ -201,9 +197,7 @@ public class Tracking extends Service implements LocationListener, OnConnectionF
 
     public void updateDatabase() {
         Log.i(TAG, "updateDatabase()");
-        //mGPSDb.open();
         mGPSDb.insertLocation(mCurrentLocation);
-        //mGPSDb.close();
         //write position to GlobalVariables class
         mGlobalVariable.setLocation(mCurrentLocation);
     }
