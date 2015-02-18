@@ -85,14 +85,15 @@ public class Tracking extends Service implements LocationListener, OnConnectionF
         int mNotificationId = 42;
         NotificationManager mNotifyMgr = (NotificationManager) getSystemService(NOTIFICATION_SERVICE);
         mNotifyMgr.cancel(mNotificationId);
-
-        //TODO: avoid, that UploadActivity is started, if collectData is false, but it's the first time, the activity is started.
         mGPSDb.open();
         // Start Intent returned by mGPSDb.sendToServer()
         // intent has track data as "Extra"
         Intent intent = mGPSDb.sendToServer(this);
         intent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
-        startActivity(intent);
+        //only start activity, if data isn't empty
+        if (!intent.getStringExtra("data").equals("[]")) {
+            startActivity(intent);
+        }
         mGPSDb.deleteDatabase();
         mGPSDb.close();
     }
