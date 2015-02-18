@@ -129,12 +129,12 @@ public class GPSDatabase {
         return num;
     }
 
-    private void open() throws SQLException {
+    public void open() throws SQLException {
         Log.i(TAG, "open()");
         db = dbHelper.getWritableDatabase();
     }
 
-    private void close() {
+    public void close() {
         Log.i(TAG, "close()");
         dbHelper.close();
     }
