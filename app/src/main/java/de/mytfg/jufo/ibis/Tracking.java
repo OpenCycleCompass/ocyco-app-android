@@ -221,6 +221,7 @@ public class Tracking extends Service implements LocationListener, OnConnectionF
 
         // Create Notification
         Intent tracking_showIntent = new Intent(this, ShowDataActivity.class);
+        tracking_showIntent.setFlags(tracking_showIntent.getFlags() | Intent.FLAG_ACTIVITY_NO_HISTORY);
         PendingIntent tracking_showPendingIntent = PendingIntent.getActivity(this, 0, tracking_showIntent, 0);
 
         Intent tracking_stopIntent = new Intent(this, Tracking.class);
