@@ -55,7 +55,6 @@ public class GPSDatabase {
         this.context = context;
         dbHelper = new DbHelper(context);
         startTst = System.currentTimeMillis() / 1000;
-        open();
     }
 
     //creating a DbHelper
@@ -129,12 +128,12 @@ public class GPSDatabase {
         return num;
     }
 
-    private void open() throws SQLException {
+    public void open() throws SQLException {
         Log.i(TAG, "open()");
         db = dbHelper.getWritableDatabase();
     }
 
-    private void close() {
+    public void close() {
         Log.i(TAG, "close()");
         dbHelper.close();
     }
@@ -176,6 +175,5 @@ public class GPSDatabase {
         //delete database
         context.deleteDatabase(DBNAME);
         Log.i(TAG, "database deleted");
-        close();
     }
 }

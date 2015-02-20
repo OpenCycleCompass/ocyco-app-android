@@ -39,7 +39,7 @@ public class Tracking extends Service implements LocationListener, OnConnectionF
     //location vars
     protected Location mCurrentLocation;
 
-    public GPSDatabase mGPSDb;
+    private GPSDatabase mGPSDb;
 
     boolean saveData = true;
 
@@ -86,10 +86,13 @@ public class Tracking extends Service implements LocationListener, OnConnectionF
         mNotifyMgr.cancel(mNotificationId);
         // Start Intent returned by mGPSDb.sendToServer()
         // intent has track data as "Extra"
+        int d_rows = mGPSDb.prepareDB();
+        Log.i(TAG, Integer.toString(d_rows) + " " + getString(R.string.tracking_prepare_coords_removed_filter1));
         Intent intent = mGPSDb.sendToServer(this);
         intent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
         //only start activity, if data isn't empty
-        if (!intent.getStringExtra("data").equals("[]")) {
+        //if (!intent.getStringExtra("data").equals("[]")) {
+        if (!intent.getStringExtra("data").equals(UploadTrackActivity.data_empty)) { // valid but empty JSON defined in UploadTrackActivity ("[]")
             startActivity(intent);
         }
         mGPSDb.deleteDatabase();
@@ -101,11 +104,13 @@ public class Tracking extends Service implements LocationListener, OnConnectionF
         if (mGoogleApiClient.isConnected()) {
             LocationServices.FusedLocationApi.removeLocationUpdates(mGoogleApiClient, this);
         }
+        mGPSDb.close();
     }
 
     protected void startLocationUpdates() {
         Log.i(TAG, "startLocationUpdates()");
         LocationServices.FusedLocationApi.requestLocationUpdates(mGoogleApiClient, mLocationRequest, this);
+        mGPSDb.open();
     }
 
     /**
@@ -138,7 +143,6 @@ public class Tracking extends Service implements LocationListener, OnConnectionF
 
     @Override
     public void onLocationChanged(Location location) {
-
         Log.i(TAG, "onLocationChanged()");
         mCurrentLocation = location;
         checkAccuracy(location.getAccuracy());
@@ -147,8 +151,10 @@ public class Tracking extends Service implements LocationListener, OnConnectionF
             updateDatabase();
             //update Notification
             int num_rows = mGPSDb.getNumRows();
+            double total_dist = mGPSDb.getTotalDist();
+            String s_total_dist = roundDecimals(total_dist/1000);
             // Update notification
-            mBuilder.setContentText(getString(R.string.tracking_status_active) + " - " + num_rows + " GPS Punkte aufgezeichnet");
+            mBuilder.setContentText(getString(R.string.tracking_status_active) + " - " + num_rows + getString(R.string.coordinates) + s_total_dist + " " + getString(R.string.km));
             // Sets an ID for the notification
             int mNotificationId = 42;
             // Builds the notification and issues it.
@@ -208,6 +214,13 @@ public class Tracking extends Service implements LocationListener, OnConnectionF
         Log.i(TAG, "onCreate()");
         super.onCreate();
 
+        // Create Database
+        mGPSDb = new GPSDatabase(this.getApplicationContext());
+        // Delete old data from database
+        mGPSDb.open();
+        mGPSDb.deleteDatabase();
+        mGPSDb.close();
+
         // Create Notification
         Intent tracking_showIntent = new Intent(this, ShowDataActivity.class);
         tracking_showIntent.setFlags(tracking_showIntent.getFlags() | Intent.FLAG_ACTIVITY_NO_HISTORY);
@@ -236,11 +249,6 @@ public class Tracking extends Service implements LocationListener, OnConnectionF
         buildGoogleApiClient();
         mGoogleApiClient.connect();
 
-        //create Database
-        mGPSDb = new GPSDatabase(this.getApplicationContext());
-        //delete old database, if exists
-        //delete database
-        mGPSDb.deleteDatabase();
         //initialize global variable class
         mGlobalVariable = (GlobalVariables) getApplicationContext();
     }

@@ -81,6 +81,8 @@
     <string name="cb_show_scaleBarOverlay">Maßstab anzeigen</string>
     <string name="text_size">Textgröße in den Infoboxen:</string>
     <string name="text_size_unit">dp</string>
+    <string name="coordinates">" Koordinaten / "</string>
+    <string name="tracking_prepare_coords_removed_filter1"><![CDATA["coordinates where tdiff<0.5 or dist<0.5 removed"]]></string>
 
 
 </resources>

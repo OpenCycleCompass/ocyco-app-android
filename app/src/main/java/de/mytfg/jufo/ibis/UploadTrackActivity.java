@@ -64,8 +64,9 @@ public class UploadTrackActivity extends ActionBarActivity {
     private Button button_UploadTrack;
     private Button button_DeleteTrack;
 
-    private String data = "[]"; // empty, but valid JSON
-    //private String token = "";
+    public static final String data_empty = "[]"; // empty, but valid JSON
+    private String data = data_empty;
+
     private long startTst;
     private long stopTst;
     private double length;
