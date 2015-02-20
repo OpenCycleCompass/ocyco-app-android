@@ -42,6 +42,7 @@ public class Tracking extends Service implements LocationListener, OnConnectionF
     private GPSDatabase mGPSDb;
 
     boolean saveData = true;
+    private String accNotiStr;
 
     // Notification
     // Sets an ID for the notification
@@ -73,7 +74,7 @@ public class Tracking extends Service implements LocationListener, OnConnectionF
         Log.i(TAG, "startOnlineTracking()");
         mGlobalVariable.setCollectData(true);
         // Create Notification with track info
-        mBuilder.setContentText(getString(R.string.tracking_status_active));
+        mBuilder.setContentText(accNotiStr + getString(R.string.tracking_status_active));
         // Builds the notification and issues it.
         mNotifyMgr.notify(mNotificationId, mBuilder.build());
     }
@@ -145,16 +146,15 @@ public class Tracking extends Service implements LocationListener, OnConnectionF
     public void onLocationChanged(Location location) {
         Log.i(TAG, "onLocationChanged()");
         mCurrentLocation = location;
-        checkAccuracy(location.getAccuracy());
         //only save data, if accuracy is ok
-        if (saveData && mGlobalVariable.isCollectData()) {
+        if (mGlobalVariable.isCollectData() && checkAccuracy(location.getAccuracy())) {
             updateDatabase();
             //update Notification
             int num_rows = mGPSDb.getNumRows();
             double total_dist = mGPSDb.getTotalDist();
             String s_total_dist = roundDecimals(total_dist/1000);
             // Update notification
-            mBuilder.setContentText(getString(R.string.tracking_status_active) + " - " + num_rows + getString(R.string.coordinates) + s_total_dist + " " + getString(R.string.km));
+            mBuilder.setContentText(accNotiStr + getString(R.string.tracking_status_active) + " - " + num_rows + getString(R.string.coordinates) + s_total_dist + " " + getString(R.string.km));
             // Sets an ID for the notification
             int mNotificationId = 42;
             // Builds the notification and issues it.
@@ -189,15 +189,18 @@ public class Tracking extends Service implements LocationListener, OnConnectionF
 
     }
 
-    public void checkAccuracy(Float accuracy) {
+    public boolean checkAccuracy(Float accuracy) {
         Log.i(TAG, "checkAccuracy " + accuracy);
         mGlobalVariable.setAccuracy(accuracy);
         if (accuracy > 20) {
             saveData = false;
+            accNotiStr = "GPS wird gesucht ...";
         } else if (accuracy < 20) {
             saveData = true;
+            accNotiStr = "";
 
         }
+        return saveData;
     }
 
 
@@ -220,6 +223,8 @@ public class Tracking extends Service implements LocationListener, OnConnectionF
         mGPSDb.open();
         mGPSDb.deleteDatabase();
         mGPSDb.close();
+
+        accNotiStr = getString(R.string.tracking_gps_searching);
 
         // Create Notification
         Intent tracking_showIntent = new Intent(this, ShowDataActivity.class);
