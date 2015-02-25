@@ -146,6 +146,11 @@ public class SettingsActivity extends ActionBarActivity implements TimePickerFra
         }
     }
 
+    public void onClickFindRoute (View view) {
+        Intent intent = new Intent(this, RoutingActivity.class);
+        startActivity(intent);
+    }
+
     private void openAlert(String StrEditText) {
         //set up a new alert dialog
         AlertDialog.Builder alertDialogBuilder = new AlertDialog.Builder(SettingsActivity.this);

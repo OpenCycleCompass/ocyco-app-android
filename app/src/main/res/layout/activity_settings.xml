@@ -124,6 +124,14 @@
                 android:text="@string/setTime" />
 
             <Button
+                android:id="@+id/button_findRoute"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="10dp"
+                android:text="@string/findRoute"
+                android:onClick="onClickFindRoute"/>
+
+            <Button
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:layout_marginTop="10dp"

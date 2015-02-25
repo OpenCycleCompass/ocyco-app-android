@@ -80,5 +80,7 @@
     <string name="address_format">Bitte geben sie die Adresse in folgendem Format ein: Stadt, Straße, Hausnummer</string>
     <string name="destination">Zieladresse</string>
     <string name="generate_route_button">Route generieren</string>
+    <string name="api1_get_route">getroute.php?getroute=getroute</string>
+    <string name="findRoute">Route finden</string>
 
 </resources>

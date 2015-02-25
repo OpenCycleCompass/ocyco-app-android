@@ -61,7 +61,8 @@
         android:layout_height="wrap_content"
         android:layout_marginTop="10dp"
         android:id="@+id/generate_route"
-        android:text="@string/generate_route_button"/>
+        android:text="@string/generate_route_button"
+        android:onClick="onClickGenerateRoute"/>
 
 
 
