@@ -14,6 +14,10 @@ import android.view.View;
 import android.widget.EditText;
 import android.widget.Toast;
 
+import org.json.JSONArray;
+import org.json.JSONException;
+import org.json.JSONObject;
+
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
@@ -91,6 +95,29 @@ public class RoutingActivity extends ActionBarActivity {
             Log.i(TAG, "onPostExecute");
             Log.i(TAG, "HTTP result: " + result);
             //TODO: Json Objekt empfangen und auswerten
+            //create JSON Object
+            JSONObject jObject = null;
+            try {
+                jObject = new JSONObject(result);
+            } catch (JSONException e) {
+                e.printStackTrace();
+            }
+            if (jObject != null) {
+                try {
+                    //get JSON Array
+                    JSONArray jArray = jObject.getJSONArray("points");
+                    //Read from JSON Array
+                    for (int i = 0; i < jArray.length(); i++) {
+                        JSONObject oneObject = jArray.getJSONObject(i);
+                        // Pulling items from the array
+                        double lat = oneObject.getDouble("lat");
+                        double lon = oneObject.getDouble("lon");
+                    }
+                } catch (JSONException e) {
+                   e.printStackTrace();
+                }
+
+            }
         }
     }
 
