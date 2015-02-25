@@ -1,6 +1,7 @@
 package de.mytfg.jufo.ibis;
 
 import android.content.Context;
+import android.location.Location;
 import android.net.ConnectivityManager;
 import android.net.NetworkInfo;
 import android.net.Uri;
@@ -29,11 +30,17 @@ import java.net.URL;
 public class RoutingActivity extends ActionBarActivity {
 
     final String TAG = "RoutingActivity-class";
+    RoutingDatabase mRDb;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_routing);
+        mRDb = new RoutingDatabase(this);
+        mRDb.open();
+        boolean deleted = mRDb.deleteDatabase();
+        Log.i(TAG, "deleted "+deleted);
+        mRDb.close();
     }
 
     public void onClickGenerateRoute(View view) {
@@ -94,9 +101,10 @@ public class RoutingActivity extends ActionBarActivity {
         protected void onPostExecute(String result) {
             Log.i(TAG, "onPostExecute");
             Log.i(TAG, "HTTP result: " + result);
-            //TODO: Json Objekt empfangen und auswerten
+            double dist;
             //create JSON Object
             JSONObject jObject = null;
+            Location oldLocation = new Location("");
             try {
                 jObject = new JSONObject(result);
             } catch (JSONException e) {
@@ -107,14 +115,38 @@ public class RoutingActivity extends ActionBarActivity {
                     //get JSON Array
                     JSONArray jArray = jObject.getJSONArray("points");
                     //Read from JSON Array
+                    mRDb.open();
                     for (int i = 0; i < jArray.length(); i++) {
+                        Location location = new Location("");
                         JSONObject oneObject = jArray.getJSONObject(i);
                         // Pulling items from the array
                         double lat = oneObject.getDouble("lat");
                         double lon = oneObject.getDouble("lon");
+                        location.setLatitude(lat);
+                        location.setLongitude(lon);
+                        if (i!=0) {
+                            dist = location.distanceTo(oldLocation);
+                        }
+                        else {
+                            dist = 0;
+                        }
+                        //insert into db
+                        mRDb.insertData(lat, lon, dist);
+                        oldLocation = location;
                     }
+                    Log.i(TAG, "totalDistDB "+mRDb.getTotalDist());
+                    Log.i(TAG, "totalCnt "+mRDb.getTotalCnt());
+                    mRDb.close();
                 } catch (JSONException e) {
                    e.printStackTrace();
+                }
+                try {
+                    //get JSON Array
+                    double distance = jObject.getDouble("distance");
+                    Log.i(TAG, "totalDistServer "+distance);
+                    Log.i(TAG, "totalCntServer "+jObject.getLong("numpoints"));
+                } catch (JSONException e) {
+                    e.printStackTrace();
                 }
 
             }

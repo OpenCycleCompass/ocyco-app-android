@@ -1,5 +1,6 @@
 package de.mytfg.jufo.ibis;
 
+import android.content.ContentValues;
 import android.content.Context;
 import android.database.Cursor;
 import android.database.SQLException;
@@ -13,19 +14,21 @@ public class RoutingDatabase {
     //database variables
     private DbHelper dbHelper;
     public final String DBNAME = "RoutingDatabase";
-    public final int DBVERSION = 1;
+    public final int DBVERSION = 3;
     public SQLiteDatabase db;
     public final String COLUMN_ID = "Id";
     public final String COLUMN_LAT = "latitude";
     public final String COLUMN_LON = "longitude";
     public final String COLUMN_DIST = "distance"; ///distance to last point in meters
     public final String TABLENAME = "RoutingData";
-    public final String CREATERDB = "CREATE TABLE "+TABLENAME+"("+COLUMN_ID+" INTEGER PRIMARY KEY AUTOINCREMENT," +
+    public final String CREATERDB = "CREATE TABLE "+TABLENAME+"("+
+            COLUMN_ID+" INTEGER PRIMARY KEY AUTOINCREMENT," +
             COLUMN_LAT+" REAL NOT NULL, " +
             COLUMN_LON+" REAL NOT NULL, " +
-            COLUMN_DIST+" REAL, ";
-    //timestamp vars
-    public long startTst;
+            COLUMN_DIST+" REAL, " +
+            ");";
+
+
     // Log TAG
     protected static final String TAG = "RoutingDatabase-class";
 
@@ -34,7 +37,6 @@ public class RoutingDatabase {
         Log.i(TAG, "GPSDatabase Constructor");
         this.context = context;
         dbHelper = new DbHelper(context);
-        startTst = System.currentTimeMillis() / 1000;
     }
 
     //creating a DbHelper
@@ -56,6 +58,14 @@ public class RoutingDatabase {
         }
     }
 
+    public long insertData(double lat, double lon, double dist) {
+        ContentValues value = new ContentValues();
+        value.put(COLUMN_LAT, lat);
+        value.put(COLUMN_LON, lon);
+        value.put(COLUMN_DIST, dist);
+        return db.insert(TABLENAME, null, value);
+    }
+
     public double getTotalDist() {
         double tdist;
         Cursor mCount = db.rawQuery("SELECT SUM("+COLUMN_DIST+") FROM " + TABLENAME, null);
@@ -63,6 +73,15 @@ public class RoutingDatabase {
         tdist = mCount.getDouble(0);
         mCount.close();
         return tdist;
+    }
+
+    public long getTotalCnt() {
+        long cnt;
+        Cursor mCount = db.rawQuery("SELECT COUNT("+COLUMN_DIST+") FROM " + TABLENAME, null);
+        mCount.moveToFirst();
+        cnt = mCount.getLong(0);
+        mCount.close();
+        return cnt;
     }
 
     public void open() throws SQLException {
@@ -75,9 +94,9 @@ public class RoutingDatabase {
         dbHelper.close();
     }
 
-    public void deleteDatabase() {
-        //delete database
-        context.deleteDatabase(DBNAME);
+    public boolean deleteDatabase() {
         Log.i(TAG, "database deleted");
+        //delete database
+        return context.deleteDatabase(DBNAME);
     }
 }
