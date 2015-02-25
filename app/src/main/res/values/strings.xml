@@ -75,6 +75,10 @@
     <string name="tracking_prepare_coords_removed_filter1"><![CDATA["coordinates where tdiff<0.5 or dist<0.5 removed"]]></string>
     <string name="tracking_gps_searching"><![CDATA["GPS wird gesucht ... "]]></string>
     <string name="title_activity_routing">RoutingActivity</string>
-    <string name="hello_world">Hello world!</string>
+    <string name="RoutingActivity_headline">Routenfindung</string>
+    <string name="start">Startadresse</string>
+    <string name="address_format">Bitte geben sie die Adresse in folgendem Format ein: Stadt, Straße, Hausnummer</string>
+    <string name="destination">Zieladresse</string>
+    <string name="generate_route_button">Route generieren</string>
 
 </resources>
