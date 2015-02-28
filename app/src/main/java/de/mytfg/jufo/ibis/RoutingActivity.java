@@ -1,6 +1,7 @@
 package de.mytfg.jufo.ibis;
 
 import android.content.Context;
+import android.content.Intent;
 import android.location.Location;
 import android.net.ConnectivityManager;
 import android.net.NetworkInfo;
@@ -12,6 +13,7 @@ import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
+import android.widget.Button;
 import android.widget.EditText;
 import android.widget.Toast;
 
@@ -31,11 +33,16 @@ public class RoutingActivity extends ActionBarActivity {
 
     final String TAG = "RoutingActivity-class";
     RoutingDatabase mRDb;
+    Button start_navigation;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_routing);
+        //get and set up views
+        start_navigation = (Button) findViewById(R.id.start_navigation);
+        start_navigation.setEnabled(false);
+        //set up database, delete old database
         mRDb = new RoutingDatabase(this);
         mRDb.open();
         boolean deleted = mRDb.deleteDatabase();
@@ -67,6 +74,11 @@ public class RoutingActivity extends ActionBarActivity {
             Toast toast = Toast.makeText(context, getString(R.string.upload_error_no_network_try_again_later), duration);
             toast.show();
         }
+    }
+
+    public void onClickStartNavigation (View view) {
+        Intent intent = new Intent (this, ShowDataActivity.class);
+        startActivity(intent);
     }
 
     // Reads an InputStream and converts it to a String.
@@ -136,9 +148,20 @@ public class RoutingActivity extends ActionBarActivity {
                     }
                     Log.i(TAG, "totalDistDB "+mRDb.getTotalDist());
                     Log.i(TAG, "totalCnt "+mRDb.getTotalCnt());
+                    //show Toast
+                    int duration = Toast.LENGTH_LONG;
+                    Toast toast = Toast.makeText(getApplicationContext(), "Die Route wurde generiert, die Strecke beträgt "+mRDb.getTotalDist()/1000+"km", duration);
+                    toast.show();
                     mRDb.close();
+                    //enable start_navigation button in case of successful route generating
+                    start_navigation.setEnabled(true);
+
                 } catch (JSONException e) {
                    e.printStackTrace();
+                    int duration = Toast.LENGTH_LONG;
+                    Toast toast = Toast.makeText(getApplicationContext(), R.string.rout_find_error, duration);
+                    toast.show();
+                    mRDb.close();
                 }
                 try {
                     //get JSON Array

@@ -82,5 +82,7 @@
     <string name="generate_route_button">Route generieren</string>
     <string name="api1_get_route">getroute.php?getroute=getroute</string>
     <string name="findRoute">Route finden</string>
+    <string name="start_navigation_button">Navigation starten</string>
+    <string name="rout_find_error">Ihre Start- oder Zielort konnte nicht gefunden werden!</string>
 
 </resources>

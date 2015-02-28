@@ -25,7 +25,7 @@ public class RoutingDatabase {
             COLUMN_ID+" INTEGER PRIMARY KEY AUTOINCREMENT," +
             COLUMN_LAT+" REAL NOT NULL, " +
             COLUMN_LON+" REAL NOT NULL, " +
-            COLUMN_DIST+" REAL, " +
+            COLUMN_DIST+" REAL" +
             ");";
 
 
