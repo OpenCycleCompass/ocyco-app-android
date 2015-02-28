@@ -75,8 +75,6 @@ public class MapFragment extends Fragment {
         }
         mMapView.getController().setZoom(18);
         startMapUpdates();
-
-
     }
 
     //Timer for updating the map
