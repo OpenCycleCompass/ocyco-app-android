@@ -39,9 +39,11 @@ public class ShowDataActivity extends ActionBarActivity {
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
+
+
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_show_data);
-
+        Log.i(TAG, "MapLayoutEnde");
         //initialize global variable class
         mGlobalVariable = (GlobalVariables) getApplicationContext();
         //alert dialog for accuracy alerts

@@ -8,6 +8,10 @@ import android.database.sqlite.SQLiteDatabase;
 import android.database.sqlite.SQLiteOpenHelper;
 import android.util.Log;
 
+import org.json.JSONArray;
+import org.json.JSONException;
+import org.json.JSONObject;
+
 
 public class RoutingDatabase {
     private Context context;
@@ -82,6 +86,24 @@ public class RoutingDatabase {
         cnt = mCount.getLong(0);
         mCount.close();
         return cnt;
+    }
+
+    public JSONArray getAllPoints() {
+        Cursor cursor = db.query(TABLENAME, new String[]{COLUMN_LAT, COLUMN_LON}, null, null, null, null, null);
+        JSONArray data = new JSONArray();
+        cursor.moveToFirst();
+        while (!cursor.isAfterLast()) {
+            JSONObject point = new JSONObject();
+            try {
+                point.put("lat", cursor.getDouble(0));
+                point.put("lon", cursor.getDouble(1));
+            } catch (JSONException e) {
+                e.printStackTrace();
+            }
+            data.put(point);
+            cursor.moveToNext();
+        }
+        return data;
     }
 
     public void open() throws SQLException {

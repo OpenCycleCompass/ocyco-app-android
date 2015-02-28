@@ -77,8 +77,12 @@ public class RoutingActivity extends ActionBarActivity {
     }
 
     public void onClickStartNavigation (View view) {
-        Intent intent = new Intent (this, ShowDataActivity.class);
-        startActivity(intent);
+        //start tracking service
+        Intent intent = new Intent(this, Tracking.class);
+        startService(intent);
+        //start ShowDataActivity
+        Intent intent2 = new Intent (this, ShowDataActivity.class);
+        startActivity(intent2);
     }
 
     // Reads an InputStream and converts it to a String.
