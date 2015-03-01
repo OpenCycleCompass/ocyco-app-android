@@ -14,6 +14,11 @@ public class MainActivity extends ActionBarActivity {
         startActivity(intent);
     }
 
+    public void onClickFindRoute2 (View view) {
+        Intent intent = new Intent(this, RoutingActivity.class);
+        startActivity(intent);
+    }
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);

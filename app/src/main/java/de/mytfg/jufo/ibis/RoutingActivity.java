@@ -7,6 +7,7 @@ import android.net.ConnectivityManager;
 import android.net.NetworkInfo;
 import android.net.Uri;
 import android.os.AsyncTask;
+import android.support.v4.app.DialogFragment;
 import android.support.v7.app.ActionBarActivity;
 import android.os.Bundle;
 import android.util.Log;
@@ -15,6 +16,7 @@ import android.view.MenuItem;
 import android.view.View;
 import android.widget.Button;
 import android.widget.EditText;
+import android.widget.TextView;
 import android.widget.Toast;
 
 import org.json.JSONArray;
@@ -27,13 +29,18 @@ import java.io.InputStreamReader;
 import java.io.Reader;
 import java.net.HttpURLConnection;
 import java.net.URL;
+import java.util.Calendar;
+import java.util.Locale;
 
 
-public class RoutingActivity extends ActionBarActivity {
+public class RoutingActivity extends ActionBarActivity implements TimePickerFragment.OnTimePickedListener {
 
     final String TAG = "RoutingActivity-class";
     RoutingDatabase mRDb;
     Button start_navigation;
+    double tAnkEingTime;
+    GlobalVariables mGlobalVariables;
+    EditText editDistance;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -42,11 +49,13 @@ public class RoutingActivity extends ActionBarActivity {
         //get and set up views
         start_navigation = (Button) findViewById(R.id.start_navigation);
         start_navigation.setEnabled(false);
+        editDistance = (EditText) findViewById(R.id.enter_distance);
         //set up database, delete old database
         mRDb = new RoutingDatabase(this);
+        mGlobalVariables = (GlobalVariables) getApplicationContext();
         mRDb.open();
         boolean deleted = mRDb.deleteDatabase();
-        Log.i(TAG, "deleted "+deleted);
+        Log.i(TAG, "deleted " + deleted);
         mRDb.close();
     }
 
@@ -76,13 +85,59 @@ public class RoutingActivity extends ActionBarActivity {
         }
     }
 
-    public void onClickStartNavigation (View view) {
-        //start tracking service
-        Intent intent = new Intent(this, Tracking.class);
-        startService(intent);
-        //start ShowDataActivity
-        Intent intent2 = new Intent (this, ShowDataActivity.class);
-        startActivity(intent2);
+    //create and show the TimePickerFragment
+    public void showTimePickerDialog(View v) {
+        DialogFragment mTimePickerFragment = new TimePickerFragment();
+        mTimePickerFragment.show(getSupportFragmentManager(), "timePicker");
+    }
+
+    //get picked time from TimePickerFragment via Interface
+    public void onTimePicked(int hour, int minute) {
+        //show picked time
+        TextView arrivalTime = (TextView) findViewById(R.id.arrivalTime);
+        if (minute < 10) {
+            arrivalTime.setText(hour + ":0" + minute + " Uhr");
+        } else {
+            arrivalTime.setText(hour + ":" + minute + " Uhr");
+        }
+        convertToMilliseconds(hour, minute);
+
+        final Calendar c = Calendar.getInstance();
+        int current_hour = c.get(Calendar.HOUR_OF_DAY);
+        int current_minute = c.get(Calendar.MINUTE);
+
+        //if set time is before current time add a day in milliseconds to set time
+        if ((hour < current_hour) || (current_hour == hour) && (minute < current_minute)) {
+            tAnkEingTime += 24 * 60 * 60 * 1000;
+        }
+        mGlobalVariables.settAnkEingTime(tAnkEingTime);
+
+    }
+
+    //convert hour and minutes to milliseconds for mathematical operations @Calculation
+    public void convertToMilliseconds(int hour, int minute) {
+        tAnkEingTime = (double) ((hour * 60 + minute) * 60 * 1000);
+    }
+
+    String roundDecimals(double d) {
+        return String.format(Locale.US, "%.2f", d);
+    }
+
+    public void onClickStartNavigation(View view) {
+        //TODO: switch for manual distance
+        if (true) {
+            //read text from EditText and convert to String
+            editDistance = (EditText) findViewById(R.id.enter_distance);
+            Double sEing = Double.parseDouble(editDistance.getText().toString());
+            //try to convert String to Float
+            mGlobalVariables.setsEing(sEing);
+            //start ShowDataActivity
+            Intent intent = new Intent(this, ShowDataActivity.class);
+            startActivity(intent);
+            //start tracking service
+            Intent intent2 = new Intent(this, Tracking.class);
+            startService(intent2);
+        }
     }
 
     // Reads an InputStream and converts it to a String.
@@ -127,11 +182,11 @@ public class RoutingActivity extends ActionBarActivity {
                 e.printStackTrace();
             }
             if (jObject != null) {
+                mRDb.open();
                 try {
                     //get JSON Array
                     JSONArray jArray = jObject.getJSONArray("points");
                     //Read from JSON Array
-                    mRDb.open();
                     for (int i = 0; i < jArray.length(); i++) {
                         Location location = new Location("");
                         JSONObject oneObject = jArray.getJSONObject(i);
@@ -140,28 +195,30 @@ public class RoutingActivity extends ActionBarActivity {
                         double lon = oneObject.getDouble("lon");
                         location.setLatitude(lat);
                         location.setLongitude(lon);
-                        if (i!=0) {
+                        if (i != 0) {
                             dist = location.distanceTo(oldLocation);
-                        }
-                        else {
+                        } else {
                             dist = 0;
                         }
                         //insert into db
                         mRDb.insertData(lat, lon, dist);
                         oldLocation = location;
                     }
-                    Log.i(TAG, "totalDistDB "+mRDb.getTotalDist());
-                    Log.i(TAG, "totalCnt "+mRDb.getTotalCnt());
+                    //get total dist, convert to km an round
+                    double totalDist = mRDb.getTotalDist()/1000;
+                    String totalDistRounded = roundDecimals(totalDist);
+                    mRDb.close();
                     //show Toast
                     int duration = Toast.LENGTH_LONG;
-                    Toast toast = Toast.makeText(getApplicationContext(), "Die Route wurde generiert, die Strecke beträgt "+mRDb.getTotalDist()/1000+"km", duration);
+                    Toast toast = Toast.makeText(getApplicationContext(), "Die Route wurde generiert, die Strecke beträgt " + totalDistRounded + "km", duration);
                     toast.show();
-                    mRDb.close();
                     //enable start_navigation button in case of successful route generating
                     start_navigation.setEnabled(true);
+                    //write totalDistRounded to edit text
+                    editDistance.setText(totalDistRounded);
 
                 } catch (JSONException e) {
-                   e.printStackTrace();
+                    e.printStackTrace();
                     int duration = Toast.LENGTH_LONG;
                     Toast toast = Toast.makeText(getApplicationContext(), R.string.rout_find_error, duration);
                     toast.show();
@@ -170,8 +227,8 @@ public class RoutingActivity extends ActionBarActivity {
                 try {
                     //get JSON Array
                     double distance = jObject.getDouble("distance");
-                    Log.i(TAG, "totalDistServer "+distance);
-                    Log.i(TAG, "totalCntServer "+jObject.getLong("numpoints"));
+                    Log.i(TAG, "totalDistServer " + distance);
+                    Log.i(TAG, "totalCntServer " + jObject.getLong("numpoints"));
                 } catch (JSONException e) {
                     e.printStackTrace();
                 }

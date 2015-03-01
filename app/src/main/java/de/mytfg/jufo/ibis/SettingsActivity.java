@@ -5,7 +5,6 @@ import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.SharedPreferences;
-import android.support.v4.app.DialogFragment;
 import android.support.v7.app.ActionBarActivity;
 import android.os.Bundle;
 import android.view.Menu;
@@ -13,16 +12,10 @@ import android.view.MenuItem;
 import android.view.View;
 import android.widget.CheckBox;
 import android.widget.EditText;
-import android.widget.TextView;
 
-import java.util.Calendar;
-
-
-public class SettingsActivity extends ActionBarActivity implements TimePickerFragment.OnTimePickedListener {
+public class SettingsActivity extends ActionBarActivity {
 
     //Variables declaration
-    public float FloatDistStartDest;
-    double tAnkEingTime;
     float FloatTextSize;
 
     //create instance of GlobalVariables class
@@ -46,7 +39,6 @@ public class SettingsActivity extends ActionBarActivity implements TimePickerFra
         mGlobalVariable.setShowLocationOverlay(settings.getBoolean("showLocationOverlay", true));
         mGlobalVariable.setShowCompassOverlay(settings.getBoolean("showCompassOverlay", true));
         mGlobalVariable.setShowScaleBarOverlay(settings.getBoolean("showScaleBarOverlay", true));
-        FloatDistStartDest = settings.getFloat("FloatDistStartDest", 0);
         FloatTextSize = settings.getFloat("FloatTextSize", 8);
         //set check boxes
         final CheckBox CBcollectData = (CheckBox) findViewById(R.id.CBCollectData);
@@ -58,8 +50,6 @@ public class SettingsActivity extends ActionBarActivity implements TimePickerFra
         final CheckBox cb_show_scaleBarOverlay = (CheckBox) findViewById(R.id.cb_show_scaleBarOverlay);
         cb_show_scaleBarOverlay.setChecked(mGlobalVariable.isShow_scaleBarOverlay());
         //set default text
-        EditText editDistance = (EditText) findViewById(R.id.enter_distance);
-        editDistance.setText(Float.toString(FloatDistStartDest));
         EditText enter_text_size = (EditText) findViewById(R.id.enter_text_size);
         enter_text_size.setText(Float.toString(FloatTextSize));
     }
@@ -83,7 +73,6 @@ public class SettingsActivity extends ActionBarActivity implements TimePickerFra
         editor.putBoolean("showCompassOverlay", mGlobalVariable.isShow_compassOverlay());
         editor.putBoolean("showLocationOverlay", mGlobalVariable.isShow_locationOverlay());
         editor.putBoolean("showScaleBarOverlay", mGlobalVariable.isShow_scaleBarOverlay());
-        editor.putFloat("FloatDistStartDest", FloatDistStartDest);
         editor.putFloat("FloatTextSize", FloatTextSize);
         // Commit the edits!
         editor.apply();
@@ -113,16 +102,6 @@ public class SettingsActivity extends ActionBarActivity implements TimePickerFra
     //called when save Button is clicked
     public void saveSettings(View view) {
         boolean exception = false;
-        //read text from EditText and convert to String
-        EditText editDistance = (EditText) findViewById(R.id.enter_distance);
-        String StrEditText = editDistance.getText().toString();
-        //try to convert String to Float
-        try {
-            FloatDistStartDest = Float.parseFloat(StrEditText);
-        } catch (java.lang.NumberFormatException e) {
-            exception = true;
-            openAlert(StrEditText);
-        }
         EditText enter_text_size = (EditText) findViewById(R.id.enter_text_size);
         String strEnterTxtSz = enter_text_size.getText().toString();
         //try to convert String to Float
@@ -132,21 +111,16 @@ public class SettingsActivity extends ActionBarActivity implements TimePickerFra
             exception = true;
             openAlert(strEnterTxtSz);
         }
-        double sEing = (double) FloatDistStartDest;
-        mGlobalVariable.setSettingVars(tAnkEingTime, sEing, FloatTextSize);
+        mGlobalVariable.setSettingVars(FloatTextSize);
         if (!exception) {
             //restart Tracking Service starts it's onStartCommand (NOT onCreate),
             //so checkOnline will be executed again
             Intent intent = new Intent(this, Tracking.class);
             startService(intent);
-
-            //start ShowDataActivity
-            Intent intent2 = new Intent(this, ShowDataActivity.class);
-            startActivity(intent2);
         }
     }
 
-    public void onClickFindRoute (View view) {
+    public void onClickFindRoute(View view) {
         Intent intent = new Intent(this, RoutingActivity.class);
         startActivity(intent);
     }
@@ -195,36 +169,5 @@ public class SettingsActivity extends ActionBarActivity implements TimePickerFra
         startService(stopOnlineTrackingIntent);
     }
 
-    //create and show the TimePickerFragment
-    public void showTimePickerDialog(View v) {
-        DialogFragment mTimePickerFragment = new TimePickerFragment();
-        mTimePickerFragment.show(getSupportFragmentManager(), "timePicker");
-    }
-
-    //get picked time from TimePickerFragment via Interface
-    public void onTimePicked(int hour, int minute) {
-        //show picked time
-        TextView arrivalTime = (TextView) findViewById(R.id.arrivalTime);
-        if (minute < 10) {
-            arrivalTime.setText(hour + ":0" + minute + " Uhr");
-        } else {
-            arrivalTime.setText(hour + ":" + minute + " Uhr");
-        }
-        convertToMilliseconds(hour, minute);
-
-        final Calendar c = Calendar.getInstance();
-        int current_hour = c.get(Calendar.HOUR_OF_DAY);
-        int current_minute = c.get(Calendar.MINUTE);
-
-        //if set time is before current time add a day in milliseconds to set time
-        if ((hour<current_hour)||(current_hour==hour)&&(minute<current_minute)) {
-            tAnkEingTime += 24*60*60*1000;
-        }
-    }
-
-    //convert hour and minutes to milliseconds for mathematical operations @Calculation
-    public void convertToMilliseconds(int hour, int minute) {
-        tAnkEingTime = (double) ((hour * 60 + minute) * 60 * 1000);
-    }
 }
 

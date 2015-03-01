@@ -5,7 +5,7 @@
     <string name="app_name_short">iBis</string>
     <string name="action_settings">Einstellungen</string>
     <string name="welcome_headline">Wilkommen bei iBis!</string>
-    <string name="welcome">Bevor Sie mit der Navigation beginen können, müssen sie noch einige Einstellungen vornehmen.</string>
+    <string name="welcome">Sie können entweder ihre Einstellungen überprüfen, oder direkt eine suchen.</string>
     <string name="button_open_settings">Einstellungen</string>
     <string name="title_activity_settings">Einstellungen</string>
     <string name="general_settings">Allgemeine Einstellungen</string>
@@ -77,7 +77,7 @@
     <string name="title_activity_routing">RoutingActivity</string>
     <string name="RoutingActivity_headline">Routenfindung</string>
     <string name="start">Startadresse</string>
-    <string name="address_format">Bitte geben sie die Adresse in folgendem Format ein: Stadt, Straße, Hausnummer</string>
+    <string name="address_format">Bitte geben sie die Adresse in folgendem Format ein: Straße Hausnummer, Stadt</string>
     <string name="destination">Zieladresse</string>
     <string name="generate_route_button">Route generieren</string>
     <string name="api1_get_route">getroute.php?getroute=getroute</string>

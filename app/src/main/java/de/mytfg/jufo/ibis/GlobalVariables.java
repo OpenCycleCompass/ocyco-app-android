@@ -27,10 +27,16 @@ public class GlobalVariables extends Application {
         location = locationIn;
     }
 
-    public void setSettingVars(double tAnkEingTimeIn, double sEingIn, float textSizeIn) {
-        tAnkEingTime = tAnkEingTimeIn;
-        sEing = sEingIn;
+    public void setSettingVars(float textSizeIn) {
         textSize = textSizeIn;
+    }
+
+    public void setsEing (double sEingIn) {
+        sEing = sEingIn;
+    }
+
+    public void settAnkEingTime (double tAnkEingTimeIn) {
+        tAnkEingTime = tAnkEingTimeIn;
     }
 
     public void setShowLocationOverlay(boolean show_locationOverlay_in) {

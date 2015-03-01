@@ -1,7 +1,6 @@
 package de.mytfg.jufo.ibis;
 
 import android.location.Location;
-import android.util.Log;
 
 import java.util.Calendar;
 
