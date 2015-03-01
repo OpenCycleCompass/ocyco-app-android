@@ -39,9 +39,11 @@ public class ShowDataActivity extends ActionBarActivity {
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
+
+
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_show_data);
-
+        Log.i(TAG, "MapLayoutEnde");
         //initialize global variable class
         mGlobalVariable = (GlobalVariables) getApplicationContext();
         //alert dialog for accuracy alerts
@@ -62,14 +64,16 @@ public class ShowDataActivity extends ActionBarActivity {
 
     private void setTextSize() {
         float textSize = mGlobalVariable.getTextSize();
-        sGefBox.setTextSize(0x00000003, textSize);
-        sZufBox.setTextSize(0x00000003, textSize);
-        vAktBox.setTextSize(0x00000003, textSize);
-        vDBox.setTextSize(0x00000003, textSize);
-        tAnkBox.setTextSize(0x00000003, textSize);
-        tAnkUntBox.setTextSize(0x00000003, textSize);
-        vDMussBox.setTextSize(0x00000003, textSize);
-        vDUntBox.setTextSize(0x00000003, textSize);
+        if (textSize != 0) {
+            sGefBox.setTextSize(0x00000003, textSize);
+            sZufBox.setTextSize(0x00000003, textSize);
+            vAktBox.setTextSize(0x00000003, textSize);
+            vDBox.setTextSize(0x00000003, textSize);
+            tAnkBox.setTextSize(0x00000003, textSize);
+            tAnkUntBox.setTextSize(0x00000003, textSize);
+            vDMussBox.setTextSize(0x00000003, textSize);
+            vDUntBox.setTextSize(0x00000003, textSize);
+        }
     }
 
 
@@ -116,7 +120,6 @@ public class ShowDataActivity extends ActionBarActivity {
             //check, if accuracy alert is necessary
             if (accuracyAlert != oldAccuracyAlert) {
                 //check which accuracy alert
-                //TODO: close first dialog, when second one is opened (or put both in one dialog)
                 if (accuracyAlert) {
                     openAccuracyAlert(false);
                 } else {
@@ -138,6 +141,7 @@ public class ShowDataActivity extends ActionBarActivity {
 
     //read data from global var class and write to info boxes
     public void showData() {
+        Log.i(TAG, "showData()");
         //get variables from global class and round
         String sGef = roundDecimals(mGlobalVariable.getsGef()) + " km";
         String sZuf = roundDecimals(mGlobalVariable.getsZuf()) + " km";

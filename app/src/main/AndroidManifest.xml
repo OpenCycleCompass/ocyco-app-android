@@ -2,23 +2,23 @@
 <manifest xmlns:android="http://schemas.android.com/apk/res/android"
     package="de.mytfg.jufo.ibis" >
 
-    <uses-permission android:name="android.permission.ACCESS_FINE_LOCATION"/>
+    <uses-permission android:name="android.permission.ACCESS_FINE_LOCATION" />
     <uses-permission android:name="android.permission.ACCESS_WIFI_STATE" />
     <uses-permission android:name="android.permission.ACCESS_NETWORK_STATE" />
     <uses-permission android:name="android.permission.INTERNET" />
     <uses-permission android:name="android.permission.WRITE_EXTERNAL_STORAGE" />
 
     <application
-        android:name="de.mytfg.jufo.ibis.GlobalVariables"
+        android:name=".GlobalVariables"
         android:allowBackup="true"
         android:icon="@mipmap/ic_launcher"
         android:label="@string/app_name"
-        android:theme="@style/AppTheme"
-        android:supportsRtl="false">
+        android:supportsRtl="false"
+        android:theme="@style/AppTheme" >
         <activity
-            android:name="de.mytfg.jufo.ibis.MainActivity"
+            android:name=".MainActivity"
             android:label="@string/app_name"
-            android:screenOrientation="portrait">
+            android:screenOrientation="portrait" >
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
 
@@ -26,28 +26,36 @@
             </intent-filter>
         </activity>
         <activity
-            android:name="de.mytfg.jufo.ibis.SettingsActivity"
+            android:name=".SettingsActivity"
             android:label="@string/title_activity_settings"
-            android:screenOrientation="portrait">
+            android:screenOrientation="portrait" >
         </activity>
         <activity
-            android:name="de.mytfg.jufo.ibis.ShowDataActivity"
+            android:name=".ShowDataActivity"
             android:label="@string/title_activity_show_data"
-            android:screenOrientation="portrait">
+            android:screenOrientation="portrait" >
         </activity>
         <activity
-            android:name="de.mytfg.jufo.ibis.UploadTrackActivity"
+            android:name=".UploadTrackActivity"
             android:label="@string/title_activity_upload_track"
-            android:screenOrientation="portrait">
+            android:screenOrientation="portrait" >
         </activity>
+
         <service
-            android:name="de.mytfg.jufo.ibis.Tracking"
+            android:name=".Tracking"
             android:label="iBis Tracking GPS" />
+
         <meta-data
             android:name="com.google.android.gms.version"
             android:value="@integer/google_play_services_version" />
-        <!-- TODO: Ensure Devices Have the Google Play services APK
-         (https://developer.android.com/google/play-services/setup.html#ensure) -->
+        <!--
+         TODO: Ensure Devices Have the Google Play services APK
+         (https://developer.android.com/google/play-services/setup.html#ensure)
+        -->
+        <activity
+            android:name=".RoutingActivity"
+            android:label="@string/title_activity_routing" >
+        </activity>
     </application>
 
 </manifest>

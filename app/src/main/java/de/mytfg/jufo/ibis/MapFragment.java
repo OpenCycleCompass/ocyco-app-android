@@ -10,7 +10,11 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 
+import org.json.JSONArray;
+import org.json.JSONException;
+import org.json.JSONObject;
 import org.osmdroid.ResourceProxy;
+import org.osmdroid.bonuspack.overlays.Polyline;
 import org.osmdroid.util.GeoPoint;
 import org.osmdroid.util.ResourceProxyImpl;
 import org.osmdroid.views.MapView;
@@ -19,6 +23,8 @@ import org.osmdroid.views.overlay.compass.CompassOverlay;
 import org.osmdroid.views.overlay.compass.InternalCompassOrientationProvider;
 import org.osmdroid.views.overlay.mylocation.GpsMyLocationProvider;
 import org.osmdroid.views.overlay.mylocation.MyLocationNewOverlay;
+
+import java.util.ArrayList;
 
 public class MapFragment extends Fragment {
 
@@ -32,6 +38,7 @@ public class MapFragment extends Fragment {
     protected static final String TAG = "IBis-MapFragment";
     //global var class
     GlobalVariables mGlobalVariables;
+    RoutingDatabase mRDB;
 
 
     @Override
@@ -43,13 +50,15 @@ public class MapFragment extends Fragment {
 
     @Override
     public void onActivityCreated(Bundle savedInstanceState) {
+        Log.i(TAG, "onActivityCreated()");
         super.onActivityCreated(savedInstanceState);
 
         final Context context = this.getActivity();
         final DisplayMetrics dm = context.getResources().getDisplayMetrics();
         //initialize global variable class
         mGlobalVariables = (GlobalVariables) getActivity().getApplicationContext();
-
+        //initialize RoutingDatabase
+        mRDB = new RoutingDatabase(getActivity().getApplicationContext());
         //set zoom and touch controls
         mMapView.setBuiltInZoomControls(true);
         mMapView.setMultiTouchControls(true);
@@ -74,10 +83,40 @@ public class MapFragment extends Fragment {
             mMapView.getOverlays().add(this.mScaleBarOverlay);
         }
         mMapView.getController().setZoom(18);
+        mMapView.getOverlays().add(this.createPolyline());
         startMapUpdates();
 
-
     }
+
+    public Polyline createPolyline () {
+        Log.i(TAG, "createPolyline()");
+        //create waypoints Array
+        ArrayList<GeoPoint> waypoints = new ArrayList<>();
+        //get waypoints
+        mRDB.open();
+        JSONArray allPoints = mRDB.getAllPoints();
+        mRDB.close();
+        try {
+            for (int i = 0; i < allPoints.length(); i++) {
+                JSONObject oneObject = allPoints.getJSONObject(i);
+                // Pulling items from the array
+                double lat = oneObject.getDouble("lat");
+                double lon = oneObject.getDouble("lon");
+                //adding to waypoints array
+                waypoints.add(new GeoPoint(lat, lon));
+            }
+            Log.i(TAG, "for beendet");
+        } catch (JSONException e) {
+            e.printStackTrace();
+        }
+        //create and set up the polyline
+        Polyline routeOverlay = new Polyline(getActivity().getApplicationContext());
+        routeOverlay.setPoints(waypoints);
+        routeOverlay.setColor(0x880040FF/*half-transparent blue*/);
+
+        return routeOverlay;
+    }
+
 
     //Timer for updating the map
     Handler timerHandler = new Handler();

@@ -164,6 +164,7 @@ public class Tracking extends Service implements LocationListener, OnConnectionF
     }
 
     public void callCalculate() {
+        Log.i(TAG, "callCalculate()");
         mCalculate.getData(mCurrentLocation, mGlobalVariable.getsEing());
         //only call mathematical methods, if this is not the first location - else there will be a NPE
         if (!mCalculate.checkFirstLoc()) {
