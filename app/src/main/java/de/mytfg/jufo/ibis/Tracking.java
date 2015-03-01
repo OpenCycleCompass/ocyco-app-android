@@ -147,6 +147,8 @@ public class Tracking extends Service implements LocationListener, OnConnectionF
     public void onLocationChanged(Location location) {
         Log.i(TAG, "onLocationChanged()");
         mCurrentLocation = location;
+        //write position to GlobalVariables class
+        mGlobalVariable.setLocation(mCurrentLocation);
         //only save data, if accuracy is ok
         if (mGlobalVariable.isCollectData() && checkAccuracy(location.getAccuracy())) {
             updateDatabase();
@@ -192,8 +194,6 @@ public class Tracking extends Service implements LocationListener, OnConnectionF
     }
 
     public boolean checkAccuracy(Float accuracy) {
-        Log.i(TAG, "checkAccuracy " + accuracy);
-        mGlobalVariable.setAccuracy(accuracy);
         if (accuracy > 20) {
             saveData = false;
             accNotiStr = "GPS wird gesucht ...";
@@ -209,8 +209,6 @@ public class Tracking extends Service implements LocationListener, OnConnectionF
     public void updateDatabase() {
         Log.i(TAG, "updateDatabase()");
         mGPSDb.insertLocation(mCurrentLocation);
-        //write position to GlobalVariables class
-        mGlobalVariable.setLocation(mCurrentLocation);
     }
 
 

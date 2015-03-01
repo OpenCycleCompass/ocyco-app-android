@@ -6,10 +6,10 @@ import android.location.Location;
 public class GlobalVariables extends Application {
 
     //The variables can be set and read from every Activity or Service!
-    double sGef, sZuf, vAkt, vD, tAnk, tAnkUnt, vDMuss, vDunt, tAnkEingTime, sEing, accuracy;
+    double sGef, sZuf, vAkt, vD, tAnk, tAnkUnt, vDMuss, vDunt, tAnkEingTime, sEing;
     float textSize;
     Location location;
-    boolean show_locationOverlay, show_compassOverlay, show_scaleBarOverlay, collectData, collectDataSet;
+    boolean show_locationOverlay, show_compassOverlay, show_scaleBarOverlay, collectData, collectDataSet, auto_center=true;
 
     public void setCalculationVars(double sGefIn, double sZufIn, double vAktIn, double vDIn, double tAnkIn, double tAnkUntIn, double vDMussIn, double vDuntIn) {
         sGef = sGefIn;
@@ -22,6 +22,9 @@ public class GlobalVariables extends Application {
         vDunt = vDuntIn;
     }
 
+    public void setAutoCenter(boolean auto_center_in) {
+        auto_center = auto_center_in;
+    }
 
     public void setLocation(Location locationIn) {
         location = locationIn;
@@ -31,11 +34,11 @@ public class GlobalVariables extends Application {
         textSize = textSizeIn;
     }
 
-    public void setsEing (double sEingIn) {
+    public void setsEing(double sEingIn) {
         sEing = sEingIn;
     }
 
-    public void settAnkEingTime (double tAnkEingTimeIn) {
+    public void settAnkEingTime(double tAnkEingTimeIn) {
         tAnkEingTime = tAnkEingTimeIn;
     }
 
@@ -51,20 +54,22 @@ public class GlobalVariables extends Application {
         show_scaleBarOverlay = show_scaleBarOverlay_in;
     }
 
-    public void setAccuracy(double accuracyIn) {
-        accuracy = accuracyIn;
-    }
-
     public void setCollectData(boolean collectDataIn) {
         collectData = collectDataIn;
         collectDataSet = true;
+    }
+
+    public boolean isAutoCenter() {
+        return auto_center;
     }
 
     public boolean isCollectData() {
         return collectData;
     }
 
-    public  boolean isCollectDataSet() { return collectDataSet; }
+    public boolean isCollectDataSet() {
+        return collectDataSet;
+    }
 
     public boolean isShow_locationOverlay() {
         return show_locationOverlay;
@@ -80,10 +85,6 @@ public class GlobalVariables extends Application {
 
     public Location getLocation() {
         return location;
-    }
-
-    public double getAccuracy() {
-        return accuracy;
     }
 
     public double getsEing() {

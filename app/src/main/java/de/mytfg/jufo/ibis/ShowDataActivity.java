@@ -84,7 +84,7 @@ public class ShowDataActivity extends ActionBarActivity {
         }
         if (confirm) {
             alertDialogBuilder.setTitle("Positionsbestimmung erfolgreich!");
-            alertDialogBuilder.setMessage((int)mGlobalVariable.getAccuracy() + "m Abweichung ist akzeptabel für die Navigation, sie können nun beginnen!");
+            alertDialogBuilder.setMessage((int)mGlobalVariable.getLocation().getAccuracy() + "m Abweichung ist akzeptabel für die Navigation, sie können nun beginnen!");
             //create the OK Button and onClickListener
             alertDialogBuilder.setPositiveButton("OK", new DialogInterface.OnClickListener() {
                 //close dialog when clicked
@@ -96,7 +96,7 @@ public class ShowDataActivity extends ActionBarActivity {
 
         } else {
             alertDialogBuilder.setTitle("Positionsbestimmung zu ungenau!");
-            alertDialogBuilder.setMessage((int)mGlobalVariable.getAccuracy() + "m Abweichung sind zu ungenau zum Navigieren! Haben Sie GPS aktiviert? Signal wird gesucht...");
+            alertDialogBuilder.setMessage((int)mGlobalVariable.getLocation().getAccuracy() + "m Abweichung sind zu ungenau zum Navigieren! Haben Sie GPS aktiviert? Signal wird gesucht...");
         }
         //create and show alert dialog
         alertDialog = alertDialogBuilder.create();
@@ -111,7 +111,7 @@ public class ShowDataActivity extends ActionBarActivity {
         @Override
         public void run() {
             oldAccuracyAlert = accuracyAlert;
-            if (mGlobalVariable.getAccuracy() < 20) {
+            if (mGlobalVariable.getLocation().getAccuracy() < 20) {
                 showData();
                 accuracyAlert = false;
             } else {
@@ -212,6 +212,9 @@ public class ShowDataActivity extends ActionBarActivity {
                 Intent intent = new Intent(this, SettingsActivity.class);
                 startActivity(intent);
                 return true;
+            case R.id.auto_center:
+                item.setChecked(!item.isChecked());
+                mGlobalVariable.setAutoCenter(item.isChecked());
             default:
                 return super.onOptionsItemSelected(item);
         }
