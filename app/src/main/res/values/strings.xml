@@ -5,7 +5,10 @@
     <string name="app_name_short">iBis</string>
     <string name="action_settings">Einstellungen</string>
     <string name="welcome_headline">Wilkommen bei iBis!</string>
-    <string name="welcome">Sie können entweder ihre Einstellungen überprüfen, oder direkt eine suchen.</string>
+    <string name="welcome">iBis - intelligent bike information system ist ein Fahrrad Informations- und Navigationssystem.
+        Das Ziel ist es, ihnen eine möglichst für Fahrradfahrer geeignete, schnelle Route zu suchen und
+        ihnen möglichst hilfreiche und konkrete Informationen über Ihren Ankunftszeitpunkt zu geben.
+        Sie können entweder Ihre Einstellungen überprüfen, oder direkt eine Route suchen.</string>
     <string name="button_open_settings">Einstellungen</string>
     <string name="title_activity_settings">Einstellungen</string>
     <string name="general_settings">Allgemeine Einstellungen</string>
@@ -74,8 +77,7 @@
     <string name="coordinates">" Koordinaten / "</string>
     <string name="tracking_prepare_coords_removed_filter1"><![CDATA["coordinates where tdiff<0.5 or dist<0.5 removed"]]></string>
     <string name="tracking_gps_searching"><![CDATA["GPS wird gesucht ... "]]></string>
-    <string name="title_activity_routing">RoutingActivity</string>
-    <string name="RoutingActivity_headline">Routenfindung</string>
+    <string name="title_activity_routing">Routenfindung</string>
     <string name="start">Startadresse</string>
     <string name="address_format">Bitte geben sie die Adresse in folgendem Format ein: Straße Hausnummer, Stadt</string>
     <string name="destination">Zieladresse</string>
