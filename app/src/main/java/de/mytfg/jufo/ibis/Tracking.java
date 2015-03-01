@@ -87,6 +87,7 @@ public class Tracking extends Service implements LocationListener, OnConnectionF
         mNotifyMgr.cancel(mNotificationId);
         // Start Intent returned by mGPSDb.sendToServer()
         // intent has track data as "Extra"
+        mGPSDb.open();
         int d_rows = mGPSDb.prepareDB();
         Log.i(TAG, Integer.toString(d_rows) + " " + getString(R.string.tracking_prepare_coords_removed_filter1));
         Intent intent = mGPSDb.sendToServer(this);
