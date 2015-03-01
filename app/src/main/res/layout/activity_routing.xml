@@ -15,13 +15,12 @@
             android:padding="@dimen/activity_padding"
             tools:context="de.mytfg.jufo.ibis.RoutingActivity">
 
-            <TextView
+            <Switch
+                android:id="@+id/switch_manuelDistance"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:layout_marginBottom="10dp"
-                android:layout_marginTop="5dp"
-                android:text="@string/RoutingActivity_headline"
-                android:textSize="20sp" />
+                android:text="@string/switch_manuel_distance"
+                android:onClick="onSwitchManualDistance"/>
 
             <TextView
                 android:layout_width="wrap_content"
@@ -29,7 +28,7 @@
                 android:layout_marginBottom="5dp"
                 android:layout_marginTop="5dp"
                 android:text="@string/start"
-                android:textSize="15sp" />
+                android:textSize="18sp" />
 
             <TextView
                 android:layout_width="wrap_content"
@@ -50,7 +49,7 @@
                 android:layout_marginBottom="5dp"
                 android:layout_marginTop="15dp"
                 android:text="@string/destination"
-                android:textSize="15sp" />
+                android:textSize="18sp" />
 
             <TextView
                 android:layout_width="wrap_content"

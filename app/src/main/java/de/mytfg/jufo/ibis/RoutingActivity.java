@@ -16,6 +16,7 @@ import android.view.MenuItem;
 import android.view.View;
 import android.widget.Button;
 import android.widget.EditText;
+import android.widget.Switch;
 import android.widget.TextView;
 import android.widget.Toast;
 
@@ -41,6 +42,11 @@ public class RoutingActivity extends ActionBarActivity implements TimePickerFrag
     double tAnkEingTime;
     GlobalVariables mGlobalVariables;
     EditText editDistance;
+    boolean manuel_distance;
+    private Switch switch_manuelDistance;
+    EditText destination_address;
+    EditText start_address;
+
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -57,14 +63,15 @@ public class RoutingActivity extends ActionBarActivity implements TimePickerFrag
         boolean deleted = mRDb.deleteDatabase();
         Log.i(TAG, "deleted " + deleted);
         mRDb.close();
+        switch_manuelDistance = (Switch) findViewById(R.id.switch_manuelDistance);
+        start_address = (EditText) findViewById(R.id.start_address);
+        destination_address = (EditText) findViewById(R.id.destination_address);
     }
 
     public void onClickGenerateRoute(View view) {
         Log.i(TAG, "onClickGenerateRoute");
         //read addresses from edit text
-        EditText start_address = (EditText) findViewById(R.id.start_address);
         String strStartAddress = start_address.getText().toString();
-        EditText destination_address = (EditText) findViewById(R.id.destination_address);
         String strDestinationAddress = destination_address.getText().toString();
         makeUrl(strStartAddress, strDestinationAddress);
         //make URL String
@@ -123,11 +130,29 @@ public class RoutingActivity extends ActionBarActivity implements TimePickerFrag
         return String.format(Locale.US, "%.2f", d);
     }
 
+    public void onSwitchManualDistance(View view) {
+        manuel_distance = switch_manuelDistance.isChecked();
+        updateUI();
+    }
+
+    public void updateUI() {
+        //enable / disable UI elements
+        if (manuel_distance) {
+            start_address.setEnabled(false);
+            destination_address.setEnabled(false);
+            editDistance.setEnabled(true);
+            start_navigation.setEnabled(true);
+        }
+        else {
+            start_address.setEnabled(true);
+            destination_address.setEnabled(true);
+            editDistance.setEnabled(false);
+            start_navigation.setEnabled(false);
+        }
+    }
+
     public void onClickStartNavigation(View view) {
-        //TODO: switch for manual distance
-        if (true) {
             //read text from EditText and convert to String
-            editDistance = (EditText) findViewById(R.id.enter_distance);
             Double sEing = Double.parseDouble(editDistance.getText().toString());
             //try to convert String to Float
             mGlobalVariables.setsEing(sEing);
@@ -137,7 +162,6 @@ public class RoutingActivity extends ActionBarActivity implements TimePickerFrag
             //start tracking service
             Intent intent2 = new Intent(this, Tracking.class);
             startService(intent2);
-        }
     }
 
     // Reads an InputStream and converts it to a String.
@@ -205,7 +229,7 @@ public class RoutingActivity extends ActionBarActivity implements TimePickerFrag
                         oldLocation = location;
                     }
                     //get total dist, convert to km an round
-                    double totalDist = mRDb.getTotalDist()/1000;
+                    double totalDist = mRDb.getTotalDist() / 1000;
                     String totalDistRounded = roundDecimals(totalDist);
                     mRDb.close();
                     //show Toast
