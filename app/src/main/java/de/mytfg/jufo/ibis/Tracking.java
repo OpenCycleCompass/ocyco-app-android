@@ -62,17 +62,18 @@ public class Tracking extends Service implements LocationListener, OnConnectionF
     }
 
     public void checkOnline() {
-        Log.i(TAG, "checkOnline()");
-        if (mGlobalVariable.isCollectData()) {
+        Log.i(TAG, "checkOnline(): " + "CollectData: "+mGlobalVariable.isCollectData() +" Running: "+mGlobalVariable.isTrackingRunning());
+        if (mGlobalVariable.isCollectData()&&!mGlobalVariable.isTrackingRunning()) {
             startOnlineTracking();
-        } else {
+        } else if (mGlobalVariable.isTrackingRunning()){
+            mGlobalVariable.setCollectData(false);
             stopOnlineTracking();
         }
     }
 
     public void startOnlineTracking() {
         Log.i(TAG, "startOnlineTracking()");
-        mGlobalVariable.setCollectData(true);
+        mGlobalVariable.setTrackingRunning(true);
         // Create Notification with track info
         mBuilder.setContentText(accNotiStr + getString(R.string.tracking_status_active));
         // Builds the notification and issues it.
@@ -88,8 +89,10 @@ public class Tracking extends Service implements LocationListener, OnConnectionF
         // Start Intent returned by mGPSDb.sendToServer()
         // intent has track data as "Extra"
         mGPSDb.open();
+        //ATTENTION: can have the effect, that the UploadActivity will not be started!
         int d_rows = mGPSDb.prepareDB();
         Log.i(TAG, Integer.toString(d_rows) + " " + getString(R.string.tracking_prepare_coords_removed_filter1));
+        mGPSDb.close();
         Intent intent = mGPSDb.sendToServer(this);
         intent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
         //only start activity, if data isn't empty
@@ -97,8 +100,10 @@ public class Tracking extends Service implements LocationListener, OnConnectionF
         if (!intent.getStringExtra("data").equals(UploadTrackActivity.data_empty)) { // valid but empty JSON defined in UploadTrackActivity ("[]")
             startActivity(intent);
         }
+        mGPSDb.open();
         mGPSDb.deleteDatabase();
         mGPSDb.close();
+        mGlobalVariable.setTrackingRunning(false);
     }
 
     public void stopLocationUpdates() {

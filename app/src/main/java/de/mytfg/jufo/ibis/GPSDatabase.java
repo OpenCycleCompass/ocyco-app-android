@@ -141,6 +141,7 @@ public class GPSDatabase {
     }
 
     public Intent sendToServer(Context c) {
+        open();
         //Log.i(TAG, "sendToServer()");
         stopTst = System.currentTimeMillis() / 1000;
         JSONArray data = new JSONArray();
@@ -170,6 +171,7 @@ public class GPSDatabase {
         intent.putExtra("startTst", startTst);
         intent.putExtra("totalDist", getTotalDist());
         intent.putExtra("coordCnt", getNumRows());
+        close();
         return intent;
     }
 
