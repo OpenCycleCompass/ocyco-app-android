@@ -98,6 +98,7 @@ public class Tracking extends Service implements LocationListener, OnConnectionF
             startActivity(intent);
         }
         mGPSDb.deleteDatabase();
+        mGPSDb.close();
     }
 
     public void stopLocationUpdates() {
@@ -106,13 +107,11 @@ public class Tracking extends Service implements LocationListener, OnConnectionF
         if (mGoogleApiClient.isConnected()) {
             LocationServices.FusedLocationApi.removeLocationUpdates(mGoogleApiClient, this);
         }
-        mGPSDb.close();
     }
 
     protected void startLocationUpdates() {
         Log.i(TAG, "startLocationUpdates()");
         LocationServices.FusedLocationApi.requestLocationUpdates(mGoogleApiClient, mLocationRequest, this);
-        mGPSDb.open();
     }
 
     /**
@@ -153,8 +152,10 @@ public class Tracking extends Service implements LocationListener, OnConnectionF
         if (mGlobalVariable.isCollectData() && checkAccuracy(location.getAccuracy())) {
             updateDatabase();
             //update Notification
+            mGPSDb.open();
             int num_rows = mGPSDb.getNumRows();
             double total_dist = mGPSDb.getTotalDist();
+            mGPSDb.close();
             String s_total_dist = roundDecimals(total_dist/1000);
             // Update notification
             mBuilder.setContentText(accNotiStr + getString(R.string.tracking_status_active) + " - " + num_rows + getString(R.string.coordinates) + s_total_dist + " " + getString(R.string.km));
@@ -210,6 +211,7 @@ public class Tracking extends Service implements LocationListener, OnConnectionF
         Log.i(TAG, "updateDatabase()");
         mGPSDb.open();
         mGPSDb.insertLocation(mCurrentLocation);
+        mGPSDb.close();
     }
 
 
@@ -217,7 +219,6 @@ public class Tracking extends Service implements LocationListener, OnConnectionF
     public void onCreate() {
         Log.i(TAG, "onCreate()");
         super.onCreate();
-
         // Create Database
         mGPSDb = new GPSDatabase(this.getApplicationContext());
         // Delete old data from database
