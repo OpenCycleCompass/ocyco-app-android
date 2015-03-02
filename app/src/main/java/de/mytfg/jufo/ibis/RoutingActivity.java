@@ -14,8 +14,11 @@ import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
+import android.widget.AdapterView;
+import android.widget.ArrayAdapter;
 import android.widget.Button;
 import android.widget.EditText;
+import android.widget.Spinner;
 import android.widget.Switch;
 import android.widget.TextView;
 import android.widget.Toast;
@@ -34,7 +37,7 @@ import java.util.Calendar;
 import java.util.Locale;
 
 
-public class RoutingActivity extends ActionBarActivity implements TimePickerFragment.OnTimePickedListener {
+public class RoutingActivity extends ActionBarActivity implements TimePickerFragment.OnTimePickedListener, AdapterView.OnItemSelectedListener {
 
     final String TAG = "RoutingActivity-class";
     RoutingDatabase mRDb;
@@ -46,6 +49,8 @@ public class RoutingActivity extends ActionBarActivity implements TimePickerFrag
     private Switch switch_manuelDistance;
     EditText destination_address;
     EditText start_address;
+    Spinner selectRouteType;
+    String route_type;
 
 
     @Override
@@ -66,8 +71,18 @@ public class RoutingActivity extends ActionBarActivity implements TimePickerFrag
         switch_manuelDistance = (Switch) findViewById(R.id.switch_manuelDistance);
         start_address = (EditText) findViewById(R.id.start_address);
         destination_address = (EditText) findViewById(R.id.destination_address);
+        // configure select_route_type spinner
+        selectRouteType = (Spinner) findViewById(R.id.select_route_type);
+        ArrayAdapter<CharSequence> adapter = ArrayAdapter.createFromResource(this,
+                R.array.route_types, android.R.layout.simple_spinner_item);
+        adapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
+        selectRouteType.setAdapter(adapter);
+        selectRouteType.setOnItemSelectedListener(this);
+
         updateUI();
     }
+
+
 
     public void onClickGenerateRoute(View view) {
         Log.i(TAG, "onClickGenerateRoute");
@@ -173,6 +188,26 @@ public class RoutingActivity extends ActionBarActivity implements TimePickerFrag
         char[] buffer = new char[len];
         reader.read(buffer);
         return new String(buffer);
+    }
+
+    @Override
+    public void onItemSelected(AdapterView<?> parent, View view, int position, long id) {
+        switch (position) {
+            case (0):
+                route_type = "default";
+            case (1):
+                route_type="shortest";
+            case (2):
+                route_type="fastest";
+            case (3):
+                route_type="scenery";
+        }
+    }
+
+    @Override
+    public void onNothingSelected(AdapterView<?> parent) {
+        // nothing
+
     }
 
     private class GetHttpTask extends AsyncTask<String, Void, String> {
