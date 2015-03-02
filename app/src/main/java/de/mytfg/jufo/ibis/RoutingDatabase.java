@@ -6,6 +6,7 @@ import android.database.Cursor;
 import android.database.SQLException;
 import android.database.sqlite.SQLiteDatabase;
 import android.database.sqlite.SQLiteOpenHelper;
+import android.location.Location;
 import android.util.Log;
 
 import org.json.JSONArray;
@@ -80,6 +81,34 @@ public class RoutingDatabase {
         mCount.close();
         return tdist;
     }
+
+    public void readPointsArray (JSONArray jArray) {
+        Location oldLocation = new Location("");
+        double dist;
+        for (int i = 0; i < jArray.length(); i++) {
+            try {
+                Location location = new Location("");
+                JSONObject oneObject = jArray.getJSONObject(i);
+                // Pulling items from the array
+                double lat = oneObject.getDouble("lat");
+                double lon = oneObject.getDouble("lon");
+                location.setLatitude(lat);
+                location.setLongitude(lon);
+                if (i != 0) {
+                    dist = location.distanceTo(oldLocation);
+                } else {
+                    dist = 0;
+                }
+                //insert into db
+                insertData(lat, lon, dist);
+                oldLocation = location;
+            }
+            catch (JSONException e) {
+                e.printStackTrace();
+            }
+        }
+    }
+
 
     public long getTotalCnt() {
         long cnt;
