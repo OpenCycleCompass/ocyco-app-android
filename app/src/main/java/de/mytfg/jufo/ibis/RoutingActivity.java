@@ -1,7 +1,10 @@
 package de.mytfg.jufo.ibis;
 
+import android.app.AlertDialog;
 import android.content.Context;
+import android.content.DialogInterface;
 import android.content.Intent;
+import android.content.SharedPreferences;
 import android.net.ConnectivityManager;
 import android.net.NetworkInfo;
 import android.net.Uri;
@@ -41,20 +44,29 @@ import java.util.Locale;
 
 public class RoutingActivity extends ActionBarActivity implements TimePickerFragment.OnTimePickedListener, AdapterView.OnItemSelectedListener {
 
+    //LOG Tag
     final String TAG = "RoutingActivity-class";
-    RoutingDatabase mRDb;
-    Button start_navigation;
-    double tAnkEingTime;
-    GlobalVariables mGlobalVariables;
-    EditText editDistance;
-    boolean manuel_distance;
-    private Switch switch_manuelDistance;
+    //Views
     EditText destination_address;
     EditText start_address;
+    EditText editDistance;
+    TextView arrivalTime;
     Spinner selectRouteType;
-    String route_type;
     TextView loading_text;
     ImageView loading_image;
+    Button start_navigation;
+    Button generate_route;
+    Switch switch_manuelDistance;
+    Switch switch_userData;
+    //self-written classes
+    RoutingDatabase mRDb;
+    GlobalVariables mGlobalVariables;
+    //vars
+    double tAnkEingTime;
+    boolean manuel_distance, routing_with_user_data;
+    String route_type;
+    //shared preferences
+    SharedPreferences settings;
 
 
     @Override
@@ -64,19 +76,22 @@ public class RoutingActivity extends ActionBarActivity implements TimePickerFrag
         //get and set up views
         start_navigation = (Button) findViewById(R.id.start_navigation);
         start_navigation.setEnabled(false);
+        generate_route = (Button) findViewById(R.id.generate_route);
         editDistance = (EditText) findViewById(R.id.enter_distance);
-        //set up database, delete old database
-        mRDb = new RoutingDatabase(this);
-        mGlobalVariables = (GlobalVariables) getApplicationContext();
-        mRDb.open();
-        boolean deleted = mRDb.deleteDatabase();
-        Log.i(TAG, "deleted " + deleted);
-        mRDb.close();
-        switch_manuelDistance = (Switch) findViewById(R.id.switch_manuelDistance);
         start_address = (EditText) findViewById(R.id.start_address);
         destination_address = (EditText) findViewById(R.id.destination_address);
         loading_text = (TextView) findViewById(R.id.loading_text);
+        arrivalTime = (TextView) findViewById(R.id.arrivalTime);
         loading_image = (ImageView) findViewById(R.id.loading_image);
+        switch_manuelDistance = (Switch) findViewById(R.id.switch_manuelDistance);
+        switch_userData = (Switch) findViewById(R.id.switch_userData);
+        //global variables class
+        mGlobalVariables = (GlobalVariables) getApplicationContext();
+        //set up database, delete old database
+        mRDb = new RoutingDatabase(this);
+        mRDb.open();
+        mRDb.deleteDatabase();
+        mRDb.close();
         // configure select_route_type spinner
         selectRouteType = (Spinner) findViewById(R.id.select_route_type);
         ArrayAdapter<CharSequence> adapter = ArrayAdapter.createFromResource(this,
@@ -84,8 +99,42 @@ public class RoutingActivity extends ActionBarActivity implements TimePickerFrag
         adapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
         selectRouteType.setAdapter(adapter);
         selectRouteType.setOnItemSelectedListener(this);
-
+        // Restore preferences
+        settings = getSharedPreferences(getString(R.string.preference_file_key), Context.MODE_PRIVATE);
+        editDistance.setText(settings.getString("distance", ""));
+        start_address.setText(settings.getString("start_string", ""));
+        destination_address.setText(settings.getString("dest_string", ""));
+        //call updateUI()
         updateUI();
+    }
+
+    protected void onStop() {
+        super.onStop();
+        //creating a editor and add variables
+        SharedPreferences.Editor editor = settings.edit();
+        editor.putString("start_string", start_address.getText().toString());
+        editor.putString("dest_string", destination_address.getText().toString());
+        editor.putString("distance", editDistance.getText().toString());
+        // Commit the edits!
+        editor.apply();
+    }
+
+    private void openAlert(String missing_value) {
+        //set up a new alert dialog
+        AlertDialog.Builder alertDialogBuilder = new AlertDialog.Builder(RoutingActivity.this);
+        alertDialogBuilder.setTitle("Fehler!");
+        alertDialogBuilder.setMessage("Sie haben keine " + missing_value + " eingegeben!");
+
+        //create the OK Button and onClickListener
+        alertDialogBuilder.setPositiveButton("OK", new DialogInterface.OnClickListener() {
+            //close dialog when clicked
+            public void onClick(DialogInterface dialog, int id) {
+                dialog.cancel();
+            }
+        });
+        //create and show alert dialog
+        AlertDialog alertDialog = alertDialogBuilder.create();
+        alertDialog.show();
     }
 
 
@@ -114,7 +163,7 @@ public class RoutingActivity extends ActionBarActivity implements TimePickerFrag
         showLoadingAnimation();
     }
 
-    public void showLoadingAnimation () {
+    public void showLoadingAnimation() {
         // set content
         loading_text.setText(R.string.loading_text);
         loading_image.setImageResource(R.drawable.ic_launcher);
@@ -137,13 +186,8 @@ public class RoutingActivity extends ActionBarActivity implements TimePickerFrag
 
     //get picked time from TimePickerFragment via Interface
     public void onTimePicked(int hour, int minute) {
-        //show picked time
-        TextView arrivalTime = (TextView) findViewById(R.id.arrivalTime);
-        if (minute < 10) {
-            arrivalTime.setText(hour + ":0" + minute + " Uhr");
-        } else {
-            arrivalTime.setText(hour + ":" + minute + " Uhr");
-        }
+        showTime(hour, minute);
+
         convertToMilliseconds(hour, minute);
 
         final Calendar c = Calendar.getInstance();
@@ -156,6 +200,15 @@ public class RoutingActivity extends ActionBarActivity implements TimePickerFrag
         }
         mGlobalVariables.settAnkEingTime(tAnkEingTime);
 
+    }
+
+    public void showTime(int hour, int minute) {
+        //show picked time
+        if (minute < 10) {
+            arrivalTime.setText(hour + ":0" + minute + " Uhr");
+        } else {
+            arrivalTime.setText(hour + ":" + minute + " Uhr");
+        }
     }
 
     //convert hour and minutes to milliseconds for mathematical operations @Calculation
@@ -172,6 +225,10 @@ public class RoutingActivity extends ActionBarActivity implements TimePickerFrag
         updateUI();
     }
 
+    public void onSwitchUserData (View view) {
+        routing_with_user_data = switch_userData.isChecked();
+    }
+
     public void updateUI() {
         //enable / disable UI elements
         if (manuel_distance) {
@@ -179,25 +236,47 @@ public class RoutingActivity extends ActionBarActivity implements TimePickerFrag
             destination_address.setEnabled(false);
             editDistance.setEnabled(true);
             start_navigation.setEnabled(true);
+            generate_route.setEnabled(false);
         } else {
             start_address.setEnabled(true);
             destination_address.setEnabled(true);
             editDistance.setEnabled(false);
             start_navigation.setEnabled(false);
+            generate_route.setEnabled(true);
         }
     }
 
     public void onClickStartNavigation(View view) {
+        boolean distanceExc = false;
+        boolean timeExc = false;
         //read text from EditText and convert to String
-        Double sEing = Double.parseDouble(editDistance.getText().toString());
-        //try to convert String to Float
-        mGlobalVariables.setsEing(sEing);
-        //start ShowDataActivity
-        Intent intent = new Intent(this, ShowDataActivity.class);
-        startActivity(intent);
-        //start tracking service
-        Intent intent2 = new Intent(this, Tracking.class);
-        startService(intent2);
+        try {
+            //try to convert String to Float
+            Double sEing = Double.parseDouble(editDistance.getText().toString());
+            mGlobalVariables.setsEing(sEing);
+        } catch (Exception e) {
+            distanceExc = true;
+        }
+        // open alert with correct text
+        if (mGlobalVariables.gettAnkEingTime() == 0) {
+            timeExc = true;
+        }
+        if (timeExc&&distanceExc) {
+            openAlert("Strecke und keine Uhrzeit");
+        } else if (distanceExc) {
+            openAlert("Strecke");
+        } else if (timeExc) {
+            openAlert("Uhrzeit");
+        }
+        // only start ShowDataActivity and Tracking Service, if both excs are false
+        if (!timeExc && !distanceExc) {
+            //start ShowDataActivity
+            Intent intent = new Intent(this, ShowDataActivity.class);
+            startActivity(intent);
+            //start tracking service
+            Intent intent2 = new Intent(this, Tracking.class);
+            startService(intent2);
+        }
     }
 
     // Reads an InputStream and converts it to a String.
@@ -342,12 +421,14 @@ public class RoutingActivity extends ActionBarActivity implements TimePickerFrag
 
     private String makeUrl(String StartAddress, String DestinationAddress) {
         Log.i(TAG, "makeURL");
+        String optimize = (routing_with_user_data) ? "1" : "0";
         String lurlstr;
         Uri.Builder lurl;
         lurl = Uri.parse(this.getString(R.string.api1_base_url) + this.getString(R.string.api1_get_route))
                 .buildUpon()
                 .appendQueryParameter("start", StartAddress)
                 .appendQueryParameter("end", DestinationAddress)
+                .appendQueryParameter("optimize", optimize)
                 .appendQueryParameter("profile", route_type);
         lurlstr = lurl.build().toString();
         Log.i(TAG, lurlstr);

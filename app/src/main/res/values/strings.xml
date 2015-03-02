@@ -49,7 +49,7 @@
     <string name="upload_track_public_visible">Track öffentlich einsehbar hochladen</string>
     <string name="error">Fehler: </string>
     <string name="km">km</string>
-    <string name="desired_arrival_time">Die gewünschte Ankunftszeit beträgt:</string>
+    <string name="desired_arrival_time">Gewünschte Ankunftszeit:</string>
     <string name="desired_arrival_time_defaultval">----</string>
     <string name="driven">gefahren</string>
     <string name="driven_defaultval">---</string>
@@ -89,5 +89,6 @@
     <string name="switch_manuel_distance">Möchten sie die Streckenlänge manuell eingeben?</string>
     <string name="route_type">Routentyp:</string>
     <string name="loading_text">Route wird generiert, bitte warten...</string>
+    <string name="switch_user_data">Möchten Sie für Ihre Routenfindung die gesammelten Daten anderer User nutzen?</string>
 
 </resources>
