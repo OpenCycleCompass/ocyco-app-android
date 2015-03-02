@@ -41,20 +41,25 @@ import java.util.Locale;
 
 public class RoutingActivity extends ActionBarActivity implements TimePickerFragment.OnTimePickedListener, AdapterView.OnItemSelectedListener {
 
+    //LOG Tag
     final String TAG = "RoutingActivity-class";
-    RoutingDatabase mRDb;
-    Button start_navigation;
-    double tAnkEingTime;
-    GlobalVariables mGlobalVariables;
-    EditText editDistance;
-    boolean manuel_distance;
-    private Switch switch_manuelDistance;
+    //Views
     EditText destination_address;
     EditText start_address;
+    EditText editDistance;
     Spinner selectRouteType;
-    String route_type;
     TextView loading_text;
     ImageView loading_image;
+    Button start_navigation;
+    Switch switch_manuelDistance;
+    //self-written classes
+    RoutingDatabase mRDb;
+    GlobalVariables mGlobalVariables;
+    //vars
+    double tAnkEingTime;
+    boolean manuel_distance;
+    String route_type;
+
 
 
     @Override
@@ -65,18 +70,18 @@ public class RoutingActivity extends ActionBarActivity implements TimePickerFrag
         start_navigation = (Button) findViewById(R.id.start_navigation);
         start_navigation.setEnabled(false);
         editDistance = (EditText) findViewById(R.id.enter_distance);
-        //set up database, delete old database
-        mRDb = new RoutingDatabase(this);
-        mGlobalVariables = (GlobalVariables) getApplicationContext();
-        mRDb.open();
-        boolean deleted = mRDb.deleteDatabase();
-        Log.i(TAG, "deleted " + deleted);
-        mRDb.close();
-        switch_manuelDistance = (Switch) findViewById(R.id.switch_manuelDistance);
         start_address = (EditText) findViewById(R.id.start_address);
         destination_address = (EditText) findViewById(R.id.destination_address);
         loading_text = (TextView) findViewById(R.id.loading_text);
         loading_image = (ImageView) findViewById(R.id.loading_image);
+        switch_manuelDistance = (Switch) findViewById(R.id.switch_manuelDistance);
+        //global variables class
+        mGlobalVariables = (GlobalVariables) getApplicationContext();
+        //set up database, delete old database
+        mRDb = new RoutingDatabase(this);
+        mRDb.open();
+        mRDb.deleteDatabase();
+        mRDb.close();
         // configure select_route_type spinner
         selectRouteType = (Spinner) findViewById(R.id.select_route_type);
         ArrayAdapter<CharSequence> adapter = ArrayAdapter.createFromResource(this,
@@ -84,7 +89,7 @@ public class RoutingActivity extends ActionBarActivity implements TimePickerFrag
         adapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
         selectRouteType.setAdapter(adapter);
         selectRouteType.setOnItemSelectedListener(this);
-
+        //call updateUI()
         updateUI();
     }
 
