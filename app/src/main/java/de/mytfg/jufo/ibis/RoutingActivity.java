@@ -1,6 +1,8 @@
 package de.mytfg.jufo.ibis;
 
+import android.app.AlertDialog;
 import android.content.Context;
+import android.content.DialogInterface;
 import android.content.Intent;
 import android.net.ConnectivityManager;
 import android.net.NetworkInfo;
@@ -62,7 +64,6 @@ public class RoutingActivity extends ActionBarActivity implements TimePickerFrag
     String route_type;
 
 
-
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -95,6 +96,24 @@ public class RoutingActivity extends ActionBarActivity implements TimePickerFrag
         updateUI();
     }
 
+    private void openAlert(String missing_value) {
+        //set up a new alert dialog
+        AlertDialog.Builder alertDialogBuilder = new AlertDialog.Builder(RoutingActivity.this);
+        alertDialogBuilder.setTitle("Fehler!");
+        alertDialogBuilder.setMessage("Sie haben keine " + missing_value + " eingegeben!");
+
+        //create the OK Button and onClickListener
+        alertDialogBuilder.setPositiveButton("OK", new DialogInterface.OnClickListener() {
+            //close dialog when clicked
+            public void onClick(DialogInterface dialog, int id) {
+                dialog.cancel();
+            }
+        });
+        //create and show alert dialog
+        AlertDialog alertDialog = alertDialogBuilder.create();
+        alertDialog.show();
+    }
+
 
     public void onClickGenerateRoute(View view) {
         Log.i(TAG, "onClickGenerateRoute");
@@ -121,7 +140,7 @@ public class RoutingActivity extends ActionBarActivity implements TimePickerFrag
         showLoadingAnimation();
     }
 
-    public void showLoadingAnimation () {
+    public void showLoadingAnimation() {
         // set content
         loading_text.setText(R.string.loading_text);
         loading_image.setImageResource(R.drawable.ic_launcher);
@@ -197,16 +216,36 @@ public class RoutingActivity extends ActionBarActivity implements TimePickerFrag
     }
 
     public void onClickStartNavigation(View view) {
+        boolean distanceExc = false;
+        boolean timeExc = false;
         //read text from EditText and convert to String
-        Double sEing = Double.parseDouble(editDistance.getText().toString());
-        //try to convert String to Float
-        mGlobalVariables.setsEing(sEing);
-        //start ShowDataActivity
-        Intent intent = new Intent(this, ShowDataActivity.class);
-        startActivity(intent);
-        //start tracking service
-        Intent intent2 = new Intent(this, Tracking.class);
-        startService(intent2);
+        try {
+            //try to convert String to Float
+            Double sEing = Double.parseDouble(editDistance.getText().toString());
+            mGlobalVariables.setsEing(sEing);
+        } catch (Exception e) {
+            distanceExc = true;
+        }
+        // open alert with correct text
+        if (mGlobalVariables.gettAnkEingTime() == 0) {
+            timeExc = true;
+        }
+        if (timeExc&&distanceExc) {
+            openAlert("Strecke und keine Uhrzeit");
+        } else if (distanceExc) {
+            openAlert("Strecke");
+        } else if (timeExc) {
+            openAlert("Uhrzeit");
+        }
+        // only start ShowDataActivity and Tracking Service, if both excs are false
+        if (!timeExc && !distanceExc) {
+            //start ShowDataActivity
+            Intent intent = new Intent(this, ShowDataActivity.class);
+            startActivity(intent);
+            //start tracking service
+            Intent intent2 = new Intent(this, Tracking.class);
+            startService(intent2);
+        }
     }
 
     // Reads an InputStream and converts it to a String.
