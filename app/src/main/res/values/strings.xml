@@ -88,5 +88,6 @@
     <string name="rout_find_error">Ihre Start- oder Zielort konnte nicht gefunden werden!</string>
     <string name="switch_manuel_distance">Möchten sie die Streckenlänge manuell eingeben?</string>
     <string name="route_type">Routentyp:</string>
+    <string name="loading_text">Route wird generiert, bitte warten...</string>
 
 </resources>

@@ -13,10 +13,13 @@ import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
+import android.view.animation.Animation;
+import android.view.animation.AnimationUtils;
 import android.widget.AdapterView;
 import android.widget.ArrayAdapter;
 import android.widget.Button;
 import android.widget.EditText;
+import android.widget.ImageView;
 import android.widget.Spinner;
 import android.widget.Switch;
 import android.widget.TextView;
@@ -50,6 +53,8 @@ public class RoutingActivity extends ActionBarActivity implements TimePickerFrag
     EditText start_address;
     Spinner selectRouteType;
     String route_type;
+    TextView loading_text;
+    ImageView loading_image;
 
 
     @Override
@@ -70,6 +75,8 @@ public class RoutingActivity extends ActionBarActivity implements TimePickerFrag
         switch_manuelDistance = (Switch) findViewById(R.id.switch_manuelDistance);
         start_address = (EditText) findViewById(R.id.start_address);
         destination_address = (EditText) findViewById(R.id.destination_address);
+        loading_text = (TextView) findViewById(R.id.loading_text);
+        loading_image = (ImageView) findViewById(R.id.loading_image);
         // configure select_route_type spinner
         selectRouteType = (Spinner) findViewById(R.id.select_route_type);
         ArrayAdapter<CharSequence> adapter = ArrayAdapter.createFromResource(this,
@@ -104,6 +111,22 @@ public class RoutingActivity extends ActionBarActivity implements TimePickerFrag
             Toast toast = Toast.makeText(context, getString(R.string.upload_error_no_network_try_again_later), duration);
             toast.show();
         }
+        showLoadingAnimation();
+    }
+
+    public void showLoadingAnimation () {
+        // set content
+        loading_text.setText(R.string.loading_text);
+        loading_image.setImageResource(R.drawable.ic_launcher);
+        //start rotation
+        Animation rotation = AnimationUtils.loadAnimation(this, R.anim.rotation);
+        loading_image.startAnimation(rotation);
+    }
+
+    public void removeLoadingAnimation() {
+        // remove loading animation
+        loading_text.setText("");
+        loading_image.setImageResource(0);
     }
 
     //create and show the TimePickerFragment
@@ -273,6 +296,7 @@ public class RoutingActivity extends ActionBarActivity implements TimePickerFrag
                 }
 
             }
+            removeLoadingAnimation();
         }
     }
 
