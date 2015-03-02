@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
 
-    <string name="app_name">iBis - intelligent bike information system</string>
+    <string name="app_name">iBis</string>
     <string name="app_name_short">iBis</string>
     <string name="action_settings">Einstellungen</string>
     <string name="welcome_headline">Wilkommen bei iBis!</string>

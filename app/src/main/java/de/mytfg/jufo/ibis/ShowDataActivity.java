@@ -80,11 +80,11 @@ public class ShowDataActivity extends ActionBarActivity {
     private void openAccuracyAlert(boolean confirm) {
         if (dialogExists) {
             alertDialog.dismiss();
-            dialogExists=false;
+            dialogExists = false;
         }
         if (confirm) {
             alertDialogBuilder.setTitle("Positionsbestimmung erfolgreich!");
-            alertDialogBuilder.setMessage((int)mGlobalVariable.getAccuracy() + "m Abweichung ist akzeptabel für die Navigation, sie können nun beginnen!");
+            alertDialogBuilder.setMessage((int) mGlobalVariable.getLocation().getAccuracy() + "m Abweichung ist akzeptabel für die Navigation, sie können nun beginnen!");
             //create the OK Button and onClickListener
             alertDialogBuilder.setPositiveButton("OK", new DialogInterface.OnClickListener() {
                 //close dialog when clicked
@@ -96,7 +96,11 @@ public class ShowDataActivity extends ActionBarActivity {
 
         } else {
             alertDialogBuilder.setTitle("Positionsbestimmung zu ungenau!");
-            alertDialogBuilder.setMessage((int)mGlobalVariable.getAccuracy() + "m Abweichung sind zu ungenau zum Navigieren! Haben Sie GPS aktiviert? Signal wird gesucht...");
+            if (mGlobalVariable.getLocation()!= null) {
+                alertDialogBuilder.setMessage((int) mGlobalVariable.getLocation().getAccuracy() + "m Abweichung sind zu ungenau zum Navigieren! Haben Sie GPS aktiviert? Signal wird gesucht...");
+            } else {
+                alertDialogBuilder.setMessage("Kein Signal! Haben Sie GPS aktiviert? Signal wird gesucht...");
+            }
         }
         //create and show alert dialog
         alertDialog = alertDialogBuilder.create();
@@ -106,26 +110,35 @@ public class ShowDataActivity extends ActionBarActivity {
 
     //Timer for updating the info boxes
     Handler timerHandler = new Handler();
+    boolean noGPSAlertOpen;
     Runnable timerRunnable = new Runnable() {
 
         @Override
         public void run() {
             oldAccuracyAlert = accuracyAlert;
-            if (mGlobalVariable.getAccuracy() < 20) {
-                showData();
-                accuracyAlert = false;
-            } else {
-                accuracyAlert = true;
-            }
-            //check, if accuracy alert is necessary
-            if (accuracyAlert != oldAccuracyAlert) {
-                //check which accuracy alert
-                if (accuracyAlert) {
-                    openAccuracyAlert(false);
+            if (mGlobalVariable.getLocation() != null) {
+                noGPSAlertOpen = false;
+                if (mGlobalVariable.getLocation().getAccuracy() < 20) {
+                    showData();
+                    accuracyAlert = false;
                 } else {
-                    openAccuracyAlert(true);
+                    accuracyAlert = true;
                 }
+                //check, if accuracy alert is necessary
+                if (accuracyAlert != oldAccuracyAlert) {
+                    //check which accuracy alert
+                    if (accuracyAlert) {
+                        openAccuracyAlert(false);
+                    } else {
+                        openAccuracyAlert(true);
+                    }
+                }
+            } else {
+                if (!noGPSAlertOpen)
+                openAccuracyAlert(false);
+                noGPSAlertOpen=true;
             }
+
             timerHandler.postDelayed(this, 500);
         }
     };
@@ -212,6 +225,9 @@ public class ShowDataActivity extends ActionBarActivity {
                 Intent intent = new Intent(this, SettingsActivity.class);
                 startActivity(intent);
                 return true;
+            case R.id.auto_center:
+                item.setChecked(!item.isChecked());
+                mGlobalVariable.setAutoCenter(item.isChecked());
             default:
                 return super.onOptionsItemSelected(item);
         }

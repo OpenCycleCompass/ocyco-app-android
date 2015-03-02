@@ -124,7 +124,9 @@ public class MapFragment extends Fragment {
 
         @Override
         public void run() {
-            updateMap();
+            if (mGlobalVariables.isAutoCenter()) {
+                updateMap();
+            }
             timerHandler.postDelayed(this, 500);
         }
     };
@@ -137,8 +139,8 @@ public class MapFragment extends Fragment {
         Log.i(TAG, "updateMap()");
         //center at users position
         try {
-
             GeoPoint currentLocation = new GeoPoint(mGlobalVariables.getLocation().getLatitude(), mGlobalVariables.getLocation().getLongitude());
+            Log.i(TAG, "Geopoint"+currentLocation);
             mMapView.getController().setCenter(currentLocation);
         } catch (java.lang.NullPointerException e) {
             Log.i(TAG, "NullPointerException");

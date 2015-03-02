@@ -66,6 +66,7 @@ public class RoutingActivity extends ActionBarActivity implements TimePickerFrag
         switch_manuelDistance = (Switch) findViewById(R.id.switch_manuelDistance);
         start_address = (EditText) findViewById(R.id.start_address);
         destination_address = (EditText) findViewById(R.id.destination_address);
+        updateUI();
     }
 
     public void onClickGenerateRoute(View view) {

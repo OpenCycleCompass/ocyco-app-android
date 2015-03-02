@@ -7,4 +7,10 @@
         android:orderInCategory="100"
         android:title="@string/action_settings"
         app:showAsAction="never" />
+
+    <item android:id="@+id/auto_center"
+        android:title="automatisch zentrieren"
+        android:icon="@android:drawable/ic_menu_preferences"
+        android:checkable="true"
+        android:checked="true"/>
 </menu>
