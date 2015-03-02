@@ -49,7 +49,7 @@
     <string name="upload_track_public_visible">Track öffentlich einsehbar hochladen</string>
     <string name="error">Fehler: </string>
     <string name="km">km</string>
-    <string name="desired_arrival_time">Die gewünschte Ankunftszeit beträgt:</string>
+    <string name="desired_arrival_time">Gewünschte Ankunftszeit:</string>
     <string name="desired_arrival_time_defaultval">----</string>
     <string name="driven">gefahren</string>
     <string name="driven_defaultval">---</string>

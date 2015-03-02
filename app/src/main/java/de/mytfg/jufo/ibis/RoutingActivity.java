@@ -51,6 +51,7 @@ public class RoutingActivity extends ActionBarActivity implements TimePickerFrag
     TextView loading_text;
     ImageView loading_image;
     Button start_navigation;
+    Button generate_route;
     Switch switch_manuelDistance;
     //self-written classes
     RoutingDatabase mRDb;
@@ -69,6 +70,7 @@ public class RoutingActivity extends ActionBarActivity implements TimePickerFrag
         //get and set up views
         start_navigation = (Button) findViewById(R.id.start_navigation);
         start_navigation.setEnabled(false);
+        generate_route = (Button) findViewById(R.id.generate_route);
         editDistance = (EditText) findViewById(R.id.enter_distance);
         start_address = (EditText) findViewById(R.id.start_address);
         destination_address = (EditText) findViewById(R.id.destination_address);
@@ -184,11 +186,13 @@ public class RoutingActivity extends ActionBarActivity implements TimePickerFrag
             destination_address.setEnabled(false);
             editDistance.setEnabled(true);
             start_navigation.setEnabled(true);
+            generate_route.setEnabled(false);
         } else {
             start_address.setEnabled(true);
             destination_address.setEnabled(true);
             editDistance.setEnabled(false);
             start_navigation.setEnabled(false);
+            generate_route.setEnabled(true);
         }
     }
 
