@@ -2,7 +2,6 @@ package de.mytfg.jufo.ibis;
 
 import android.content.Context;
 import android.content.Intent;
-import android.location.Location;
 import android.net.ConnectivityManager;
 import android.net.NetworkInfo;
 import android.net.Uri;
@@ -83,7 +82,6 @@ public class RoutingActivity extends ActionBarActivity implements TimePickerFrag
     }
 
 
-
     public void onClickGenerateRoute(View view) {
         Log.i(TAG, "onClickGenerateRoute");
         //read addresses from edit text
@@ -158,8 +156,7 @@ public class RoutingActivity extends ActionBarActivity implements TimePickerFrag
             destination_address.setEnabled(false);
             editDistance.setEnabled(true);
             start_navigation.setEnabled(true);
-        }
-        else {
+        } else {
             start_address.setEnabled(true);
             destination_address.setEnabled(true);
             editDistance.setEnabled(false);
@@ -168,16 +165,16 @@ public class RoutingActivity extends ActionBarActivity implements TimePickerFrag
     }
 
     public void onClickStartNavigation(View view) {
-            //read text from EditText and convert to String
-            Double sEing = Double.parseDouble(editDistance.getText().toString());
-            //try to convert String to Float
-            mGlobalVariables.setsEing(sEing);
-            //start ShowDataActivity
-            Intent intent = new Intent(this, ShowDataActivity.class);
-            startActivity(intent);
-            //start tracking service
-            Intent intent2 = new Intent(this, Tracking.class);
-            startService(intent2);
+        //read text from EditText and convert to String
+        Double sEing = Double.parseDouble(editDistance.getText().toString());
+        //try to convert String to Float
+        mGlobalVariables.setsEing(sEing);
+        //start ShowDataActivity
+        Intent intent = new Intent(this, ShowDataActivity.class);
+        startActivity(intent);
+        //start tracking service
+        Intent intent2 = new Intent(this, Tracking.class);
+        startService(intent2);
     }
 
     // Reads an InputStream and converts it to a String.
@@ -196,11 +193,11 @@ public class RoutingActivity extends ActionBarActivity implements TimePickerFrag
             case (0):
                 route_type = "default";
             case (1):
-                route_type="shortest";
+                route_type = "shortest";
             case (2):
-                route_type="fastest";
+                route_type = "fastest";
             case (3):
-                route_type="scenery";
+                route_type = "scenery";
         }
     }
 
@@ -232,10 +229,8 @@ public class RoutingActivity extends ActionBarActivity implements TimePickerFrag
         protected void onPostExecute(String result) {
             Log.i(TAG, "onPostExecute");
             Log.i(TAG, "HTTP result: " + result);
-            double dist;
             //create JSON Object
             JSONObject jObject = null;
-            Location oldLocation = new Location("");
             try {
                 jObject = new JSONObject(result);
             } catch (JSONException e) {
@@ -246,24 +241,8 @@ public class RoutingActivity extends ActionBarActivity implements TimePickerFrag
                 try {
                     //get JSON Array
                     JSONArray jArray = jObject.getJSONArray("points");
-                    //Read from JSON Array
-                    for (int i = 0; i < jArray.length(); i++) {
-                        Location location = new Location("");
-                        JSONObject oneObject = jArray.getJSONObject(i);
-                        // Pulling items from the array
-                        double lat = oneObject.getDouble("lat");
-                        double lon = oneObject.getDouble("lon");
-                        location.setLatitude(lat);
-                        location.setLongitude(lon);
-                        if (i != 0) {
-                            dist = location.distanceTo(oldLocation);
-                        } else {
-                            dist = 0;
-                        }
-                        //insert into db
-                        mRDb.insertData(lat, lon, dist);
-                        oldLocation = location;
-                    }
+                    //read and insert points from jArrray
+                    mRDb.readPointsArray(jArray);
                     //get total dist, convert to km an round
                     double totalDist = mRDb.getTotalDist() / 1000;
                     String totalDistRounded = roundDecimals(totalDist);
