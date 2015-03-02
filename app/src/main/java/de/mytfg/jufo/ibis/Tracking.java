@@ -208,6 +208,7 @@ public class Tracking extends Service implements LocationListener, OnConnectionF
 
     public void updateDatabase() {
         Log.i(TAG, "updateDatabase()");
+        mGPSDb.open();
         mGPSDb.insertLocation(mCurrentLocation);
     }
 
