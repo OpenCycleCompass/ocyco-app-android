@@ -344,7 +344,8 @@ public class RoutingActivity extends ActionBarActivity implements TimePickerFrag
         lurl = Uri.parse(this.getString(R.string.api1_base_url) + this.getString(R.string.api1_get_route))
                 .buildUpon()
                 .appendQueryParameter("start", StartAddress)
-                .appendQueryParameter("end", DestinationAddress);
+                .appendQueryParameter("end", DestinationAddress)
+                .appendQueryParameter("profile", route_type);
         lurlstr = lurl.build().toString();
         Log.i(TAG, lurlstr);
         return lurlstr;
