@@ -22,7 +22,16 @@
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:text="@string/switch_manuel_distance"
-                android:onClick="onSwitchManualDistance"/>
+                android:onClick="onSwitchManualDistance"
+                android:layout_marginBottom="20dp"/>
+
+            <Switch
+                android:id="@+id/switch_userData"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="@string/switch_user_data"
+                android:onClick="onSwitchUserData"
+                android:layout_marginBottom="20dp"/>
 
             <TextView
                 android:layout_width="wrap_content"

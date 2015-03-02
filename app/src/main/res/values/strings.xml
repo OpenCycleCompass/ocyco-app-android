@@ -89,5 +89,6 @@
     <string name="switch_manuel_distance">Möchten sie die Streckenlänge manuell eingeben?</string>
     <string name="route_type">Routentyp:</string>
     <string name="loading_text">Route wird generiert, bitte warten...</string>
+    <string name="switch_user_data">Möchten Sie für Ihre Routenfindung die gesammelten Daten anderer User nutzen?</string>
 
 </resources>

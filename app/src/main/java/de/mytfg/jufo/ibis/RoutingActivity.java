@@ -57,12 +57,13 @@ public class RoutingActivity extends ActionBarActivity implements TimePickerFrag
     Button start_navigation;
     Button generate_route;
     Switch switch_manuelDistance;
+    Switch switch_userData;
     //self-written classes
     RoutingDatabase mRDb;
     GlobalVariables mGlobalVariables;
     //vars
     double tAnkEingTime;
-    boolean manuel_distance;
+    boolean manuel_distance, routing_with_user_data;
     String route_type;
     //shared preferences
     SharedPreferences settings;
@@ -83,6 +84,7 @@ public class RoutingActivity extends ActionBarActivity implements TimePickerFrag
         arrivalTime = (TextView) findViewById(R.id.arrivalTime);
         loading_image = (ImageView) findViewById(R.id.loading_image);
         switch_manuelDistance = (Switch) findViewById(R.id.switch_manuelDistance);
+        switch_userData = (Switch) findViewById(R.id.switch_userData);
         //global variables class
         mGlobalVariables = (GlobalVariables) getApplicationContext();
         //set up database, delete old database
@@ -221,6 +223,10 @@ public class RoutingActivity extends ActionBarActivity implements TimePickerFrag
     public void onSwitchManualDistance(View view) {
         manuel_distance = switch_manuelDistance.isChecked();
         updateUI();
+    }
+
+    public void onSwitchUserData (View view) {
+        routing_with_user_data = switch_userData.isChecked();
     }
 
     public void updateUI() {
@@ -415,12 +421,14 @@ public class RoutingActivity extends ActionBarActivity implements TimePickerFrag
 
     private String makeUrl(String StartAddress, String DestinationAddress) {
         Log.i(TAG, "makeURL");
+        String optimize = (routing_with_user_data) ? "1" : "0";
         String lurlstr;
         Uri.Builder lurl;
         lurl = Uri.parse(this.getString(R.string.api1_base_url) + this.getString(R.string.api1_get_route))
                 .buildUpon()
                 .appendQueryParameter("start", StartAddress)
                 .appendQueryParameter("end", DestinationAddress)
+                .appendQueryParameter("optimize", optimize)
                 .appendQueryParameter("profile", route_type);
         lurlstr = lurl.build().toString();
         Log.i(TAG, lurlstr);
