@@ -4,6 +4,7 @@ import android.app.AlertDialog;
 import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
+import android.content.SharedPreferences;
 import android.net.ConnectivityManager;
 import android.net.NetworkInfo;
 import android.net.Uri;
@@ -49,6 +50,7 @@ public class RoutingActivity extends ActionBarActivity implements TimePickerFrag
     EditText destination_address;
     EditText start_address;
     EditText editDistance;
+    TextView arrivalTime;
     Spinner selectRouteType;
     TextView loading_text;
     ImageView loading_image;
@@ -62,6 +64,8 @@ public class RoutingActivity extends ActionBarActivity implements TimePickerFrag
     double tAnkEingTime;
     boolean manuel_distance;
     String route_type;
+    //shared preferences
+    SharedPreferences settings;
 
 
     @Override
@@ -76,6 +80,7 @@ public class RoutingActivity extends ActionBarActivity implements TimePickerFrag
         start_address = (EditText) findViewById(R.id.start_address);
         destination_address = (EditText) findViewById(R.id.destination_address);
         loading_text = (TextView) findViewById(R.id.loading_text);
+        arrivalTime = (TextView) findViewById(R.id.arrivalTime);
         loading_image = (ImageView) findViewById(R.id.loading_image);
         switch_manuelDistance = (Switch) findViewById(R.id.switch_manuelDistance);
         //global variables class
@@ -92,8 +97,24 @@ public class RoutingActivity extends ActionBarActivity implements TimePickerFrag
         adapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
         selectRouteType.setAdapter(adapter);
         selectRouteType.setOnItemSelectedListener(this);
+        // Restore preferences
+        settings = getSharedPreferences(getString(R.string.preference_file_key), Context.MODE_PRIVATE);
+        editDistance.setText(settings.getString("distance", ""));
+        start_address.setText(settings.getString("start_string", ""));
+        destination_address.setText(settings.getString("dest_string", ""));
         //call updateUI()
         updateUI();
+    }
+
+    protected void onStop() {
+        super.onStop();
+        //creating a editor and add variables
+        SharedPreferences.Editor editor = settings.edit();
+        editor.putString("start_string", start_address.getText().toString());
+        editor.putString("dest_string", destination_address.getText().toString());
+        editor.putString("distance", editDistance.getText().toString());
+        // Commit the edits!
+        editor.apply();
     }
 
     private void openAlert(String missing_value) {
@@ -163,13 +184,8 @@ public class RoutingActivity extends ActionBarActivity implements TimePickerFrag
 
     //get picked time from TimePickerFragment via Interface
     public void onTimePicked(int hour, int minute) {
-        //show picked time
-        TextView arrivalTime = (TextView) findViewById(R.id.arrivalTime);
-        if (minute < 10) {
-            arrivalTime.setText(hour + ":0" + minute + " Uhr");
-        } else {
-            arrivalTime.setText(hour + ":" + minute + " Uhr");
-        }
+        showTime(hour, minute);
+
         convertToMilliseconds(hour, minute);
 
         final Calendar c = Calendar.getInstance();
@@ -182,6 +198,15 @@ public class RoutingActivity extends ActionBarActivity implements TimePickerFrag
         }
         mGlobalVariables.settAnkEingTime(tAnkEingTime);
 
+    }
+
+    public void showTime(int hour, int minute) {
+        //show picked time
+        if (minute < 10) {
+            arrivalTime.setText(hour + ":0" + minute + " Uhr");
+        } else {
+            arrivalTime.setText(hour + ":" + minute + " Uhr");
+        }
     }
 
     //convert hour and minutes to milliseconds for mathematical operations @Calculation
