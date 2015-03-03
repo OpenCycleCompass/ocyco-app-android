@@ -403,6 +403,8 @@ public class RoutingActivity extends ActionBarActivity implements TimePickerFrag
                 try {
                     //get JSON Array
                     JSONArray jArray = jObject.getJSONArray("points");
+                    // delete old database
+                    mRDb.deleteData();
                     //read and insert points from jArrray
                     mRDb.readPointsArray(jArray);
                     //get total dist, convert to km an round

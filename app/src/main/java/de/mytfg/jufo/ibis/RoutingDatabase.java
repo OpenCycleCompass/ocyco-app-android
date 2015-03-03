@@ -44,6 +44,10 @@ public class RoutingDatabase {
         dbHelper = new DbHelper(context);
     }
 
+    public void deleteData () {
+        db.delete(TABLENAME, null, null);
+    }
+
     //creating a DbHelper
     public class DbHelper extends SQLiteOpenHelper {
         //DbHelper constructor
