@@ -62,17 +62,18 @@ public class Tracking extends Service implements LocationListener, OnConnectionF
     }
 
     public void checkOnline() {
-        Log.i(TAG, "checkOnline()");
-        if (mGlobalVariable.isCollectData()) {
+        Log.i(TAG, "checkOnline(): " + "CollectData: "+mGlobalVariable.isCollectData() +" Running: "+mGlobalVariable.isTrackingRunning());
+        if (mGlobalVariable.isCollectData()&&!mGlobalVariable.isTrackingRunning()) {
             startOnlineTracking();
-        } else {
+        } else if (mGlobalVariable.isTrackingRunning()){
+            mGlobalVariable.setCollectData(false);
             stopOnlineTracking();
         }
     }
 
     public void startOnlineTracking() {
         Log.i(TAG, "startOnlineTracking()");
-        mGlobalVariable.setCollectData(true);
+        mGlobalVariable.setTrackingRunning(true);
         // Create Notification with track info
         mBuilder.setContentText(accNotiStr + getString(R.string.tracking_status_active));
         // Builds the notification and issues it.
@@ -88,8 +89,10 @@ public class Tracking extends Service implements LocationListener, OnConnectionF
         // Start Intent returned by mGPSDb.sendToServer()
         // intent has track data as "Extra"
         mGPSDb.open();
+        //ATTENTION: can have the effect, that the UploadActivity will not be started!
         int d_rows = mGPSDb.prepareDB();
         Log.i(TAG, Integer.toString(d_rows) + " " + getString(R.string.tracking_prepare_coords_removed_filter1));
+        mGPSDb.close();
         Intent intent = mGPSDb.sendToServer(this);
         intent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
         //only start activity, if data isn't empty
@@ -97,7 +100,10 @@ public class Tracking extends Service implements LocationListener, OnConnectionF
         if (!intent.getStringExtra("data").equals(UploadTrackActivity.data_empty)) { // valid but empty JSON defined in UploadTrackActivity ("[]")
             startActivity(intent);
         }
+        mGPSDb.open();
         mGPSDb.deleteDatabase();
+        mGPSDb.close();
+        mGlobalVariable.setTrackingRunning(false);
     }
 
     public void stopLocationUpdates() {
@@ -106,13 +112,11 @@ public class Tracking extends Service implements LocationListener, OnConnectionF
         if (mGoogleApiClient.isConnected()) {
             LocationServices.FusedLocationApi.removeLocationUpdates(mGoogleApiClient, this);
         }
-        mGPSDb.close();
     }
 
     protected void startLocationUpdates() {
         Log.i(TAG, "startLocationUpdates()");
         LocationServices.FusedLocationApi.requestLocationUpdates(mGoogleApiClient, mLocationRequest, this);
-        mGPSDb.open();
     }
 
     /**
@@ -153,8 +157,10 @@ public class Tracking extends Service implements LocationListener, OnConnectionF
         if (mGlobalVariable.isCollectData() && checkAccuracy(location.getAccuracy())) {
             updateDatabase();
             //update Notification
+            mGPSDb.open();
             int num_rows = mGPSDb.getNumRows();
             double total_dist = mGPSDb.getTotalDist();
+            mGPSDb.close();
             String s_total_dist = roundDecimals(total_dist/1000);
             // Update notification
             mBuilder.setContentText(accNotiStr + getString(R.string.tracking_status_active) + " - " + num_rows + getString(R.string.coordinates) + s_total_dist + " " + getString(R.string.km));
@@ -210,6 +216,7 @@ public class Tracking extends Service implements LocationListener, OnConnectionF
         Log.i(TAG, "updateDatabase()");
         mGPSDb.open();
         mGPSDb.insertLocation(mCurrentLocation);
+        mGPSDb.close();
     }
 
 
@@ -217,7 +224,6 @@ public class Tracking extends Service implements LocationListener, OnConnectionF
     public void onCreate() {
         Log.i(TAG, "onCreate()");
         super.onCreate();
-
         // Create Database
         mGPSDb = new GPSDatabase(this.getApplicationContext());
         // Delete old data from database

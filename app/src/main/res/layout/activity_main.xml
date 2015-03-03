@@ -32,4 +32,26 @@
         android:onClick="onClickFindRoute2"
         android:text="@string/findRoute" />
 
+    <TextView
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:paddingTop="15dp"
+        android:paddingBottom="10dp"
+        android:text="@string/tracking"
+        android:textSize="18sp"/>
+
+    <Button
+        android:id="@+id/button_start_tracking"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:text="@string/start_tracking"
+        android:onClick="onClickStartTracking"/>
+
+    <Button
+        android:id="@+id/button_stop_tracking"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:text="@string/stop_tracking"
+        android:onClick="onClickStopTracking"/>
+
 </LinearLayout>

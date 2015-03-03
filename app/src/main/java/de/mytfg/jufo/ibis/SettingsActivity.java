@@ -5,6 +5,7 @@ import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.SharedPreferences;
+import android.os.Handler;
 import android.support.v7.app.ActionBarActivity;
 import android.os.Bundle;
 import android.view.Menu;
@@ -52,6 +53,7 @@ public class SettingsActivity extends ActionBarActivity {
         //set default text
         EditText enter_text_size = (EditText) findViewById(R.id.enter_text_size);
         enter_text_size.setText(Float.toString(FloatTextSize));
+        startUIUpdates();
     }
 
 
@@ -59,6 +61,26 @@ public class SettingsActivity extends ActionBarActivity {
     public boolean onCreateOptionsMenu(Menu menu) {
         getMenuInflater().inflate(R.menu.menu_settings, menu);
         return true;
+    }
+
+    //Timer for updating the map
+    Handler timerHandler = new Handler();
+    Runnable timerRunnable = new Runnable() {
+
+        @Override
+        public void run() {
+            updateCBCollectData();
+            timerHandler.postDelayed(this, 500);
+        }
+    };
+
+    public void startUIUpdates() {
+        timerHandler.postDelayed(timerRunnable, 0);
+    }
+
+    public void updateCBCollectData() {
+        final CheckBox CBcollectData = (CheckBox) findViewById(R.id.CBCollectData);
+        CBcollectData.setChecked(mGlobalVariable.isCollectData());
     }
 
     @Override
@@ -101,23 +123,15 @@ public class SettingsActivity extends ActionBarActivity {
 
     //called when save Button is clicked
     public void saveSettings(View view) {
-        boolean exception = false;
         EditText enter_text_size = (EditText) findViewById(R.id.enter_text_size);
         String strEnterTxtSz = enter_text_size.getText().toString();
         //try to convert String to Float
         try {
             FloatTextSize = Float.parseFloat(strEnterTxtSz);
         } catch (java.lang.NumberFormatException e) {
-            exception = true;
             openAlert(strEnterTxtSz);
         }
         mGlobalVariable.setSettingVars(FloatTextSize);
-        if (!exception) {
-            //restart Tracking Service starts it's onStartCommand (NOT onCreate),
-            //so checkOnline will be executed again
-            Intent intent = new Intent(this, Tracking.class);
-            startService(intent);
-        }
     }
 
     public void onClickFindRoute(View view) {
@@ -159,15 +173,5 @@ public class SettingsActivity extends ActionBarActivity {
                 return super.onOptionsItemSelected(item);
         }
     }
-
-    public void onClickstopOnlineTracking(View view) {
-        //set collect data false
-        mGlobalVariable.setCollectData(false);
-        final CheckBox checkBox = (CheckBox) findViewById(R.id.CBCollectData);
-        checkBox.setChecked(mGlobalVariable.isCollectData());
-        Intent stopOnlineTrackingIntent = new Intent(this, Tracking.class);
-        startService(stopOnlineTrackingIntent);
-    }
-
 }
 

@@ -9,7 +9,7 @@ public class GlobalVariables extends Application {
     double sGef, sZuf, vAkt, vD, tAnk, tAnkUnt, vDMuss, vDunt, tAnkEingTime, sEing;
     float textSize;
     Location location;
-    boolean show_locationOverlay, show_compassOverlay, show_scaleBarOverlay, collectData, collectDataSet, auto_center=true;
+    boolean show_locationOverlay, show_compassOverlay, show_scaleBarOverlay, collectData, collectDataSet, auto_center = true, trackingRunning=false;
 
     public void setCalculationVars(double sGefIn, double sZufIn, double vAktIn, double vDIn, double tAnkIn, double tAnkUntIn, double vDMussIn, double vDuntIn) {
         sGef = sGefIn;
@@ -20,6 +20,10 @@ public class GlobalVariables extends Application {
         tAnkUnt = tAnkUntIn;
         vDMuss = vDMussIn;
         vDunt = vDuntIn;
+    }
+
+    public void setTrackingRunning(boolean trRunIn) {
+        trackingRunning = trRunIn;
     }
 
     public void setAutoCenter(boolean auto_center_in) {
@@ -58,6 +62,7 @@ public class GlobalVariables extends Application {
         collectData = collectDataIn;
         collectDataSet = true;
     }
+    public boolean isTrackingRunning () {return trackingRunning;}
 
     public boolean isAutoCenter() {
         return auto_center;

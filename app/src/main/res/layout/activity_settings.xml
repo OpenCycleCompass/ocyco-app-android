@@ -66,13 +66,6 @@
                 android:text="@string/findRoute"
                 android:onClick="onClickFindRoute"/>
 
-            <Button
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:layout_marginTop="10dp"
-                android:onClick="onClickstopOnlineTracking"
-                android:text="@string/tracking_stop" />
-
             <TextView
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
