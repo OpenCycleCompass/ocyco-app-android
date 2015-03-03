@@ -6,10 +6,10 @@ import android.location.Location;
 public class GlobalVariables extends Application {
 
     //The variables can be set and read from every Activity or Service!
-    double sGef, sZuf, vAkt, vD, tAnk, tAnkUnt, vDMuss, vDunt, tAnkEingTime, sEing;
+    double sGef, sZuf, vAkt, vD, tAnk, tAnkUnt, vDMuss, vDunt, tAnkEingTime, sEing, sEingTimeFactor;
     float textSize;
     Location location;
-    boolean show_locationOverlay, show_compassOverlay, show_scaleBarOverlay, collectData, collectDataSet, auto_center = true, trackingRunning=false;
+    boolean show_locationOverlay, show_compassOverlay, show_scaleBarOverlay, collectData, collectDataSet, auto_center = true, trackingRunning = false, use_time_factor;
 
     public void setCalculationVars(double sGefIn, double sZufIn, double vAktIn, double vDIn, double tAnkIn, double tAnkUntIn, double vDMussIn, double vDuntIn) {
         sGef = sGefIn;
@@ -20,6 +20,14 @@ public class GlobalVariables extends Application {
         tAnkUnt = tAnkUntIn;
         vDMuss = vDMussIn;
         vDunt = vDuntIn;
+    }
+
+    public void setsEingTimeFactor(double sEingTimeVarIn) {
+        sEingTimeFactor = sEingTimeVarIn;
+    }
+
+    public void setUseTimeFactor(boolean tfIn) {
+        use_time_factor = tfIn;
     }
 
     public void setTrackingRunning(boolean trRunIn) {
@@ -62,7 +70,14 @@ public class GlobalVariables extends Application {
         collectData = collectDataIn;
         collectDataSet = true;
     }
-    public boolean isTrackingRunning () {return trackingRunning;}
+
+    public boolean isUseTimeFactor() {
+        return use_time_factor;
+    }
+
+    public boolean isTrackingRunning() {
+        return trackingRunning;
+    }
 
     public boolean isAutoCenter() {
         return auto_center;
@@ -87,6 +102,8 @@ public class GlobalVariables extends Application {
     public boolean isShow_scaleBarOverlay() {
         return show_scaleBarOverlay;
     }
+
+    public double getsEingTimeFactor() {return sEingTimeFactor;}
 
     public Location getLocation() {
         return location;

@@ -174,11 +174,11 @@ public class Tracking extends Service implements LocationListener, OnConnectionF
         if (!mCalculate.checkFirstLoc()) {
             mCalculate.calculateTimeVars(mGlobalVariable.gettAnkEingTime());
             mGPSDb.open();
-            mCalculate.calculateDrivenDistance(mGPSDb.getTotalDist()/1000d);
+            mCalculate.calculateDrivenDistance(mGPSDb.getTotalDist());
             mGPSDb.close();
             mCalculate.calculateDrivenTime();
             mCalculate.calculateSpeed();
-            mCalculate.math();
+            mCalculate.math(mGlobalVariable.isUseTimeFactor(), mGlobalVariable.getsEingTimeFactor()/1000d);
             //get Variables from calculation
             double sGef = mCalculate.getsGef();
             double sZuf = mCalculate.getsZuf();

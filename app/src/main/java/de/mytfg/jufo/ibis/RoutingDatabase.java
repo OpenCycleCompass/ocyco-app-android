@@ -19,7 +19,7 @@ public class RoutingDatabase {
     //database variables
     private DbHelper dbHelper;
     public final String DBNAME = "RoutingDatabase";
-    public final int DBVERSION = 4;
+    public final int DBVERSION = 8;
     public SQLiteDatabase db;
     public final String COLUMN_ID = "Id";
     public final String COLUMN_LAT = "latitude";
@@ -31,7 +31,8 @@ public class RoutingDatabase {
             COLUMN_ID+" INTEGER PRIMARY KEY AUTOINCREMENT," +
             COLUMN_LAT+" REAL NOT NULL, " +
             COLUMN_LON+" REAL NOT NULL, " +
-            COLUMN_DIST+" REAL" +
+            COLUMN_DIST+" REAL," +
+            COLUMN_TIMEFACTOR+" REAL " +
             ");";
 
 
@@ -107,7 +108,13 @@ public class RoutingDatabase {
                 // Pulling items from the array
                 double lat = oneObject.getDouble("lat");
                 double lon = oneObject.getDouble("lon");
-                double tf = oneObject.getDouble("time_factor");
+                double tf;
+                if(oneObject.has("time_factor")) {
+                    tf = oneObject.getDouble("time_factor");
+                }
+                else {
+                    tf = 1d;
+                }
                 location.setLatitude(lat);
                 location.setLongitude(lon);
                 if (i != 0) {
@@ -124,7 +131,7 @@ public class RoutingDatabase {
             }
         }
     }
-
+//gzui
 
     public JSONArray getAllPoints() {
         Cursor cursor = db.query(TABLENAME, new String[]{COLUMN_LAT, COLUMN_LON}, null, null, null, null, null);

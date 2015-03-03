@@ -61,6 +61,7 @@ public class RoutingActivity extends ActionBarActivity implements TimePickerFrag
     Button start_from_current_position;
     Switch switch_manuelDistance;
     Switch switch_userData;
+    Switch switch_timeFactor;
     //self-written classes
     RoutingDatabase mRDb;
     GlobalVariables mGlobalVariables;
@@ -90,6 +91,7 @@ public class RoutingActivity extends ActionBarActivity implements TimePickerFrag
         loading_image = (ImageView) findViewById(R.id.loading_image);
         switch_manuelDistance = (Switch) findViewById(R.id.switch_manuelDistance);
         switch_userData = (Switch) findViewById(R.id.switch_userData);
+        switch_timeFactor = (Switch) findViewById(R.id.switch_timeFactor);
         //global variables class
         mGlobalVariables = (GlobalVariables) getApplicationContext();
         //set up database, delete old database
@@ -287,6 +289,10 @@ public class RoutingActivity extends ActionBarActivity implements TimePickerFrag
         routing_with_user_data = switch_userData.isChecked();
     }
 
+    public void onSwitchTimeFactor (View view) {
+        mGlobalVariables.setUseTimeFactor(switch_timeFactor.isChecked());
+    }
+
     public void updateUI() {
         //enable / disable UI elements
         if (manuel_distance) {
@@ -310,6 +316,11 @@ public class RoutingActivity extends ActionBarActivity implements TimePickerFrag
     public void onClickStartNavigation(View view) {
         boolean distanceExc = false;
         boolean timeExc = false;
+        if (!manuel_distance) {
+            mRDb.open();
+            mGlobalVariables.setsEingTimeFactor(mRDb.getTotalDistTimeFactored());
+            mRDb.close();
+        }
         //read text from EditText and convert to String
         try {
             //try to convert String to Float
@@ -437,6 +448,10 @@ public class RoutingActivity extends ActionBarActivity implements TimePickerFrag
                     e.printStackTrace();
                 }
 
+            } else {
+                int duration = Toast.LENGTH_LONG;
+                Toast toast = Toast.makeText(getApplicationContext(), "der server ist nicht erreichbar", duration);
+                toast.show();
             }
             removeLoadingAnimation();
         }

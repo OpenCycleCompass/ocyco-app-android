@@ -33,6 +33,14 @@
                 android:onClick="onSwitchUserData"
                 android:layout_marginBottom="20dp"/>
 
+            <Switch
+                android:id="@+id/switch_timeFactor"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="@string/switch_timeFactor"
+                android:onClick="onSwitchTimeFactor"
+                android:layout_marginBottom="20dp"/>
+
             <TextView
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
