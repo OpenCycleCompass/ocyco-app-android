@@ -66,7 +66,7 @@ public class RoutingActivity extends ActionBarActivity implements TimePickerFrag
     GlobalVariables mGlobalVariables;
     //vars
     double tAnkEingTime;
-    boolean manuel_distance, routing_with_user_data, navigate_from_current_position=false;
+    boolean manuel_distance, routing_with_user_data, navigate_from_current_position = false;
     String route_type;
     Location startLocation;
     //shared preferences
@@ -112,13 +112,11 @@ public class RoutingActivity extends ActionBarActivity implements TimePickerFrag
         //call updateUI()
         updateUI();
         //set onFocusListener
-        start_address.setOnFocusChangeListener(new View.OnFocusChangeListener()
-        {
+        start_address.setOnFocusChangeListener(new View.OnFocusChangeListener() {
             @Override
-            public void onFocusChange(View v, boolean hasFocus)
-            {
+            public void onFocusChange(View v, boolean hasFocus) {
                 if (hasFocus) {
-                    navigate_from_current_position=false;
+                    navigate_from_current_position = false;
                     start_address.setText("");
                 }
             }
@@ -157,7 +155,7 @@ public class RoutingActivity extends ActionBarActivity implements TimePickerFrag
 
     public void startFromCurrentPosition(View view) {
         // start tracking service for getting actual position
-        navigate_from_current_position=true;
+        navigate_from_current_position = true;
         if (!mGlobalVariables.isTrackingRunning()) {
             Intent intent = new Intent(this, Tracking.class);
             startService(intent);
@@ -169,9 +167,8 @@ public class RoutingActivity extends ActionBarActivity implements TimePickerFrag
     public void lookForStartPosition() {
         try {
             startLocation = mGlobalVariables.getLocation();
-            start_address.setText(startLocation.getLatitude()  + "    " + startLocation.getLongitude());
-        }
-        catch (Exception e) {
+            start_address.setText(startLocation.getLatitude() + "    " + startLocation.getLongitude());
+        } catch (Exception e) {
             //nothing
         }
     }
@@ -483,12 +480,22 @@ public class RoutingActivity extends ActionBarActivity implements TimePickerFrag
         String optimize = (routing_with_user_data) ? "1" : "0";
         String lurlstr;
         Uri.Builder lurl;
-        lurl = Uri.parse(this.getString(R.string.api1_base_url) + this.getString(R.string.api1_get_route))
-                .buildUpon()
-                .appendQueryParameter("start", StartAddress)
-                .appendQueryParameter("end", DestinationAddress)
-                .appendQueryParameter("optimize", optimize)
-                .appendQueryParameter("profile", route_type);
+        if (navigate_from_current_position) {
+            lurl = Uri.parse(this.getString(R.string.api1_base_url) + this.getString(R.string.api1_get_route))
+                    .buildUpon()
+                    .appendQueryParameter("start_lat", startLocation.getLatitude()+"")
+                    .appendQueryParameter("start_lon", startLocation.getLongitude()+"")
+                    .appendQueryParameter("end", DestinationAddress)
+                    .appendQueryParameter("optimize", optimize)
+                    .appendQueryParameter("profile", route_type);
+        } else {
+            lurl = Uri.parse(this.getString(R.string.api1_base_url) + this.getString(R.string.api1_get_route))
+                    .buildUpon()
+                    .appendQueryParameter("start", StartAddress)
+                    .appendQueryParameter("end", DestinationAddress)
+                    .appendQueryParameter("optimize", optimize)
+                    .appendQueryParameter("profile", route_type);
+        }
         lurlstr = lurl.build().toString();
         Log.i(TAG, lurlstr);
         return lurlstr;
