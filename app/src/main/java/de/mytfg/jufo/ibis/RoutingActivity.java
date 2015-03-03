@@ -168,6 +168,10 @@ public class RoutingActivity extends ActionBarActivity implements TimePickerFrag
         try {
             startLocation = mGlobalVariables.getLocation();
             start_address.setText(startLocation.getLatitude() + "    " + startLocation.getLongitude());
+            // focus on next edit text
+            destination_address.setFocusable(true);
+            destination_address.setFocusableInTouchMode(true);
+            destination_address.requestFocus();
         } catch (Exception e) {
             //nothing
         }
@@ -241,7 +245,8 @@ public class RoutingActivity extends ActionBarActivity implements TimePickerFrag
     public void onTimePicked(int hour, int minute) {
         showTime(hour, minute);
 
-        convertToMilliseconds(hour, minute);
+        tAnkEingTime=convertToMilliseconds(hour, minute);
+        Log.i(TAG, "TimeVars tAnkEingTime onTimePicked"+tAnkEingTime);
 
         final Calendar c = Calendar.getInstance();
         int current_hour = c.get(Calendar.HOUR_OF_DAY);
@@ -265,8 +270,8 @@ public class RoutingActivity extends ActionBarActivity implements TimePickerFrag
     }
 
     //convert hour and minutes to milliseconds for mathematical operations @Calculation
-    public void convertToMilliseconds(int hour, int minute) {
-        tAnkEingTime = (double) ((hour * 60 + minute) * 60 * 1000);
+    public double convertToMilliseconds(int hour, int minute) {
+        return (double) ((hour * 60 + minute) * 60 * 1000);
     }
 
     String roundDecimals(double d) {
@@ -399,6 +404,8 @@ public class RoutingActivity extends ActionBarActivity implements TimePickerFrag
                 try {
                     //get JSON Array
                     JSONArray jArray = jObject.getJSONArray("points");
+                    // delete old database
+                    mRDb.deleteData();
                     //read and insert points from jArrray
                     mRDb.readPointsArray(jArray);
                     //get total dist, convert to km an round
