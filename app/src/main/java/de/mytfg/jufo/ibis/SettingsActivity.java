@@ -123,23 +123,15 @@ public class SettingsActivity extends ActionBarActivity {
 
     //called when save Button is clicked
     public void saveSettings(View view) {
-        boolean exception = false;
         EditText enter_text_size = (EditText) findViewById(R.id.enter_text_size);
         String strEnterTxtSz = enter_text_size.getText().toString();
         //try to convert String to Float
         try {
             FloatTextSize = Float.parseFloat(strEnterTxtSz);
         } catch (java.lang.NumberFormatException e) {
-            exception = true;
             openAlert(strEnterTxtSz);
         }
         mGlobalVariable.setSettingVars(FloatTextSize);
-        if (!exception) {
-            //restart Tracking Service starts it's onStartCommand (NOT onCreate),
-            //so checkOnline will be executed again
-            Intent intent = new Intent(this, Tracking.class);
-            startService(intent);
-        }
     }
 
     public void onClickFindRoute(View view) {
@@ -181,15 +173,5 @@ public class SettingsActivity extends ActionBarActivity {
                 return super.onOptionsItemSelected(item);
         }
     }
-
-    public void onClickstopOnlineTracking(View view) {
-        //set collect data false
-        mGlobalVariable.setCollectData(false);
-        final CheckBox checkBox = (CheckBox) findViewById(R.id.CBCollectData);
-        checkBox.setChecked(mGlobalVariable.isCollectData());
-        Intent stopOnlineTrackingIntent = new Intent(this, Tracking.class);
-        startService(stopOnlineTrackingIntent);
-    }
-
 }
 
