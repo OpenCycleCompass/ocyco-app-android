@@ -1,8 +1,3 @@
-/**
- * Created by raphael on 28.12.14.
- * iBis Tracking Service
- * receives location updates, save to SQLite.
- */
 package de.mytfg.jufo.ibis;
 
 import android.app.NotificationManager;
