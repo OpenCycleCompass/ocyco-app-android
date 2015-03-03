@@ -60,6 +60,16 @@ public class ShowDataActivity extends ActionBarActivity {
 
         setTextSize();
         updateUI();
+        checkTracking();
+    }
+
+    public void checkTracking() {
+        //start tracking, if tracking is not running
+        //happens, when tracking was not started from RoutingActivity
+        if (!mGlobalVariable.isTrackingRunning()){
+            Intent intent = new Intent(this, Tracking.class);
+            startService(intent);
+        }
     }
 
     private void setTextSize() {
