@@ -247,8 +247,8 @@ public class RoutingActivity extends ActionBarActivity implements TimePickerFrag
     public void onTimePicked(int hour, int minute) {
         showTime(hour, minute);
 
-        tAnkEingTime=convertToMilliseconds(hour, minute);
-        Log.i(TAG, "TimeVars tAnkEingTime onTimePicked"+tAnkEingTime);
+        tAnkEingTime = convertToMilliseconds(hour, minute);
+        Log.i(TAG, "TimeVars tAnkEingTime onTimePicked" + tAnkEingTime);
 
         final Calendar c = Calendar.getInstance();
         int current_hour = c.get(Calendar.HOUR_OF_DAY);
@@ -287,9 +287,15 @@ public class RoutingActivity extends ActionBarActivity implements TimePickerFrag
 
     public void onSwitchUserData(View view) {
         routing_with_user_data = switch_userData.isChecked();
+        if (switch_userData.isChecked()) {
+            switch_timeFactor.setEnabled(true);
+        } else {
+            switch_timeFactor.setChecked(false);
+            switch_timeFactor.setEnabled(false);
+        }
     }
 
-    public void onSwitchTimeFactor (View view) {
+    public void onSwitchTimeFactor(View view) {
         mGlobalVariables.setUseTimeFactor(switch_timeFactor.isChecked());
     }
 
@@ -302,7 +308,10 @@ public class RoutingActivity extends ActionBarActivity implements TimePickerFrag
             start_navigation.setEnabled(true);
             generate_route.setEnabled(false);
             start_from_current_position.setEnabled(false);
-
+            switch_userData.setChecked(false);
+            switch_userData.setEnabled(false);
+            switch_timeFactor.setChecked(false);
+            switch_timeFactor.setEnabled(false);
         } else {
             start_address.setEnabled(true);
             destination_address.setEnabled(true);
@@ -310,6 +319,8 @@ public class RoutingActivity extends ActionBarActivity implements TimePickerFrag
             start_navigation.setEnabled(false);
             generate_route.setEnabled(true);
             start_from_current_position.setEnabled(true);
+            switch_userData.setEnabled(true);
+            switch_timeFactor.setEnabled(true);
         }
     }
 
@@ -450,7 +461,7 @@ public class RoutingActivity extends ActionBarActivity implements TimePickerFrag
 
             } else {
                 int duration = Toast.LENGTH_LONG;
-                Toast toast = Toast.makeText(getApplicationContext(), "der server ist nicht erreichbar", duration);
+                Toast toast = Toast.makeText(getApplicationContext(), R.string.upload_error_no_network_try_again_later, duration);
                 toast.show();
             }
             removeLoadingAnimation();
@@ -505,8 +516,8 @@ public class RoutingActivity extends ActionBarActivity implements TimePickerFrag
         if (navigate_from_current_position) {
             lurl = Uri.parse(this.getString(R.string.api1_base_url) + this.getString(R.string.api1_get_route))
                     .buildUpon()
-                    .appendQueryParameter("start_lat", startLocation.getLatitude()+"")
-                    .appendQueryParameter("start_lon", startLocation.getLongitude()+"")
+                    .appendQueryParameter("start_lat", startLocation.getLatitude() + "")
+                    .appendQueryParameter("start_lon", startLocation.getLongitude() + "")
                     .appendQueryParameter("end", DestinationAddress)
                     .appendQueryParameter("optimize", optimize)
                     .appendQueryParameter("profile", route_type);
