@@ -3,8 +3,21 @@
     xmlns:tools="http://schemas.android.com/tools"
     tools:context="de.mytfg.jufo.ibis.SettingsActivity">
     <item
-        android:id="@+id/action_show_data"
+        android:id="@+id/action_MainActivity"
+        android:orderInCategory="100"
+        android:title="@string/action_MainActivity"
+        app:showAsAction="never" />
+
+    <item
+        android:id="@+id/action_show_data_activity"
         android:orderInCategory="100"
         android:title="@string/action_show_data_activity"
         app:showAsAction="never" />
+
+    <item
+        android:id="@+id/action_RoutingActivity"
+        android:orderInCategory="100"
+        android:title="@string/action_RoutingActivity"
+        app:showAsAction="never" />
+
 </menu>
