@@ -19,18 +19,20 @@ public class RoutingDatabase {
     //database variables
     private DbHelper dbHelper;
     public final String DBNAME = "RoutingDatabase";
-    public final int DBVERSION = 3;
+    public final int DBVERSION = 8;
     public SQLiteDatabase db;
     public final String COLUMN_ID = "Id";
     public final String COLUMN_LAT = "latitude";
     public final String COLUMN_LON = "longitude";
     public final String COLUMN_DIST = "distance"; ///distance to last point in meters
+    public final String COLUMN_TIMEFACTOR = "time_factor";
     public final String TABLENAME = "RoutingData";
     public final String CREATERDB = "CREATE TABLE "+TABLENAME+"("+
             COLUMN_ID+" INTEGER PRIMARY KEY AUTOINCREMENT," +
             COLUMN_LAT+" REAL NOT NULL, " +
             COLUMN_LON+" REAL NOT NULL, " +
-            COLUMN_DIST+" REAL" +
+            COLUMN_DIST+" REAL," +
+            COLUMN_TIMEFACTOR+" REAL " +
             ");";
 
 
@@ -69,17 +71,27 @@ public class RoutingDatabase {
         }
     }
 
-    public long insertData(double lat, double lon, double dist) {
+    public long insertData(double lat, double lon, double dist, double tf) {
         ContentValues value = new ContentValues();
         value.put(COLUMN_LAT, lat);
         value.put(COLUMN_LON, lon);
         value.put(COLUMN_DIST, dist);
+        value.put(COLUMN_TIMEFACTOR, tf);
         return db.insert(TABLENAME, null, value);
     }
 
     public double getTotalDist() {
         double tdist;
         Cursor mCount = db.rawQuery("SELECT SUM("+COLUMN_DIST+") FROM " + TABLENAME, null);
+        mCount.moveToFirst();
+        tdist = mCount.getDouble(0);
+        mCount.close();
+        return tdist;
+    }
+
+    public double getTotalDistTimeFactored() {
+        double tdist;
+        Cursor mCount = db.rawQuery("SELECT SUM("+COLUMN_DIST+" * "+COLUMN_TIMEFACTOR+") FROM " + TABLENAME, null);
         mCount.moveToFirst();
         tdist = mCount.getDouble(0);
         mCount.close();
@@ -96,6 +108,13 @@ public class RoutingDatabase {
                 // Pulling items from the array
                 double lat = oneObject.getDouble("lat");
                 double lon = oneObject.getDouble("lon");
+                double tf;
+                if(oneObject.has("time_factor")) {
+                    tf = oneObject.getDouble("time_factor");
+                }
+                else {
+                    tf = 1d;
+                }
                 location.setLatitude(lat);
                 location.setLongitude(lon);
                 if (i != 0) {
@@ -104,7 +123,7 @@ public class RoutingDatabase {
                     dist = 0;
                 }
                 //insert into db
-                insertData(lat, lon, dist);
+                insertData(lat, lon, dist, tf);
                 oldLocation = location;
             }
             catch (JSONException e) {
@@ -112,16 +131,7 @@ public class RoutingDatabase {
             }
         }
     }
-
-
-    public long getTotalCnt() {
-        long cnt;
-        Cursor mCount = db.rawQuery("SELECT COUNT("+COLUMN_DIST+") FROM " + TABLENAME, null);
-        mCount.moveToFirst();
-        cnt = mCount.getLong(0);
-        mCount.close();
-        return cnt;
-    }
+//gzui
 
     public JSONArray getAllPoints() {
         Cursor cursor = db.query(TABLENAME, new String[]{COLUMN_LAT, COLUMN_LON}, null, null, null, null, null);

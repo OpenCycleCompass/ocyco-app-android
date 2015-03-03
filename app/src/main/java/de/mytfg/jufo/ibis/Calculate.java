@@ -89,12 +89,15 @@ public class Calculate {
         tGef = ((newLoc.getTime() - firstLoc.getTime()) / 1000d / 60d / 60d);
     }
 
-    public void math() {
+    public void math(boolean use_time_factor, double sEingTimeFactor) {
         //average speed
         vD = sGef / tGef;
-        Log.i("Calculate-class", "vD:"+vD + " sGef:"+sGef+"/"+"tGef"+tGef);
         //distance to drive
-        sZuf = sEing - sGef;
+        if (use_time_factor) {
+            sZuf = sEingTimeFactor - sGef;
+        } else {
+            sZuf = sEing - sGef;
+        }
         //time to drive
         tZuf = sZuf / vD;
         //arrival time
