@@ -5,6 +5,7 @@ import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.SharedPreferences;
+import android.os.Handler;
 import android.support.v7.app.ActionBarActivity;
 import android.os.Bundle;
 import android.view.Menu;
@@ -52,6 +53,7 @@ public class SettingsActivity extends ActionBarActivity {
         //set default text
         EditText enter_text_size = (EditText) findViewById(R.id.enter_text_size);
         enter_text_size.setText(Float.toString(FloatTextSize));
+        startUIUpdates();
     }
 
 
@@ -59,6 +61,26 @@ public class SettingsActivity extends ActionBarActivity {
     public boolean onCreateOptionsMenu(Menu menu) {
         getMenuInflater().inflate(R.menu.menu_settings, menu);
         return true;
+    }
+
+    //Timer for updating the map
+    Handler timerHandler = new Handler();
+    Runnable timerRunnable = new Runnable() {
+
+        @Override
+        public void run() {
+            updateCBCollectData();
+            timerHandler.postDelayed(this, 500);
+        }
+    };
+
+    public void startUIUpdates() {
+        timerHandler.postDelayed(timerRunnable, 0);
+    }
+
+    public void updateCBCollectData() {
+        final CheckBox CBcollectData = (CheckBox) findViewById(R.id.CBCollectData);
+        CBcollectData.setChecked(mGlobalVariable.isCollectData());
     }
 
     @Override
