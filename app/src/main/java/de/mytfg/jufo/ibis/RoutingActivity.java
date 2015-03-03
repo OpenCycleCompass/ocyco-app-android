@@ -168,6 +168,10 @@ public class RoutingActivity extends ActionBarActivity implements TimePickerFrag
         try {
             startLocation = mGlobalVariables.getLocation();
             start_address.setText(startLocation.getLatitude() + "    " + startLocation.getLongitude());
+            // focus on next edit text
+            destination_address.setFocusable(true);
+            destination_address.setFocusableInTouchMode(true);
+            destination_address.requestFocus();
         } catch (Exception e) {
             //nothing
         }
