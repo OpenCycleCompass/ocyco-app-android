@@ -93,5 +93,7 @@
     <string name="tracking">Tracking - anonym Routendaten sammeln</string>
     <string name="start_tracking">Tracking starten</string>
     <string name="stop_tracking">Tracking stoppen</string>
+    <string name="start_from_current_position">Von aktueller Position aus navigieren</string>
+    <string name="search_position">Position wird gesucht...</string>
 
 </resources>

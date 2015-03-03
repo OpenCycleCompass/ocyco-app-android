@@ -52,7 +52,14 @@
             <EditText
                 android:id="@+id/start_address"
                 android:layout_width="match_parent"
-                android:layout_height="wrap_content" />
+                android:layout_height="wrap_content"/>
+
+            <Button
+                android:id="@+id/start_from_current_position"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:text="@string/start_from_current_position"
+                android:onClick="startFromCurrentPosition"/>
 
             <TextView
                 android:layout_width="wrap_content"

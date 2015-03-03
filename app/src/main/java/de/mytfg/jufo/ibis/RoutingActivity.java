@@ -5,10 +5,12 @@ import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.SharedPreferences;
+import android.location.Location;
 import android.net.ConnectivityManager;
 import android.net.NetworkInfo;
 import android.net.Uri;
 import android.os.AsyncTask;
+import android.os.Handler;
 import android.support.v4.app.DialogFragment;
 import android.support.v7.app.ActionBarActivity;
 import android.os.Bundle;
@@ -56,6 +58,7 @@ public class RoutingActivity extends ActionBarActivity implements TimePickerFrag
     ImageView loading_image;
     Button start_navigation;
     Button generate_route;
+    Button start_from_current_position;
     Switch switch_manuelDistance;
     Switch switch_userData;
     //self-written classes
@@ -63,8 +66,9 @@ public class RoutingActivity extends ActionBarActivity implements TimePickerFrag
     GlobalVariables mGlobalVariables;
     //vars
     double tAnkEingTime;
-    boolean manuel_distance, routing_with_user_data;
+    boolean manuel_distance, routing_with_user_data, navigate_from_current_position = false;
     String route_type;
+    Location startLocation;
     //shared preferences
     SharedPreferences settings;
 
@@ -77,6 +81,7 @@ public class RoutingActivity extends ActionBarActivity implements TimePickerFrag
         start_navigation = (Button) findViewById(R.id.start_navigation);
         start_navigation.setEnabled(false);
         generate_route = (Button) findViewById(R.id.generate_route);
+        start_from_current_position = (Button) findViewById(R.id.start_from_current_position);
         editDistance = (EditText) findViewById(R.id.enter_distance);
         start_address = (EditText) findViewById(R.id.start_address);
         destination_address = (EditText) findViewById(R.id.destination_address);
@@ -106,6 +111,16 @@ public class RoutingActivity extends ActionBarActivity implements TimePickerFrag
         destination_address.setText(settings.getString("dest_string", ""));
         //call updateUI()
         updateUI();
+        //set onFocusListener
+        start_address.setOnFocusChangeListener(new View.OnFocusChangeListener() {
+            @Override
+            public void onFocusChange(View v, boolean hasFocus) {
+                if (hasFocus) {
+                    navigate_from_current_position = false;
+                    start_address.setText("");
+                }
+            }
+        });
     }
 
     protected void onStop() {
@@ -135,6 +150,44 @@ public class RoutingActivity extends ActionBarActivity implements TimePickerFrag
         //create and show alert dialog
         AlertDialog alertDialog = alertDialogBuilder.create();
         alertDialog.show();
+    }
+
+
+    public void startFromCurrentPosition(View view) {
+        // start tracking service for getting actual position
+        navigate_from_current_position = true;
+        if (!mGlobalVariables.isTrackingRunning()) {
+            Intent intent = new Intent(this, Tracking.class);
+            startService(intent);
+        }
+        start_address.setText(R.string.search_position);
+        startLookingForCurrentLocation();
+    }
+
+    public void lookForStartPosition() {
+        try {
+            startLocation = mGlobalVariables.getLocation();
+            start_address.setText(startLocation.getLatitude() + "    " + startLocation.getLongitude());
+        } catch (Exception e) {
+            //nothing
+        }
+    }
+
+    //Timer for updating the map
+    Handler timerHandler = new Handler();
+    Runnable timerRunnable = new Runnable() {
+
+        @Override
+        public void run() {
+            if (navigate_from_current_position) {
+                lookForStartPosition();
+            }
+            timerHandler.postDelayed(this, 500);
+        }
+    };
+
+    public void startLookingForCurrentLocation() {
+        timerHandler.postDelayed(timerRunnable, 0);
     }
 
 
@@ -225,7 +278,7 @@ public class RoutingActivity extends ActionBarActivity implements TimePickerFrag
         updateUI();
     }
 
-    public void onSwitchUserData (View view) {
+    public void onSwitchUserData(View view) {
         routing_with_user_data = switch_userData.isChecked();
     }
 
@@ -237,12 +290,15 @@ public class RoutingActivity extends ActionBarActivity implements TimePickerFrag
             editDistance.setEnabled(true);
             start_navigation.setEnabled(true);
             generate_route.setEnabled(false);
+            start_from_current_position.setEnabled(false);
+
         } else {
             start_address.setEnabled(true);
             destination_address.setEnabled(true);
             editDistance.setEnabled(false);
             start_navigation.setEnabled(false);
             generate_route.setEnabled(true);
+            start_from_current_position.setEnabled(true);
         }
     }
 
@@ -261,7 +317,7 @@ public class RoutingActivity extends ActionBarActivity implements TimePickerFrag
         if (mGlobalVariables.gettAnkEingTime() == 0) {
             timeExc = true;
         }
-        if (timeExc&&distanceExc) {
+        if (timeExc && distanceExc) {
             openAlert("Strecke und keine Uhrzeit");
         } else if (distanceExc) {
             openAlert("Strecke");
@@ -424,12 +480,22 @@ public class RoutingActivity extends ActionBarActivity implements TimePickerFrag
         String optimize = (routing_with_user_data) ? "1" : "0";
         String lurlstr;
         Uri.Builder lurl;
-        lurl = Uri.parse(this.getString(R.string.api1_base_url) + this.getString(R.string.api1_get_route))
-                .buildUpon()
-                .appendQueryParameter("start", StartAddress)
-                .appendQueryParameter("end", DestinationAddress)
-                .appendQueryParameter("optimize", optimize)
-                .appendQueryParameter("profile", route_type);
+        if (navigate_from_current_position) {
+            lurl = Uri.parse(this.getString(R.string.api1_base_url) + this.getString(R.string.api1_get_route))
+                    .buildUpon()
+                    .appendQueryParameter("start_lat", startLocation.getLatitude()+"")
+                    .appendQueryParameter("start_lon", startLocation.getLongitude()+"")
+                    .appendQueryParameter("end", DestinationAddress)
+                    .appendQueryParameter("optimize", optimize)
+                    .appendQueryParameter("profile", route_type);
+        } else {
+            lurl = Uri.parse(this.getString(R.string.api1_base_url) + this.getString(R.string.api1_get_route))
+                    .buildUpon()
+                    .appendQueryParameter("start", StartAddress)
+                    .appendQueryParameter("end", DestinationAddress)
+                    .appendQueryParameter("optimize", optimize)
+                    .appendQueryParameter("profile", route_type);
+        }
         lurlstr = lurl.build().toString();
         Log.i(TAG, lurlstr);
         return lurlstr;
