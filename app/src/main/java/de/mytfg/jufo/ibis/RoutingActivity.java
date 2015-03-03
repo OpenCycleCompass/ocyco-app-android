@@ -245,7 +245,8 @@ public class RoutingActivity extends ActionBarActivity implements TimePickerFrag
     public void onTimePicked(int hour, int minute) {
         showTime(hour, minute);
 
-        convertToMilliseconds(hour, minute);
+        tAnkEingTime=convertToMilliseconds(hour, minute);
+        Log.i(TAG, "TimeVars tAnkEingTime onTimePicked"+tAnkEingTime);
 
         final Calendar c = Calendar.getInstance();
         int current_hour = c.get(Calendar.HOUR_OF_DAY);
@@ -269,8 +270,8 @@ public class RoutingActivity extends ActionBarActivity implements TimePickerFrag
     }
 
     //convert hour and minutes to milliseconds for mathematical operations @Calculation
-    public void convertToMilliseconds(int hour, int minute) {
-        tAnkEingTime = (double) ((hour * 60 + minute) * 60 * 1000);
+    public double convertToMilliseconds(int hour, int minute) {
+        return (double) ((hour * 60 + minute) * 60 * 1000);
     }
 
     String roundDecimals(double d) {

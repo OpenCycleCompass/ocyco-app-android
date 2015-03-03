@@ -1,6 +1,7 @@
 package de.mytfg.jufo.ibis;
 
 import android.location.Location;
+import android.util.Log;
 
 import java.util.Calendar;
 
@@ -47,6 +48,8 @@ public class Calculate {
         return (oldLoc == null);
     }
 
+
+
     public void calculateSpeed() {
         if (newLoc.hasSpeed()) {
             vAkt = (newLoc.getSpeed()) * 3.6;
@@ -54,39 +57,42 @@ public class Calculate {
             //time difference between last GPS points in hours
             double oldTime = oldLoc.getTime();
             double newTime = newLoc.getTime();
-            double timeDiff = (((newTime - oldTime) / 1000) / 60) / 60;
+            double timeDiff = (((newTime - oldTime) / 1000d) / 60d) / 60d;
             vAkt = lastDistance / timeDiff;
         }
     }
 
     public void calculateTimeVars(double tAnkEingTimeInput) {
+        Log.i("timeVars", "tAnkEing:"+tAnkEingTimeInput);
         //get date in milliseconds
         final Calendar c = Calendar.getInstance();
         int current_hour = c.get(Calendar.HOUR_OF_DAY);
         int current_minute = c.get(Calendar.MINUTE);
         double milliSeconds = System.currentTimeMillis();
-        double timeInMillis = (double) ((current_hour * 60 + current_minute) * 60 * 1000);
+        double timeInMillis = ((current_hour * 60d + current_minute) * 60d * 1000d);
+        Log.i("timeVars", "timeInMs:"+timeInMillis);
         dateInMilliseconds = (milliSeconds - timeInMillis);
+        Log.i("timeVars", "dateInMs:"+dateInMilliseconds);
         //add date to time
-        tAnkEing = (((tAnkEingTimeInput + dateInMilliseconds)/1000)/60)/60;
+        tAnkEing = (((tAnkEingTimeInput + dateInMilliseconds)/1000d)/60d)/60d;
         //get actual time in hours
-        tAkt = (((timeInMillis + dateInMilliseconds)/1000)/60)/60;
+        tAkt = (((timeInMillis + dateInMilliseconds)/1000d)/60d)/60d;
     }
 
-    public void calculateDrivenDistance() {
-        //Calculate the distance between old and newLoc in kilometers and add to sGef
-        lastDistance = newLoc.distanceTo(oldLoc)/1000;
-        sGef += lastDistance;
+    public void calculateDrivenDistance(double dist) {
+        sGef = dist;
     }
 
     public void calculateDrivenTime() {
         //calculate driven time and convert to hours
-        tGef = ((((newLoc.getTime() - firstLoc.getTime()) / 1000) / 60) / 60);
+        Log.i("TimeCalc", "newLocTime"+newLoc.getTime() + "firstLocTime"+firstLoc.getTime() );
+        tGef = ((newLoc.getTime() - firstLoc.getTime()) / 1000d / 60d / 60d);
     }
 
     public void math() {
         //average speed
         vD = sGef / tGef;
+        Log.i("Calculate-class", "vD:"+vD + " sGef:"+sGef+"/"+"tGef"+tGef);
         //distance to drive
         sZuf = sEing - sGef;
         //time to drive
@@ -120,7 +126,7 @@ public class Calculate {
 
     public double gettAnk() {
         //convert to hours
-        return (tAnk-((((dateInMilliseconds)/1000)/60)/60));
+        return (tAnk-((((dateInMilliseconds)/1000d)/60d)/60d));
     }
 
     public double gettAnkUnt() {

@@ -161,7 +161,7 @@ public class Tracking extends Service implements LocationListener, OnConnectionF
             int num_rows = mGPSDb.getNumRows();
             double total_dist = mGPSDb.getTotalDist();
             mGPSDb.close();
-            String s_total_dist = roundDecimals(total_dist/1000);
+            String s_total_dist = roundDecimals(total_dist/1000d);
             // Update notification
             mBuilder.setContentText(accNotiStr + getString(R.string.tracking_status_active) + " - " + num_rows + getString(R.string.coordinates) + s_total_dist + " " + getString(R.string.km));
             // Sets an ID for the notification
@@ -178,7 +178,9 @@ public class Tracking extends Service implements LocationListener, OnConnectionF
         //only call mathematical methods, if this is not the first location - else there will be a NPE
         if (!mCalculate.checkFirstLoc()) {
             mCalculate.calculateTimeVars(mGlobalVariable.gettAnkEingTime());
-            mCalculate.calculateDrivenDistance();
+            mGPSDb.open();
+            mCalculate.calculateDrivenDistance(mGPSDb.getTotalDist()/1000d);
+            mGPSDb.close();
             mCalculate.calculateDrivenTime();
             mCalculate.calculateSpeed();
             mCalculate.math();
