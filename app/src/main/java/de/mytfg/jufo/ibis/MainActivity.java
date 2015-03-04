@@ -92,12 +92,16 @@ public class MainActivity extends ActionBarActivity {
         // Handle item selection
         switch (item.getItemId()) {
             case R.id.action_settings:
-                Intent intent = new Intent(this, SettingsActivity.class);
-                startActivity(intent);
+                Intent intent_settings = new Intent(this, SettingsActivity.class);
+                startActivity(intent_settings);
                 return true;
-            case R.id.action_show_data:
-                Intent intent2 = new Intent(this, ShowDataActivity.class);
-                startActivity(intent2);
+            case R.id.action_show_data_activity:
+                Intent intent_showData = new Intent(this, ShowDataActivity.class);
+                startActivity(intent_showData);
+                return true;
+            case R.id.action_RoutingActivity:
+                Intent intent_routing = new Intent(this, RoutingActivity.class);
+                startActivity(intent_routing);
                 return true;
             default:
                 return super.onOptionsItemSelected(item);

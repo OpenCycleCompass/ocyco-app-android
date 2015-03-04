@@ -17,7 +17,7 @@
     <string name="distance">Wie lange ist die Strecke, die Sie fahren möchten?</string>
     <string name="save">Speichern</string>
     <string name="title_activity_show_data">iBis</string>
-    <string name="action_show_data_activity">Hauptseite</string>
+    <string name="action_show_data_activity">Navigation</string>
     <string name="preference_file_key">pref_file_key</string>
     <string name="tracking_stop">Tracking beenden</string>
     <string name="tracking_stop_notification">Beenden</string>
@@ -96,5 +96,6 @@
     <string name="start_from_current_position">Von aktueller Position aus navigieren</string>
     <string name="search_position">Position wird gesucht...</string>
     <string name="switch_timeFactor">Möchten Sie für die Berechnung der Ankunftszeit die gesammelten Daten anderer User nutzen?</string>
-
+    <string name="action_RoutingActivity">Routenfindung</string>
+    <string name="action_MainActivity">Startseite</string>
 </resources>

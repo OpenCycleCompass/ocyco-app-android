@@ -170,6 +170,7 @@ public class ShowDataActivity extends ActionBarActivity {
         String sZuf = roundDecimals(mGlobalVariable.getsZuf()) + " km";
         String vAkt = roundDecimals(mGlobalVariable.getvAkt()) + " km/h";
         String vD = roundDecimals(mGlobalVariable.getvD()) + " km/h";
+        int tAnkDays = 0;
         //get the time and format it (tAnk)
         double tAnkD = mGlobalVariable.gettAnk();
         int tAnkStd = (int) tAnkD;
@@ -180,7 +181,7 @@ public class ShowDataActivity extends ActionBarActivity {
         }
         String tAnk = tAnkStd + ":" + tAnkMinStr + " Uhr";
         if (tAnkStd > 23) {
-            int tAnkDays = tAnkStd / 24;
+            tAnkDays = tAnkStd / 24;
             tAnkStd = tAnkStd - tAnkDays * 24;
             tAnk = tAnkStd + ":" + tAnkMinStr + " Uhr" + System.getProperty("line.separator") + "in " + tAnkDays + " Tagen";
         }
@@ -200,6 +201,11 @@ public class ShowDataActivity extends ActionBarActivity {
         tAnkUntBox.setText(tAnkUnt + "");
         vDMussBox.setText(vDMuss + "");
         vDUntBox.setText(vDunt + "");
+        //do not show unrealistic high values
+        if (tAnkDays > 2) {
+            tAnkBox.setText("--:--");
+            tAnkUntBox.setText("--:--");
+        }
         //set color
         if (mGlobalVariable.gettAnkUnt() < 0) {
             tAnkUntBox.setTextColor(getResources().getColor(R.color.good_value));
@@ -232,8 +238,16 @@ public class ShowDataActivity extends ActionBarActivity {
         // Handle item selection
         switch (item.getItemId()) {
             case R.id.action_settings:
-                Intent intent = new Intent(this, SettingsActivity.class);
-                startActivity(intent);
+                Intent intent_settings = new Intent(this, SettingsActivity.class);
+                startActivity(intent_settings);
+                return true;
+            case R.id.action_MainActivity:
+                Intent intent_main = new Intent(this, MainActivity.class);
+                startActivity(intent_main);
+                return true;
+            case R.id.action_RoutingActivity:
+                Intent intent_routing = new Intent(this, RoutingActivity.class);
+                startActivity(intent_routing);
                 return true;
             case R.id.auto_center:
                 item.setChecked(!item.isChecked());
