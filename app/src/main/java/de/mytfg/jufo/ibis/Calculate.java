@@ -8,28 +8,28 @@ import java.util.Calendar;
 public class Calculate {
 
     //location vars
-    Location firstLoc;
-    Location oldLoc;
-    Location newLoc;
+    private Location firstLoc;
+    private Location oldLoc;
+    private Location newLoc;
 
     //calculation and output vars
     //speed
-    double vD; //Durchschnittsgeschwindikeit
-    double vAkt; //aktuelle Geschwindigkeit
-    double vDMuss; //notwendige Durchscnittsgeschwindigkeit, um am vorgegebenen Zeitpunkt das Ziel zu erreichen
-    double vDunt; // Unterschied zwischen aktueller- und notwendiger Durchschnittsgeschwindigkeit
+    private double vD; //Durchschnittsgeschwindikeit
+    private double vAkt; //aktuelle Geschwindigkeit
+    private double vDMuss; //notwendige Durchscnittsgeschwindigkeit, um am vorgegebenen Zeitpunkt das Ziel zu erreichen
+    private double vDunt; // Unterschied zwischen aktueller- und notwendiger Durchschnittsgeschwindigkeit
     //distance
-    double lastDistance;
     double sEing; //eingegebene Strecke
-    double sGef; //gefahrene Strecke
-    double sZuf; //zu fahrende Strecke
+    private double sGef; //gefahrene Strecke
+    private double sZuf; //zu fahrende Strecke
+    double lastDistance;
     //time
-    double tGef; //gefahrene Zeit
-    double tZuf; //zu fahrende Zeit
-    double tAkt; // aktuelle Zeit
-    double tAnk; // Ankunftszeit
-    double tAnkEing; //Eingegebene, gewünschte Ankunftszeit
-    double tAnkUnt; //Unterschied zwischen realer und gewünschter Ankunftszeit
+    private double tGef; //gefahrene Zeit
+    private double tZuf; //zu fahrende Zeit
+    private double tAkt; // aktuelle Zeit
+    private double tAnk; // Ankunftszeit
+    private double tAnkEing; //Eingegebene, gewünschte Ankunftszeit
+    private double tAnkUnt; //Unterschied zwischen realer und gewünschter Ankunftszeit
 
     double dateInMilliseconds;
 
@@ -49,7 +49,6 @@ public class Calculate {
     }
 
 
-
     public void calculateSpeed() {
         if (newLoc.hasSpeed()) {
             vAkt = (newLoc.getSpeed()) * 3.6;
@@ -63,20 +62,20 @@ public class Calculate {
     }
 
     public void calculateTimeVars(double tAnkEingTimeInput) {
-        Log.i("timeVars", "tAnkEing:"+tAnkEingTimeInput);
+        Log.i("timeVars", "tAnkEing:" + tAnkEingTimeInput);
         //get date in milliseconds
         final Calendar c = Calendar.getInstance();
         int current_hour = c.get(Calendar.HOUR_OF_DAY);
         int current_minute = c.get(Calendar.MINUTE);
         double milliSeconds = System.currentTimeMillis();
         double timeInMillis = ((current_hour * 60d + current_minute) * 60d * 1000d);
-        Log.i("timeVars", "timeInMs:"+timeInMillis);
+        Log.i("timeVars", "timeInMs:" + timeInMillis);
         dateInMilliseconds = (milliSeconds - timeInMillis);
-        Log.i("timeVars", "dateInMs:"+dateInMilliseconds);
+        Log.i("timeVars", "dateInMs:" + dateInMilliseconds);
         //add date to time
-        tAnkEing = (((tAnkEingTimeInput + dateInMilliseconds)/1000d)/60d)/60d;
+        tAnkEing = (((tAnkEingTimeInput + dateInMilliseconds) / 1000d) / 60d) / 60d;
         //get actual time in hours
-        tAkt = (((timeInMillis + dateInMilliseconds)/1000d)/60d)/60d;
+        tAkt = (((timeInMillis + dateInMilliseconds) / 1000d) / 60d) / 60d;
     }
 
     public void calculateDrivenDistance(double dist) {
@@ -85,7 +84,7 @@ public class Calculate {
 
     public void calculateDrivenTime() {
         //calculate driven time and convert to hours
-        Log.i("TimeCalc", "newLocTime"+newLoc.getTime() + "firstLocTime"+firstLoc.getTime() );
+        Log.i("TimeCalc", "newLocTime" + newLoc.getTime() + "firstLocTime" + firstLoc.getTime());
         tGef = ((newLoc.getTime() - firstLoc.getTime()) / 1000d / 60d / 60d);
     }
 
@@ -129,7 +128,7 @@ public class Calculate {
 
     public double gettAnk() {
         //convert to hours
-        return (tAnk-((((dateInMilliseconds)/1000d)/60d)/60d));
+        return (tAnk - ((((dateInMilliseconds) / 1000d) / 60d) / 60d));
     }
 
     public double gettAnkUnt() {

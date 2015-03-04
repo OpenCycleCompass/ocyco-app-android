@@ -20,27 +20,25 @@ public class ShowDataActivity extends ActionBarActivity {
     GlobalVariables mGlobalVariable;
 
     //info boxes
-    TextView sGefBox;
-    TextView sZufBox;
-    TextView vAktBox;
-    TextView vDBox;
-    TextView tAnkBox;
-    TextView tAnkUntBox;
-    TextView vDMussBox;
-    TextView vDUntBox;
+    private TextView sGefBox;
+    private TextView sZufBox;
+    private TextView vAktBox;
+    private TextView vDBox;
+    private TextView tAnkBox;
+    private TextView tAnkUntBox;
+    private TextView vDMussBox;
+    private TextView vDUntBox;
 
-    String tAnkMinStr;
-    boolean accuracyAlert, oldAccuracyAlert;
+    private String tAnkMinStr;
+    private boolean accuracyAlert, oldAccuracyAlert;
     //alert dialog vars
     AlertDialog.Builder alertDialogBuilder;
     AlertDialog alertDialog;
-    boolean dialogExists = false;
+    private boolean dialogExists = false;
 
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
-
-
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_show_data);
         Log.i(TAG, "MapLayoutEnde");
@@ -63,7 +61,7 @@ public class ShowDataActivity extends ActionBarActivity {
         checkTracking();
     }
 
-    public void checkTracking() {
+    private void checkTracking() {
         //start tracking, if tracking is not running
         //happens, when tracking was not started from RoutingActivity
         if (!mGlobalVariable.isTrackingRunning()){
@@ -153,17 +151,17 @@ public class ShowDataActivity extends ActionBarActivity {
         }
     };
 
-    public void updateUI() {
+    private void updateUI() {
         Log.i(TAG, "updateUI()");
         timerHandler.postDelayed(timerRunnable, 0);
     }
 
-    String roundDecimals(double d) {
+    private String roundDecimals(double d) {
         return String.format("%.2f", d);
     }
 
     //read data from global var class and write to info boxes
-    public void showData() {
+    private void showData() {
         Log.i(TAG, "showData()");
         //get variables from global class and round
         String sGef = roundDecimals(mGlobalVariable.getsGef()) + " km";

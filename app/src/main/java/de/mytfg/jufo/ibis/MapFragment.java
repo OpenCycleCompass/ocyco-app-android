@@ -88,7 +88,7 @@ public class MapFragment extends Fragment {
 
     }
 
-    public Polyline createPolyline () {
+    private Polyline createPolyline () {
         Log.i(TAG, "createPolyline()");
         //create waypoints Array
         ArrayList<GeoPoint> waypoints = new ArrayList<>();
@@ -131,11 +131,11 @@ public class MapFragment extends Fragment {
         }
     };
 
-    public void startMapUpdates() {
+    private void startMapUpdates() {
         timerHandler.postDelayed(timerRunnable, 0);
     }
 
-    public void updateMap() {
+    private void updateMap() {
         Log.i(TAG, "updateMap()");
         //center at users position
         try {
