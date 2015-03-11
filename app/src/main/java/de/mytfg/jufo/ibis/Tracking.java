@@ -36,7 +36,7 @@ public class Tracking extends Service implements LocationListener, OnConnectionF
 
     private GPSDatabase mGPSDb;
 
-    boolean saveData = true;
+    private boolean saveData = true;
     private String accNotiStr;
 
     // Notification
@@ -66,7 +66,7 @@ public class Tracking extends Service implements LocationListener, OnConnectionF
         }
     }
 
-    public void startOnlineTracking() {
+    private void startOnlineTracking() {
         Log.i(TAG, "startOnlineTracking()");
         mGlobalVariable.setTrackingRunning(true);
         // Create Notification with track info
@@ -75,7 +75,7 @@ public class Tracking extends Service implements LocationListener, OnConnectionF
         mNotifyMgr.notify(mNotificationId, mBuilder.build());
     }
 
-    public void stopOnlineTracking() {
+    private void stopOnlineTracking() {
         Log.i(TAG, "stopOnlineTracking()");
         //cancel notificationStopOnlineTracking
         int mNotificationId = 42;
@@ -101,7 +101,7 @@ public class Tracking extends Service implements LocationListener, OnConnectionF
         mGlobalVariable.setTrackingRunning(false);
     }
 
-    public void stopLocationUpdates() {
+    private void stopLocationUpdates() {
         Log.i(TAG, "stopLocationUpdates()");
         // Stop LocationListener
         if (mGoogleApiClient.isConnected()) {
@@ -167,7 +167,7 @@ public class Tracking extends Service implements LocationListener, OnConnectionF
         callCalculate();
     }
 
-    public void callCalculate() {
+    private void callCalculate() {
         Log.i(TAG, "callCalculate()");
         mCalculate.getData(mCurrentLocation, mGlobalVariable.getsEing());
         //only call mathematical methods, if this is not the first location - else there will be a NPE
@@ -196,7 +196,7 @@ public class Tracking extends Service implements LocationListener, OnConnectionF
 
     }
 
-    public boolean checkAccuracy(Float accuracy) {
+    private boolean checkAccuracy(Float accuracy) {
         if (accuracy > 20) {
             saveData = false;
             accNotiStr = "GPS wird gesucht ...";
@@ -209,7 +209,7 @@ public class Tracking extends Service implements LocationListener, OnConnectionF
     }
 
 
-    public void updateDatabase() {
+    private void updateDatabase() {
         Log.i(TAG, "updateDatabase()");
         mGPSDb.open();
         mGPSDb.insertLocation(mCurrentLocation);

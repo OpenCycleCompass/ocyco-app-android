@@ -47,31 +47,31 @@ import java.util.Locale;
 public class RoutingActivity extends ActionBarActivity implements TimePickerFragment.OnTimePickedListener, AdapterView.OnItemSelectedListener {
 
     //LOG Tag
-    final String TAG = "RoutingActivity-class";
+    private final static String TAG = "RoutingActivity-class";
     //Views
-    EditText destination_address;
-    EditText start_address;
-    EditText editDistance;
-    TextView arrivalTime;
-    Spinner selectRouteType;
-    TextView loading_text;
-    ImageView loading_image;
-    Button start_navigation;
-    Button generate_route;
-    Button start_from_current_position;
-    Switch switch_manuelDistance;
-    Switch switch_userData;
-    Switch switch_timeFactor;
+    private EditText destination_address;
+    private EditText start_address;
+    private EditText editDistance;
+    private TextView arrivalTime;
+    private Spinner selectRouteType;
+    private TextView loading_text;
+    private ImageView loading_image;
+    private Button start_navigation;
+    private Button generate_route;
+    private Button start_from_current_position;
+    private Switch switch_manuelDistance;
+    private Switch switch_userData;
+    private Switch switch_timeFactor;
     //self-written classes
     RoutingDatabase mRDb;
     GlobalVariables mGlobalVariables;
     //vars
-    double tAnkEingTime;
-    boolean manuel_distance, routing_with_user_data, navigate_from_current_position = false;
-    String route_type;
-    Location startLocation;
+    private double tAnkEingTime;
+    private boolean manuel_distance, routing_with_user_data, navigate_from_current_position = false;
+    private String route_type;
+    private Location startLocation;
     //shared preferences
-    SharedPreferences settings;
+    private SharedPreferences settings;
 
 
     @Override
@@ -166,7 +166,7 @@ public class RoutingActivity extends ActionBarActivity implements TimePickerFrag
         startLookingForCurrentLocation();
     }
 
-    public void lookForStartPosition() {
+    private void lookForStartPosition() {
         try {
             startLocation = mGlobalVariables.getLocation();
             start_address.setText(startLocation.getLatitude() + "    " + startLocation.getLongitude());
@@ -192,7 +192,7 @@ public class RoutingActivity extends ActionBarActivity implements TimePickerFrag
         }
     };
 
-    public void startLookingForCurrentLocation() {
+    private void startLookingForCurrentLocation() {
         timerHandler.postDelayed(timerRunnable, 0);
     }
 
@@ -222,7 +222,7 @@ public class RoutingActivity extends ActionBarActivity implements TimePickerFrag
         showLoadingAnimation();
     }
 
-    public void showLoadingAnimation() {
+    private void showLoadingAnimation() {
         // set content
         loading_text.setText(R.string.loading_text);
         loading_image.setImageResource(R.drawable.ic_launcher);
@@ -231,7 +231,7 @@ public class RoutingActivity extends ActionBarActivity implements TimePickerFrag
         loading_image.startAnimation(rotation);
     }
 
-    public void removeLoadingAnimation() {
+    private void removeLoadingAnimation() {
         // remove loading animation
         loading_text.setText("");
         loading_image.setImageResource(0);
@@ -262,7 +262,7 @@ public class RoutingActivity extends ActionBarActivity implements TimePickerFrag
 
     }
 
-    public void showTime(int hour, int minute) {
+    private void showTime(int hour, int minute) {
         //show picked time
         if (minute < 10) {
             arrivalTime.setText(hour + ":0" + minute + " Uhr");
@@ -272,7 +272,7 @@ public class RoutingActivity extends ActionBarActivity implements TimePickerFrag
     }
 
     //convert hour and minutes to milliseconds for mathematical operations @Calculation
-    public double convertToMilliseconds(int hour, int minute) {
+    private double convertToMilliseconds(int hour, int minute) {
         return (double) ((hour * 60 + minute) * 60 * 1000);
     }
 
@@ -299,7 +299,7 @@ public class RoutingActivity extends ActionBarActivity implements TimePickerFrag
         mGlobalVariables.setUseTimeFactor(switch_timeFactor.isChecked());
     }
 
-    public void updateUI() {
+    private void updateUI() {
         //enable / disable UI elements
         if (manuel_distance) {
             start_address.setEnabled(false);

@@ -17,7 +17,7 @@ import android.widget.EditText;
 public class SettingsActivity extends ActionBarActivity {
 
     //Variables declaration
-    float FloatTextSize;
+    private float FloatTextSize;
 
     //create instance of GlobalVariables class
     GlobalVariables mGlobalVariable;
@@ -74,11 +74,11 @@ public class SettingsActivity extends ActionBarActivity {
         }
     };
 
-    public void startUIUpdates() {
+    private void startUIUpdates() {
         timerHandler.postDelayed(timerRunnable, 0);
     }
 
-    public void updateCBCollectData() {
+    private void updateCBCollectData() {
         final CheckBox CBcollectData = (CheckBox) findViewById(R.id.CBCollectData);
         CBcollectData.setChecked(mGlobalVariable.isCollectData());
     }

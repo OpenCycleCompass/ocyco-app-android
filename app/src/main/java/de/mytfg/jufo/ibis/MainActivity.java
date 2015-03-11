@@ -12,8 +12,8 @@ import android.widget.Button;
 public class MainActivity extends ActionBarActivity {
 
     //views
-    Button stop_tracking_button;
-    Button start_tracking_button;
+    private Button stop_tracking_button;
+    private Button start_tracking_button;
 
     GlobalVariables mGlobalVars;
 
@@ -71,7 +71,7 @@ public class MainActivity extends ActionBarActivity {
         startUIUpdates();
     }
 
-    public void enableButtons() {
+    private void enableButtons() {
         //enable buttons - status of trackingRunning is not even changed,
         //when this statement is executed!
         start_tracking_button.setEnabled(!mGlobalVars.isTrackingRunning());
