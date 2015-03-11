@@ -6,8 +6,8 @@
     <string name="action_settings">Einstellungen</string>
     <string name="welcome_headline">Wilkommen bei iBis!</string>
     <string name="welcome">iBis - intelligent bike information system ist ein Fahrrad Informations- und Navigationssystem.
-        Das Ziel ist es, ihnen eine möglichst für Fahrradfahrer geeignete, schnelle Route zu suchen und
-        ihnen möglichst hilfreiche und konkrete Informationen über Ihren Ankunftszeitpunkt zu geben.
+        Das Ziel ist es, Ihnen eine möglichst für Fahrradfahrer geeignete, schnelle Route zu suchen und
+        Ihnen möglichst hilfreiche und konkrete Informationen über Ihren Ankunftszeitpunkt zu geben.
         Sie können entweder Ihre Einstellungen überprüfen, oder direkt eine Route suchen.</string>
     <string name="button_open_settings">Einstellungen</string>
     <string name="title_activity_settings">Einstellungen</string>
