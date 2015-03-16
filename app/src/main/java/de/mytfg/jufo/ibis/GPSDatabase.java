@@ -175,6 +175,10 @@ public class GPSDatabase {
         return intent;
     }
 
+    public void deleteData () {
+        db.delete(TABLENAME, null, null);
+    }
+
     public void deleteDatabase() {
         //delete database
         context.deleteDatabase(DBNAME);

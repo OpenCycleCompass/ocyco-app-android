@@ -1,8 +1,10 @@
 package de.mytfg.jufo.ibis;
 
+import android.app.AlertDialog;
 import android.app.NotificationManager;
 import android.app.PendingIntent;
 import android.content.Context;
+import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.SharedPreferences;
 import android.net.ConnectivityManager;
@@ -49,7 +51,7 @@ import java.util.Locale;
 public class UploadTrackActivity extends ActionBarActivity {
 
     // Log TAG
-    protected static final String TAG = "UploadTrackActivity-class";
+    protected static final String TAG = "UploadTrackAct-class";
 
     private EditText editText_UploadTrackName;
     private EditText editText_UploadTrackCom;
@@ -77,6 +79,8 @@ public class UploadTrackActivity extends ActionBarActivity {
     SharedPreferences prefs;
     SharedPreferences.Editor prefs_edit;
 
+    private GPSDatabase mGPSDb;
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -101,6 +105,9 @@ public class UploadTrackActivity extends ActionBarActivity {
 
         button_UploadTrack.setEnabled(false);
 
+        // Create Database
+        mGPSDb = new GPSDatabase(this.getApplicationContext());
+
         // Only accept a-z, A-Z, "-" and "_" as name
         editText_UploadTrackName.setFilters(new InputFilter[]{
                 new InputFilter() {
@@ -123,7 +130,7 @@ public class UploadTrackActivity extends ActionBarActivity {
         }
         startTst = incomingIntent.getLongExtra("startTst", 0);
         stopTst = incomingIntent.getLongExtra("stopTst", 0);
-        length = incomingIntent.getDoubleExtra("totalDist",0)/1000;
+        length = incomingIntent.getDoubleExtra("totalDist", 0) / 1000;
 
         //mGlobalVariables = (GlobalVariables) getApplicationContext();
         //length = mGlobalVariables.getsGef();
@@ -200,7 +207,7 @@ public class UploadTrackActivity extends ActionBarActivity {
         lurl = Uri.parse(this.getString(R.string.api1_base_url) + this.getString(R.string.api1_pushtrack_new))
                 .buildUpon()
                 .appendQueryParameter("duration", Long.toString(stopTst - startTst))
-                .appendQueryParameter("length", Double.toString(length*1000))
+                .appendQueryParameter("length", Double.toString(length * 1000))
                 .appendQueryParameter("user_token", getTokenFromPrefs());
         if (uploadPublic) {
             lurl.appendQueryParameter("name", editText_UploadTrackName.getText().toString())
@@ -264,13 +271,17 @@ public class UploadTrackActivity extends ActionBarActivity {
         }
     }
 
-    // delete Track
-    public void deleteTrack(View v) {
-        // Disable Button to prevent empty upload
-        button_DeleteTrack.setEnabled(false);
-        button_UploadTrack.setEnabled(false);
+    public void deleteTrack() {
+        //delete track
+        mGPSDb.open();
+        mGPSDb.deleteData();
+        mGPSDb.close();
+        //show Toast
         Toast toast = Toast.makeText(getApplicationContext(), getString(R.string.upload_track_deleted), Toast.LENGTH_LONG);
         toast.show();
+        //go back to MainActivity
+        Intent intent = new Intent(this, MainActivity.class);
+        startActivity(intent);
     }
 
 
@@ -507,6 +518,32 @@ public class UploadTrackActivity extends ActionBarActivity {
     private void savePublicToPrefs(Boolean p) {
         prefs_edit.putBoolean("upload_public", p);
         prefs_edit.apply();
+    }
+
+    public void openDeleteTrackAlert(View view) {
+        //set up a new alert dialog
+        AlertDialog.Builder alertDialogBuilder = new AlertDialog.Builder(UploadTrackActivity.this);
+        alertDialogBuilder.setTitle("Wirklich löschen?");
+        alertDialogBuilder.setMessage("Möchten sie den aufgezeichneten Track wirklich löschen?");
+
+        //create the OK Button and onClickListener
+        alertDialogBuilder.setPositiveButton("Ja", new DialogInterface.OnClickListener() {
+            //close dialog when clicked
+            public void onClick(DialogInterface dialog, int id) {
+                deleteTrack();
+                dialog.cancel();
+            }
+        });
+        //create the cancel Button and onClickListener
+        alertDialogBuilder.setNegativeButton("Nein", new DialogInterface.OnClickListener() {
+            //close dialog when clicked
+            public void onClick(DialogInterface dialog, int id) {
+                dialog.cancel();
+            }
+        });
+        //create and show alert dialog
+        AlertDialog alertDialog = alertDialogBuilder.create();
+        alertDialog.show();
     }
 }
 

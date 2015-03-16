@@ -118,7 +118,7 @@
                 android:id="@+id/button_DeleteTrack"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:onClick="deleteTrack"
+                android:onClick="openDeleteTrackAlert"
                 android:text="@string/upload_track_delete" />
 
             <TextView
