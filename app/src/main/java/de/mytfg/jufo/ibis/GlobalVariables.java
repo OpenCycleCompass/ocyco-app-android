@@ -6,12 +6,17 @@ import android.location.Location;
 public class GlobalVariables extends Application {
 
     //The variables can be set and read from every Activity or Service!
-    private double sGef, sZuf, vAkt, vD, tAnk, tAnkUnt, vDMuss, vDunt, tAnkEingTime, sEing, sEingTimeFactor;
+    private double sGef, sZuf, vAkt, vD, tAnk, tAnkUnt, vDMuss, vDunt, tAnkEingTime, sEing,
+            sEingTimeFactor;
     private float textSize;
     private Location location;
-    private boolean show_locationOverlay, show_compassOverlay, show_scaleBarOverlay, collectData, collectDataSet, auto_center = true, trackingRunning = false, use_time_factor;
+    private boolean show_locationOverlay, show_compassOverlay, show_scaleBarOverlay, collectData,
+            collectDataSet, auto_center = true, trackingRunning = false, use_time_factor,
+            changed_settings;
 
-    public void setCalculationVars(double sGefIn, double sZufIn, double vAktIn, double vDIn, double tAnkIn, double tAnkUntIn, double vDMussIn, double vDuntIn) {
+
+    public void setCalculationVars(double sGefIn, double sZufIn, double vAktIn, double vDIn, double
+            tAnkIn, double tAnkUntIn, double vDMussIn, double vDuntIn) {
         sGef = sGefIn;
         sZuf = sZufIn;
         vAkt = vAktIn;
@@ -20,6 +25,10 @@ public class GlobalVariables extends Application {
         tAnkUnt = tAnkUntIn;
         vDMuss = vDMussIn;
         vDunt = vDuntIn;
+    }
+
+    public void setChanged_settings(boolean changed_settingsIn) {
+        changed_settings = changed_settingsIn;
     }
 
     public void setsEingTimeFactor(double sEingTimeVarIn) {
@@ -71,6 +80,10 @@ public class GlobalVariables extends Application {
         collectDataSet = true;
     }
 
+    public boolean isChanged_settings() {
+        return changed_settings;
+    }
+
     public boolean isUseTimeFactor() {
         return use_time_factor;
     }
@@ -103,7 +116,9 @@ public class GlobalVariables extends Application {
         return show_scaleBarOverlay;
     }
 
-    public double getsEingTimeFactor() {return sEingTimeFactor;}
+    public double getsEingTimeFactor() {
+        return sEingTimeFactor;
+    }
 
     public Location getLocation() {
         return location;

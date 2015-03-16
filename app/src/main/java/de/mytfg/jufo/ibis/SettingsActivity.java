@@ -132,6 +132,7 @@ public class SettingsActivity extends ActionBarActivity {
             openAlert(strEnterTxtSz);
         }
         mGlobalVariable.setSettingVars(FloatTextSize);
+        mGlobalVariable.setChanged_settings(true);
     }
 
     public void onClickFindRoute(View view) {
