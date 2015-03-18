@@ -250,6 +250,11 @@ public class ShowDataActivity extends ActionBarActivity {
             case R.id.auto_center:
                 item.setChecked(!item.isChecked());
                 mGlobalVariable.setAutoCenter(item.isChecked());
+                return true;
+            case R.id.action_info:
+                Intent intent_info = new Intent(this, InfoActivity.class);
+                startActivity(intent_info);
+                return true;
             default:
                 return super.onOptionsItemSelected(item);
         }

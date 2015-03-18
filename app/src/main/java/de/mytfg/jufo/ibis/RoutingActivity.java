@@ -558,6 +558,10 @@ public class RoutingActivity extends ActionBarActivity implements TimePickerFrag
                 Intent intent_main = new Intent(this, MainActivity.class);
                 startActivity(intent_main);
                 return true;
+            case R.id.action_info:
+                Intent intent_info = new Intent(this, InfoActivity.class);
+                startActivity(intent_info);
+                return true;
             default:
                 return super.onOptionsItemSelected(item);
         }
