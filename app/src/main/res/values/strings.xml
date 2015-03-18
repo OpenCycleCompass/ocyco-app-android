@@ -99,4 +99,7 @@
     <string name="action_RoutingActivity">Routenfindung</string>
     <string name="action_MainActivity">Startseite</string>
     <string name="loading">Wird geladen...</string>
+    <string name="title_activity_info">Info</string>
+
+    <string name="hello_world">Hello world!</string>
 </resources>
