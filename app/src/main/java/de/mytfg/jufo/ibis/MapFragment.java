@@ -72,6 +72,12 @@ public class MapFragment extends Fragment {
         mScaleBarOverlay = new ScaleBarOverlay(context);
         mScaleBarOverlay.setCentred(true);
         mScaleBarOverlay.setScaleBarOffset(dm.widthPixels / 2, 10);
+        //check, if settings were changed by user, else activate overlays by default
+        if (!mGlobalVariables.isChanged_settings()){
+            mGlobalVariables.setShowLocationOverlay(true);
+            mGlobalVariables.setShowCompassOverlay(true);
+            mGlobalVariables.setShowScaleBarOverlay(true);
+        }
         //add overlays
         if (mGlobalVariables.isShow_locationOverlay()) {
             mMapView.getOverlays().add(this.mLocationOverlay);

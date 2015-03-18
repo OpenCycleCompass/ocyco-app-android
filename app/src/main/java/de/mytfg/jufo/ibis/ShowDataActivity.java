@@ -14,7 +14,7 @@ import android.widget.TextView;
 public class ShowDataActivity extends ActionBarActivity {
 
     // Log TAG
-    protected static final String TAG = "IBisShowDataActivity-class";
+    protected static final String TAG = "ShowDataActivity-class";
 
     //create instance of GlobalVariables class
     GlobalVariables mGlobalVariable;

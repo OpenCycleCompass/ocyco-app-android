@@ -6,8 +6,8 @@
     <string name="action_settings">Einstellungen</string>
     <string name="welcome_headline">Wilkommen bei iBis!</string>
     <string name="welcome">iBis - intelligent bike information system ist ein Fahrrad Informations- und Navigationssystem.
-        Das Ziel ist es, ihnen eine möglichst für Fahrradfahrer geeignete, schnelle Route zu suchen und
-        ihnen möglichst hilfreiche und konkrete Informationen über Ihren Ankunftszeitpunkt zu geben.
+        Das Ziel ist es, Ihnen eine möglichst für Fahrradfahrer geeignete, schnelle Route zu suchen und
+        Ihnen möglichst hilfreiche und konkrete Informationen über Ihren Ankunftszeitpunkt zu geben.
         Sie können entweder Ihre Einstellungen überprüfen, oder direkt eine Route suchen.</string>
     <string name="button_open_settings">Einstellungen</string>
     <string name="title_activity_settings">Einstellungen</string>
@@ -31,9 +31,9 @@
     <string name="upload_track_name">Name des Tracks</string>
     <string name="upload_track_com">Kommentar (optional)</string>
     <string name="upload_track_name_default">Insert-Name-Here</string>
-    <string name="upload_track_com_default">Hier könnte Ihre Werbung stehen</string>
-    <string name="upload_track_duration">Dauer (s)</string>
-    <string name="upload_track_length">Länge (km)</string>
+    <string name="upload_track_com_default">Ihr Kommentar</string>
+    <string name="upload_track_duration">Dauer</string>
+    <string name="upload_track_length">Länge</string>
     <string name="upload_track_token">Token</string>
     <string name="upload_track_token_regenerate">Token neu generieren</string>
     <string name="upload_track">Hochladen</string>
@@ -98,4 +98,5 @@
     <string name="switch_timeFactor">Möchten Sie für die Berechnung der Ankunftszeit die gesammelten Daten anderer User nutzen?</string>
     <string name="action_RoutingActivity">Routenfindung</string>
     <string name="action_MainActivity">Startseite</string>
+    <string name="loading">Wird geladen...</string>
 </resources>

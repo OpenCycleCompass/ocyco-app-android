@@ -1,8 +1,10 @@
 package de.mytfg.jufo.ibis;
 
+import android.app.AlertDialog;
 import android.app.NotificationManager;
 import android.app.PendingIntent;
 import android.content.Context;
+import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.SharedPreferences;
 import android.net.ConnectivityManager;
@@ -49,7 +51,7 @@ import java.util.Locale;
 public class UploadTrackActivity extends ActionBarActivity {
 
     // Log TAG
-    protected static final String TAG = "UploadTrackActivity-class";
+    protected static final String TAG = "UploadTrackAct-class";
 
     private EditText editText_UploadTrackName;
     private EditText editText_UploadTrackCom;
@@ -63,9 +65,11 @@ public class UploadTrackActivity extends ActionBarActivity {
 
     private Button button_UploadTrack;
     private Button button_DeleteTrack;
+    private Button button_UploadTrackTokenRegenerate;
 
     public static final String data_empty = "[]"; // empty, but valid JSON
     private String data = data_empty;
+    private String token = null;
 
     private long startTst;
     private long stopTst;
@@ -76,6 +80,8 @@ public class UploadTrackActivity extends ActionBarActivity {
     //shared preferences
     SharedPreferences prefs;
     SharedPreferences.Editor prefs_edit;
+
+    private GPSDatabase mGPSDb;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -92,14 +98,19 @@ public class UploadTrackActivity extends ActionBarActivity {
         textView_UploadTrackCom = (TextView) findViewById(R.id.textView_UploadTrackCom);
         button_DeleteTrack = (Button) findViewById(R.id.button_DeleteTrack);
         button_UploadTrack = (Button) findViewById(R.id.button_UploadTrack);
+        button_UploadTrackTokenRegenerate = (Button) findViewById(R.id.button_UploadTrackTokenRegenerate);
 
         prefs = getSharedPreferences(getString(R.string.preference_file_key), (Context.MODE_MULTI_PROCESS));
         prefs_edit = prefs.edit();
 
         uploadPublic = prefs.getBoolean("upload_public", false);
+
         switch_UploadTrackPublic.setChecked(uploadPublic);
 
         button_UploadTrack.setEnabled(false);
+
+        // Create Database
+        mGPSDb = new GPSDatabase(this.getApplicationContext());
 
         // Only accept a-z, A-Z, "-" and "_" as name
         editText_UploadTrackName.setFilters(new InputFilter[]{
@@ -123,7 +134,7 @@ public class UploadTrackActivity extends ActionBarActivity {
         }
         startTst = incomingIntent.getLongExtra("startTst", 0);
         stopTst = incomingIntent.getLongExtra("stopTst", 0);
-        length = incomingIntent.getDoubleExtra("totalDist",0)/1000;
+        length = incomingIntent.getDoubleExtra("totalDist", 0) / 1000;
 
         //mGlobalVariables = (GlobalVariables) getApplicationContext();
         //length = mGlobalVariables.getsGef();
@@ -150,11 +161,17 @@ public class UploadTrackActivity extends ActionBarActivity {
     // Initialize GUI
     private void initUI() {
 
-        editText_UploadTrackDuration.setText(Long.toString(stopTst - startTst));
-
-        editText_UploadTrackLength.setText(Double.toString(length));
-
+        editText_UploadTrackDuration.setText(formatTime(stopTst - startTst));
+        editText_UploadTrackLength.setText(roundDecimals(length) + " km");
         uploadPublic = prefs.getBoolean("upload_public", false);
+        token = prefs.getString("upload_token", null);
+        if (token == null) {
+            editText_UploadTrackToken.setText(R.string.loading);
+            getToken();
+        } else {
+            editText_UploadTrackToken.setText(token);
+        }
+
 
         String lname = prefs.getString("upload_name", null);
         if (lname != null) {
@@ -182,6 +199,34 @@ public class UploadTrackActivity extends ActionBarActivity {
         editText_UploadTrackDuration.setKeyListener(null);
     }
 
+    private String roundDecimals(double d) {
+        return String.format("%.2f", d);
+    }
+
+    private String formatTime(double secondsInput) {
+        String time;
+        //calculate hours, seconds and minutes
+        int seconds = (int) Math.round(secondsInput % 60);
+        int minutes = (int) Math.round(((secondsInput - seconds) % 3600) / 60);
+        int hours = (int) Math.round((secondsInput - seconds - minutes * 60) / 3600);
+        String hoursStrg = putZero(hours);
+        String minutesStrg = putZero(minutes);
+        String secondsStrg = putZero(seconds);
+        time = hoursStrg + "h " + minutesStrg + "min " + secondsStrg + "s";
+        return time;
+    }
+
+    //put 0 before value, if != 0 and < 10
+    private String putZero(int time_value_in) {
+        String time_value_out;
+        if ((time_value_in != 0) && (time_value_in < 10)) {
+            time_value_out = "0" + time_value_in;
+        } else {
+            time_value_out = Integer.toString(time_value_in);
+        }
+        return time_value_out;
+    }
+
     public void onSwitchPublic(View v) {
         if (switch_UploadTrackPublic.isChecked()) {
             uploadPublic = true;
@@ -200,8 +245,8 @@ public class UploadTrackActivity extends ActionBarActivity {
         lurl = Uri.parse(this.getString(R.string.api1_base_url) + this.getString(R.string.api1_pushtrack_new))
                 .buildUpon()
                 .appendQueryParameter("duration", Long.toString(stopTst - startTst))
-                .appendQueryParameter("length", Double.toString(length*1000))
-                .appendQueryParameter("user_token", getTokenFromPrefs());
+                .appendQueryParameter("length", Double.toString(length * 1000))
+                .appendQueryParameter("user_token", token);
         if (uploadPublic) {
             lurl.appendQueryParameter("name", editText_UploadTrackName.getText().toString())
                     .appendQueryParameter("comment", editText_UploadTrackCom.getText().toString())
@@ -225,8 +270,11 @@ public class UploadTrackActivity extends ActionBarActivity {
         return super.onOptionsItemSelected(item);
     }
 
+    public void onClickGetToken(View view) {
+        getToken();
+    }
 
-    public void getToken(View v) {
+    private void getToken() {
         String lurl = this.getString(R.string.api1_base_url) + this.getString(R.string.api1_token_new);
         Log.i(TAG, lurl);
         ConnectivityManager connMgr = (ConnectivityManager) getSystemService(Context.CONNECTIVITY_SERVICE);
@@ -248,6 +296,7 @@ public class UploadTrackActivity extends ActionBarActivity {
         // Disable Button to prevent multiple uploads
         button_DeleteTrack.setEnabled(false);
         button_UploadTrack.setEnabled(false);
+        button_UploadTrackTokenRegenerate.setEnabled(false);
         String lurl = makeUrl();
         Log.i(TAG, lurl);
         ConnectivityManager connMgr = (ConnectivityManager) getSystemService(Context.CONNECTIVITY_SERVICE);
@@ -264,13 +313,17 @@ public class UploadTrackActivity extends ActionBarActivity {
         }
     }
 
-    // delete Track
-    public void deleteTrack(View v) {
-        // Disable Button to prevent empty upload
-        button_DeleteTrack.setEnabled(false);
-        button_UploadTrack.setEnabled(false);
+    public void deleteTrack() {
+        //delete track
+        mGPSDb.open();
+        mGPSDb.deleteData();
+        mGPSDb.close();
+        //show Toast
         Toast toast = Toast.makeText(getApplicationContext(), getString(R.string.upload_track_deleted), Toast.LENGTH_LONG);
         toast.show();
+        //go back to MainActivity
+        Intent intent = new Intent(this, MainActivity.class);
+        startActivity(intent);
     }
 
 
@@ -491,6 +544,7 @@ public class UploadTrackActivity extends ActionBarActivity {
     }
 
     private void saveToken(String t) {
+        token = t;
         if (prefs.contains("upload_token")) {
             String old_token = prefs.getString("upload_token", "");
             String old_tokenlist = prefs.getString("upload_oldtokenlist", "");
@@ -500,13 +554,35 @@ public class UploadTrackActivity extends ActionBarActivity {
         prefs_edit.apply();
     }
 
-    private String getTokenFromPrefs() {
-        return prefs.getString("upload_token", null);
-    }
-
     private void savePublicToPrefs(Boolean p) {
         prefs_edit.putBoolean("upload_public", p);
         prefs_edit.apply();
+    }
+
+    public void openDeleteTrackAlert(View view) {
+        //set up a new alert dialog
+        AlertDialog.Builder alertDialogBuilder = new AlertDialog.Builder(UploadTrackActivity.this);
+        alertDialogBuilder.setTitle("Wirklich löschen?");
+        alertDialogBuilder.setMessage("Möchten sie den aufgezeichneten Track wirklich löschen?");
+
+        //create the OK Button and onClickListener
+        alertDialogBuilder.setPositiveButton("Ja", new DialogInterface.OnClickListener() {
+            //close dialog when clicked
+            public void onClick(DialogInterface dialog, int id) {
+                deleteTrack();
+                dialog.cancel();
+            }
+        });
+        //create the cancel Button and onClickListener
+        alertDialogBuilder.setNegativeButton("Nein", new DialogInterface.OnClickListener() {
+            //close dialog when clicked
+            public void onClick(DialogInterface dialog, int id) {
+                dialog.cancel();
+            }
+        });
+        //create and show alert dialog
+        AlertDialog alertDialog = alertDialogBuilder.create();
+        alertDialog.show();
     }
 }
 
