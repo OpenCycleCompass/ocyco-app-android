@@ -104,7 +104,7 @@
                 android:id="@+id/button_UploadTrackTokenRegenerate"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:onClick="getToken"
+                android:onClick="onClickGetToken"
                 android:text="@string/upload_track_token_regenerate" />
 
             <Button
