@@ -107,7 +107,7 @@
     <string name="info_license_headline">Lizenzen</string>
     <string name="info_license">Open Streetmap Karten und Daten:
     <a href ="http://www.openstreetmap.org/copyright/">© OpenStreetMap contributors</a>
-    \niBis App: <a href="http://http://www.gnu.de/documents/gpl.de.html">GPL v3 Lizenz</a></string>
+    \niBis App: <a href="http://www.gnu.de/documents/gpl.de.html">GPL v3 Lizenz</a></string>
     <string name="info_authors_headline">Autoren</string>
     <string name="info_authors">Leonard Rapp \nRaphael Lehmann</string>
     <string name="info_jufo_headline">Jugend forscht</string>
@@ -116,4 +116,7 @@
         \nEs hat im Rahmen des Regionalwettbewerbs 2015 den 1. Preis der Kategorie
         Mathematik / Informatik, sowie den Sonderpreis der Rheinbahn gewonnen.</string>
     <string name="action_info">Informationen</string>
+    <string name="info_contact_headline">Kontakt</string>
+    <string name="info_contact">Homepage: <a href="https://ibis.jufo.mytfg.de">ibis.jufo.mytfg.de</a>
+    \nMail: ibis@mytfg.de</string>
 </resources>

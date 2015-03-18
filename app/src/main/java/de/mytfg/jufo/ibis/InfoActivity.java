@@ -11,15 +11,18 @@ import android.widget.TextView;
 
 public class InfoActivity extends ActionBarActivity {
 
-    TextView osm_link;
+    TextView license_links;
+    TextView contact_links;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_info);
 
-        osm_link= (TextView)findViewById(R.id.osm_link);
-        osm_link.setMovementMethod(LinkMovementMethod.getInstance());
+        license_links= (TextView)findViewById(R.id.license_links);
+        license_links.setMovementMethod(LinkMovementMethod.getInstance());
+        contact_links= (TextView)findViewById(R.id.contact_links);
+        contact_links.setMovementMethod(LinkMovementMethod.getInstance());
 
     }
 
