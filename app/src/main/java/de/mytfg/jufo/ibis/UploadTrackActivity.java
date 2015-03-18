@@ -157,9 +157,9 @@ public class UploadTrackActivity extends ActionBarActivity {
     // Initialize GUI
     private void initUI() {
 
-        editText_UploadTrackDuration.setText(Long.toString(stopTst - startTst));
+        editText_UploadTrackDuration.setText(formatTime(stopTst - startTst));
 
-        editText_UploadTrackLength.setText(Double.toString(length));
+        editText_UploadTrackLength.setText(roundDecimals(length)+" km");
 
         uploadPublic = prefs.getBoolean("upload_public", false);
 
@@ -187,6 +187,35 @@ public class UploadTrackActivity extends ActionBarActivity {
         editText_UploadTrackToken.setKeyListener(null);
         editText_UploadTrackLength.setKeyListener(null);
         editText_UploadTrackDuration.setKeyListener(null);
+    }
+
+    private String roundDecimals(double d) {
+        return String.format("%.2f", d);
+    }
+
+    private String formatTime (double secondsInput) {
+        String time;
+        //calculate hours, seconds and minutes
+        int seconds = (int) Math.round(secondsInput % 60);
+        int minutes = (int) Math.round(((secondsInput-seconds) % 3600)/60);
+        int hours = (int) Math.round((secondsInput-seconds-minutes*60)/3600);
+        String hoursStrg = putZero(hours);
+        String minutesStrg = putZero(minutes);
+        String secondsStrg = putZero(seconds);
+        time = hoursStrg+"h "+minutesStrg+"min "+secondsStrg+"s";
+        return time;
+    }
+
+    //put 0 before value, if != 0 and < 10
+    private String putZero (int time_value_in) {
+        String time_value_out;
+        if ((time_value_in!=0)&&(time_value_in<10)) {
+            time_value_out="0"+time_value_in;
+        }
+        else  {
+            time_value_out=Integer.toString(time_value_in);
+        }
+        return time_value_out;
     }
 
     public void onSwitchPublic(View v) {
