@@ -100,18 +100,20 @@
     <string name="action_MainActivity">Startseite</string>
     <string name="loading">Wird geladen...</string>
     <string name="title_activity_info">Info</string>
+    <string name="info_text_headline">Über das Projekt</string>
     <string name="info_text">iBis - intelligent bike information system ist ein Fahrrad Informations- und Navigationssystem.
         Das Ziel ist es, Ihnen eine möglichst für Fahrradfahrer geeignete, schnelle Route zu suchen und
         Ihnen möglichst hilfreiche und konkrete Informationen über Ihren Ankunftszeitpunkt zu geben.</string>
     <string name="info_license_headline">Lizenzen</string>
-    <string name="info_license">Open Streetmap Karten und Daten: <a ref="www.openstreetmap.org/copyright">© OpenStreetMap contributors</a>
-    \n iBis: GPL v3 Lizenz</string>
-    <string name="info_authors_headline">Autoren:</string>
-    <string name="info_authors">Leonard Rapp \n Raphael Lehmann</string>
+    <string name="info_license">Open Streetmap Karten und Daten:
+    <a href ="http://www.openstreetmap.org/copyright/">© OpenStreetMap contributors</a>
+    \niBis App: <a href="http://http://www.gnu.de/documents/gpl.de.html">GPL v3 Lizenz</a></string>
+    <string name="info_authors_headline">Autoren</string>
+    <string name="info_authors">Leonard Rapp \nRaphael Lehmann</string>
     <string name="info_jufo_headline">Jugend forscht</string>
     <string name="info_jufo">Das iBis - Projekt ist im Rahmen eines Jugend forscht Projekts von
         Leonard Rapp und Raphael Lehmann am Theodor-Fliedner-Gymnasium Düsseldorf entstanden.
-        \n Es hat im Rahmen des Regionalwettbewerbs 2015 den 1. Preis der Kategorie
-        Mathematik/Informatik, sowie den Sonderpreis der Rheinbahn gewonnen.</string>
+        \nEs hat im Rahmen des Regionalwettbewerbs 2015 den 1. Preis der Kategorie
+        Mathematik / Informatik, sowie den Sonderpreis der Rheinbahn gewonnen.</string>
     <string name="action_info">Informationen</string>
 </resources>

@@ -3,16 +3,24 @@ package de.mytfg.jufo.ibis;
 import android.content.Intent;
 import android.support.v7.app.ActionBarActivity;
 import android.os.Bundle;
+import android.text.method.LinkMovementMethod;
 import android.view.Menu;
 import android.view.MenuItem;
+import android.widget.TextView;
 
 
 public class InfoActivity extends ActionBarActivity {
+
+    TextView osm_link;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_info);
+
+        osm_link= (TextView)findViewById(R.id.osm_link);
+        osm_link.setMovementMethod(LinkMovementMethod.getInstance());
+
     }
 
 
