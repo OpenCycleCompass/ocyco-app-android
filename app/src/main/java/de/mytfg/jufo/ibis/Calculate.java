@@ -41,7 +41,7 @@ public class Calculate {
             firstLoc = location;
         }
         //get distance, convert to km
-        sEing = sEingInput;
+        sEing = sEingInput/1000d;
     }
 
     public boolean checkFirstLoc() {
