@@ -267,7 +267,27 @@ public class UploadTrackActivity extends ActionBarActivity {
 
     @Override
     public boolean onOptionsItemSelected(MenuItem item) {
-        return super.onOptionsItemSelected(item);
+        // Handle item selection
+        switch (item.getItemId()) {
+            case R.id.action_settings:
+                Intent intent_settings = new Intent(this, SettingsActivity.class);
+                startActivity(intent_settings);
+                return true;
+            case R.id.action_MainActivity:
+                Intent intent_main = new Intent(this, MainActivity.class);
+                startActivity(intent_main);
+                return true;
+            case R.id.action_RoutingActivity:
+                Intent intent_routing = new Intent(this, RoutingActivity.class);
+                startActivity(intent_routing);
+                return true;
+            case R.id.action_info:
+                Intent intent_info = new Intent(this, InfoActivity.class);
+                startActivity(intent_info);
+                return true;
+            default:
+                return super.onOptionsItemSelected(item);
+        }
     }
 
     public void onClickGetToken(View view) {

@@ -56,6 +56,10 @@
             android:name=".RoutingActivity"
             android:label="@string/title_activity_routing" >
         </activity>
+        <activity
+            android:name=".InfoActivity"
+            android:label="@string/title_activity_info" >
+        </activity>
     </application>
 
 </manifest>

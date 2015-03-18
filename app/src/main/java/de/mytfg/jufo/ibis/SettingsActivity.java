@@ -174,6 +174,10 @@ public class SettingsActivity extends ActionBarActivity {
                 Intent intent_routing = new Intent(this, RoutingActivity.class);
                 startActivity(intent_routing);
                 return true;
+            case R.id.action_info:
+                Intent intent_info = new Intent(this, InfoActivity.class);
+                startActivity(intent_info);
+                return true;
             default:
                 return super.onOptionsItemSelected(item);
         }
