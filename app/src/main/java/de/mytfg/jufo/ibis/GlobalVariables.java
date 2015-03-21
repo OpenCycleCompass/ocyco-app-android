@@ -12,7 +12,7 @@ public class GlobalVariables extends Application {
     private Location location;
     private boolean show_locationOverlay, show_compassOverlay, show_scaleBarOverlay, collectData,
             collectDataSet, auto_center = true, trackingRunning = false, use_time_factor,
-            changed_settings;
+            changed_settings, auto_rotate, align_north=false;
 
 
     public void setCalculationVars(double sGefIn, double sZufIn, double vAktIn, double vDIn, double
@@ -29,6 +29,12 @@ public class GlobalVariables extends Application {
 
     public void setChanged_settings(boolean changed_settingsIn) {
         changed_settings = changed_settingsIn;
+    }
+
+    public void setAlign_north (boolean align_northIn) { align_north=align_northIn; }
+
+    public void setAuto_rotate(boolean auto_rotateIn) {
+        auto_rotate = auto_rotateIn;
     }
 
     public void setsEingTimeFactor(double sEingTimeVarIn) {
@@ -79,6 +85,10 @@ public class GlobalVariables extends Application {
         collectData = collectDataIn;
         collectDataSet = true;
     }
+
+    public boolean isAlign_north() { return align_north; }
+
+    public boolean isAuto_rotate() { return auto_rotate; }
 
     public boolean isChanged_settings() {
         return changed_settings;

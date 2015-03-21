@@ -55,7 +55,6 @@ public class MapFragment extends Fragment {
     RoutingDatabase mRDB;
 
 
-
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
         //context
@@ -63,9 +62,9 @@ public class MapFragment extends Fragment {
         //register receiver
         final IRegisterReceiver mRegisterReceiver = new SimpleRegisterReceiver(context_activity.getApplicationContext());
         //tile server url
-        final String[] url = new String[] {"http://tile.thunderforest.com/cycle/"};
+        final String[] url = new String[]{"http://tile.thunderforest.com/cycle/"};
         //tile source
-        final ITileSource mTileSource = new XYTileSource("cyclemap", ResourceProxy.string.cyclemap, 1, 18, 256, ".png", url);
+        final ITileSource mTileSource = new XYTileSource("cyclemap", ResourceProxy.string.cyclemap, 1, 18, 64, ".png", url);
         //file cache provider
         final TileWriter mTileWriter = new TileWriter();
         final MapTileFilesystemProvider fileSystemProvider = new MapTileFilesystemProvider(mRegisterReceiver, mTileSource);
@@ -84,7 +83,7 @@ public class MapFragment extends Fragment {
         //create the tile provider array
         final MapTileProviderArray mMapTileProviderArray = new MapTileProviderArray(mTileSource, mRegisterReceiver, new MapTileModuleProviderBase[]{fileSystemProvider, mFileArchiveProvider, downloaderProvider});
         //create map
-        mMapView = new MapView(context_activity, 256, new DefaultResourceProxyImpl(context_activity), mMapTileProviderArray);
+        mMapView = new MapView(context_activity, 64, new DefaultResourceProxyImpl(context_activity), mMapTileProviderArray);
         //and return it
         return mMapView;
     }
@@ -171,9 +170,8 @@ public class MapFragment extends Fragment {
 
         @Override
         public void run() {
-            if (mGlobalVariables.isAutoCenter()) {
-                updateMap();
-            }
+
+            updateMap();
             timerHandler.postDelayed(this, 500);
         }
     };
@@ -184,11 +182,19 @@ public class MapFragment extends Fragment {
 
     private void updateMap() {
         Log.i(TAG, "updateMap()");
-        //center at users position
+        //center at users position,rotate map
         try {
-            GeoPoint currentLocation = new GeoPoint(mGlobalVariables.getLocation().getLatitude(), mGlobalVariables.getLocation().getLongitude());
-            Log.i(TAG, "Geopoint" + currentLocation);
-            mMapView.getController().setCenter(currentLocation);
+            if (mGlobalVariables.isAutoCenter()) {
+                GeoPoint currentLocation = new GeoPoint(mGlobalVariables.getLocation().getLatitude(), mGlobalVariables.getLocation().getLongitude());
+                Log.i(TAG, "Geopoint" + currentLocation);
+                mMapView.getController().setCenter(currentLocation);
+            }
+            if ((mGlobalVariables.isAuto_rotate())&&(mGlobalVariables.getLocation().getSpeed() > 1)) {
+                mMapView.setMapOrientation(360.0f - (mGlobalVariables.getLocation().getBearing()));
+            }
+            else if (mGlobalVariables.isAlign_north()) {
+                mMapView.setMapOrientation(360.0f);
+            }
         } catch (java.lang.NullPointerException e) {
             Log.i(TAG, "NullPointerException");
         }
