@@ -9,6 +9,7 @@ import android.os.Bundle;
 import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
+import android.view.WindowManager;
 import android.widget.TextView;
 
 public class ShowDataActivity extends ActionBarActivity {
@@ -42,8 +43,12 @@ public class ShowDataActivity extends ActionBarActivity {
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
+        //keep screen on
+        getWindow().addFlags(WindowManager.LayoutParams.FLAG_KEEP_SCREEN_ON);
+        //show activity on lock screen
+        getWindow().addFlags(WindowManager.LayoutParams.FLAG_SHOW_WHEN_LOCKED);
+        //set content view
         setContentView(R.layout.activity_show_data);
-        Log.i(TAG, "MapLayoutEnde");
         //initialize global variable class
         mGlobalVariable = (GlobalVariables) getApplicationContext();
         //alert dialog for accuracy alerts
