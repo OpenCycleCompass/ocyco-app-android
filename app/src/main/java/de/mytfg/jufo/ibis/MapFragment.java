@@ -38,17 +38,29 @@ import java.util.ArrayList;
 
 public class MapFragment extends Fragment {
 
-    //map view and overlays
-    private MapView mMapView;
-    private MyLocationNewOverlay mLocationOverlay;
-    private CompassOverlay mCompassOverlay;
-    private ScaleBarOverlay mScaleBarOverlay;
     // Log TAG
     protected static final String TAG = "IBis-MapFragment";
     //global var class
     GlobalVariables mGlobalVariables;
     RoutingDatabase mRDB;
 
+    //map view and overlays
+    private MapView mMapView;
+    private MyLocationNewOverlay mLocationOverlay;
+    private CompassOverlay mCompassOverlay;
+    private ScaleBarOverlay mScaleBarOverlay;
+
+    //Timer for updating the map
+    Handler timerHandler = new Handler();
+    Runnable timerRunnable = new Runnable() {
+
+        @Override
+        public void run() {
+
+            updateMap();
+            timerHandler.postDelayed(this, 500);
+        }
+    };
 
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
@@ -149,19 +161,6 @@ public class MapFragment extends Fragment {
         return routeOverlay;
     }
 
-
-    //Timer for updating the map
-    Handler timerHandler = new Handler();
-    Runnable timerRunnable = new Runnable() {
-
-        @Override
-        public void run() {
-
-            updateMap();
-            timerHandler.postDelayed(this, 500);
-        }
-    };
-
     private void startMapUpdates() {
         timerHandler.postDelayed(timerRunnable, 0);
     }
@@ -175,10 +174,9 @@ public class MapFragment extends Fragment {
                 Log.i(TAG, "Geopoint" + currentLocation);
                 mMapView.getController().setCenter(currentLocation);
             }
-            if ((mGlobalVariables.isAuto_rotate())&&(mGlobalVariables.getLocation().getSpeed() > 1)) {
+            if ((mGlobalVariables.isAuto_rotate()) && (mGlobalVariables.getLocation().getSpeed() > 1)) {
                 mMapView.setMapOrientation(360.0f - (mGlobalVariables.getLocation().getBearing()));
-            }
-            else if (mGlobalVariables.isAlign_north()) {
+            } else if (mGlobalVariables.isAlign_north()) {
                 mMapView.setMapOrientation(360.0f);
             }
         } catch (java.lang.NullPointerException e) {

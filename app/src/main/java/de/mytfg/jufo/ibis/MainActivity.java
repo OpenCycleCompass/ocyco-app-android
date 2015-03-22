@@ -1,9 +1,9 @@
 package de.mytfg.jufo.ibis;
 
 import android.content.Intent;
+import android.os.Bundle;
 import android.os.Handler;
 import android.support.v7.app.ActionBarActivity;
-import android.os.Bundle;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
@@ -11,11 +11,20 @@ import android.widget.Button;
 
 public class MainActivity extends ActionBarActivity {
 
+    GlobalVariables mGlobalVars;
+    //Timer for updating the map
+    Handler timerHandler = new Handler();
+    Runnable timerRunnable = new Runnable() {
+
+        @Override
+        public void run() {
+            enableButtons();
+            timerHandler.postDelayed(this, 500);
+        }
+    };
     //views
     private Button stop_tracking_button;
     private Button start_tracking_button;
-
-    GlobalVariables mGlobalVars;
 
     public void openSettings(View view) {
         Intent intent = new Intent(this, SettingsActivity.class);
@@ -36,19 +45,11 @@ public class MainActivity extends ActionBarActivity {
         }
     }
 
-    //Timer for updating the map
-    Handler timerHandler = new Handler();
-    Runnable timerRunnable = new Runnable() {
-
-        @Override
-        public void run() {
-            enableButtons();
-            timerHandler.postDelayed(this, 500);
-        }
-    };
-
-    public void startUIUpdates() {
-        timerHandler.postDelayed(timerRunnable, 0);
+    private void enableButtons() {
+        //enable buttons - status of trackingRunning is not even changed,
+        //when this statement is executed!
+        start_tracking_button.setEnabled(!mGlobalVars.isTrackingRunning());
+        stop_tracking_button.setEnabled(mGlobalVars.isTrackingRunning());
     }
 
     public void onClickStopTracking(View view) {
@@ -71,13 +72,9 @@ public class MainActivity extends ActionBarActivity {
         startUIUpdates();
     }
 
-    private void enableButtons() {
-        //enable buttons - status of trackingRunning is not even changed,
-        //when this statement is executed!
-        start_tracking_button.setEnabled(!mGlobalVars.isTrackingRunning());
-        stop_tracking_button.setEnabled(mGlobalVars.isTrackingRunning());
+    public void startUIUpdates() {
+        timerHandler.postDelayed(timerRunnable, 0);
     }
-
 
     @Override
     public boolean onCreateOptionsMenu(Menu menu) {

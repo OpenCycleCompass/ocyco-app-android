@@ -15,29 +15,27 @@ import org.json.JSONObject;
 
 
 public class RoutingDatabase {
-    private Context context;
-    //database variables
-    private DbHelper dbHelper;
+    // Log TAG
+    protected static final String TAG = "RoutingDatabase-class";
     public final String DBNAME = "RoutingDatabase";
     public final int DBVERSION = 8;
-    public SQLiteDatabase db;
     public final String COLUMN_ID = "Id";
     public final String COLUMN_LAT = "latitude";
     public final String COLUMN_LON = "longitude";
     public final String COLUMN_DIST = "distance"; ///distance to last point in meters
     public final String COLUMN_TIMEFACTOR = "time_factor";
     public final String TABLENAME = "RoutingData";
-    public final String CREATERDB = "CREATE TABLE "+TABLENAME+"("+
-            COLUMN_ID+" INTEGER PRIMARY KEY AUTOINCREMENT," +
-            COLUMN_LAT+" REAL NOT NULL, " +
-            COLUMN_LON+" REAL NOT NULL, " +
-            COLUMN_DIST+" REAL," +
-            COLUMN_TIMEFACTOR+" REAL " +
+    public final String CREATERDB = "CREATE TABLE " + TABLENAME + "(" +
+            COLUMN_ID + " INTEGER PRIMARY KEY AUTOINCREMENT," +
+            COLUMN_LAT + " REAL NOT NULL, " +
+            COLUMN_LON + " REAL NOT NULL, " +
+            COLUMN_DIST + " REAL," +
+            COLUMN_TIMEFACTOR + " REAL " +
             ");";
-
-
-    // Log TAG
-    protected static final String TAG = "RoutingDatabase-class";
+    public SQLiteDatabase db;
+    private Context context;
+    //database variables
+    private DbHelper dbHelper;
 
     //constructor
     public RoutingDatabase(Context context) {
@@ -46,43 +44,13 @@ public class RoutingDatabase {
         dbHelper = new DbHelper(context);
     }
 
-    public void deleteData () {
+    public void deleteData() {
         db.delete(TABLENAME, null, null);
-    }
-
-    //creating a DbHelper
-    public class DbHelper extends SQLiteOpenHelper {
-        //DbHelper constructor
-        public DbHelper(Context context) {
-            super(context, DBNAME, null, DBVERSION);
-            Log.i(TAG, DBVERSION + "");
-        }
-
-        @Override
-        public void onCreate(SQLiteDatabase db) {
-            Log.i(TAG, "onCreate()");
-            db.execSQL(CREATERDB);
-        }
-
-        @Override
-        public void onUpgrade(SQLiteDatabase db, int oldVersion, int newVersion) {
-            db.execSQL("DROP TABLE IF EXISTS " + TABLENAME + ";");
-            onCreate(db);
-        }
-    }
-
-    public long insertData(double lat, double lon, double dist, double tf) {
-        ContentValues value = new ContentValues();
-        value.put(COLUMN_LAT, lat);
-        value.put(COLUMN_LON, lon);
-        value.put(COLUMN_DIST, dist);
-        value.put(COLUMN_TIMEFACTOR, tf);
-        return db.insert(TABLENAME, null, value);
     }
 
     public double getTotalDist() {
         double tdist;
-        Cursor mCount = db.rawQuery("SELECT SUM("+COLUMN_DIST+") FROM " + TABLENAME, null);
+        Cursor mCount = db.rawQuery("SELECT SUM(" + COLUMN_DIST + ") FROM " + TABLENAME, null);
         mCount.moveToFirst();
         tdist = mCount.getDouble(0);
         mCount.close();
@@ -91,14 +59,14 @@ public class RoutingDatabase {
 
     public double getTotalDistTimeFactored() {
         double tdist;
-        Cursor mCount = db.rawQuery("SELECT SUM("+COLUMN_DIST+" * "+COLUMN_TIMEFACTOR+") FROM " + TABLENAME, null);
+        Cursor mCount = db.rawQuery("SELECT SUM(" + COLUMN_DIST + " * " + COLUMN_TIMEFACTOR + ") FROM " + TABLENAME, null);
         mCount.moveToFirst();
         tdist = mCount.getDouble(0);
         mCount.close();
         return tdist;
     }
 
-    public void readPointsArray (JSONArray jArray) {
+    public void readPointsArray(JSONArray jArray) {
         Location oldLocation = new Location("");
         double dist;
         for (int i = 0; i < jArray.length(); i++) {
@@ -109,10 +77,9 @@ public class RoutingDatabase {
                 double lat = oneObject.getDouble("lat");
                 double lon = oneObject.getDouble("lon");
                 double tf;
-                if(oneObject.has("time_factor")) {
+                if (oneObject.has("time_factor")) {
                     tf = oneObject.getDouble("time_factor");
-                }
-                else {
+                } else {
                     tf = 1d;
                 }
                 location.setLatitude(lat);
@@ -125,13 +92,20 @@ public class RoutingDatabase {
                 //insert into db
                 insertData(lat, lon, dist, tf);
                 oldLocation = location;
-            }
-            catch (JSONException e) {
+            } catch (JSONException e) {
                 e.printStackTrace();
             }
         }
     }
-//gzui
+
+    public long insertData(double lat, double lon, double dist, double tf) {
+        ContentValues value = new ContentValues();
+        value.put(COLUMN_LAT, lat);
+        value.put(COLUMN_LON, lon);
+        value.put(COLUMN_DIST, dist);
+        value.put(COLUMN_TIMEFACTOR, tf);
+        return db.insert(TABLENAME, null, value);
+    }
 
     public JSONArray getAllPoints() {
         Cursor cursor = db.query(TABLENAME, new String[]{COLUMN_LAT, COLUMN_LON}, null, null, null, null, null);
@@ -165,5 +139,26 @@ public class RoutingDatabase {
         Log.i(TAG, "database deleted");
         //delete database
         return context.deleteDatabase(DBNAME);
+    }
+
+    //creating a DbHelper
+    public class DbHelper extends SQLiteOpenHelper {
+        //DbHelper constructor
+        public DbHelper(Context context) {
+            super(context, DBNAME, null, DBVERSION);
+            Log.i(TAG, DBVERSION + "");
+        }
+
+        @Override
+        public void onCreate(SQLiteDatabase db) {
+            Log.i(TAG, "onCreate()");
+            db.execSQL(CREATERDB);
+        }
+
+        @Override
+        public void onUpgrade(SQLiteDatabase db, int oldVersion, int newVersion) {
+            db.execSQL("DROP TABLE IF EXISTS " + TABLENAME + ";");
+            onCreate(db);
+        }
     }
 }

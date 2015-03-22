@@ -1,8 +1,8 @@
 package de.mytfg.jufo.ibis;
 
 import android.content.Intent;
-import android.support.v7.app.ActionBarActivity;
 import android.os.Bundle;
+import android.support.v7.app.ActionBarActivity;
 import android.text.method.LinkMovementMethod;
 import android.view.Menu;
 import android.view.MenuItem;
@@ -19,9 +19,9 @@ public class InfoActivity extends ActionBarActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_info);
 
-        license_links= (TextView)findViewById(R.id.license_links);
+        license_links = (TextView) findViewById(R.id.license_links);
         license_links.setMovementMethod(LinkMovementMethod.getInstance());
-        contact_links= (TextView)findViewById(R.id.contact_links);
+        contact_links = (TextView) findViewById(R.id.contact_links);
         contact_links.setMovementMethod(LinkMovementMethod.getInstance());
 
     }

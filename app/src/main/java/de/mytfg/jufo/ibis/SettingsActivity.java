@@ -5,9 +5,9 @@ import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.SharedPreferences;
+import android.os.Bundle;
 import android.os.Handler;
 import android.support.v7.app.ActionBarActivity;
-import android.os.Bundle;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
@@ -16,11 +16,20 @@ import android.widget.EditText;
 
 public class SettingsActivity extends ActionBarActivity {
 
-    //Variables declaration
-    private float FloatTextSize;
-
     //create instance of GlobalVariables class
     GlobalVariables mGlobalVariable;
+    //Timer for updating the map
+    Handler timerHandler = new Handler();
+    Runnable timerRunnable = new Runnable() {
+
+        @Override
+        public void run() {
+            updateCBCollectData();
+            timerHandler.postDelayed(this, 500);
+        }
+    };
+    //Variables declaration
+    private float FloatTextSize;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -56,31 +65,8 @@ public class SettingsActivity extends ActionBarActivity {
         startUIUpdates();
     }
 
-
-    @Override
-    public boolean onCreateOptionsMenu(Menu menu) {
-        getMenuInflater().inflate(R.menu.menu_settings, menu);
-        return true;
-    }
-
-    //Timer for updating the map
-    Handler timerHandler = new Handler();
-    Runnable timerRunnable = new Runnable() {
-
-        @Override
-        public void run() {
-            updateCBCollectData();
-            timerHandler.postDelayed(this, 500);
-        }
-    };
-
     private void startUIUpdates() {
         timerHandler.postDelayed(timerRunnable, 0);
-    }
-
-    private void updateCBCollectData() {
-        final CheckBox CBcollectData = (CheckBox) findViewById(R.id.CBCollectData);
-        CBcollectData.setChecked(mGlobalVariable.isCollectData());
     }
 
     @Override
@@ -98,6 +84,42 @@ public class SettingsActivity extends ActionBarActivity {
         editor.putFloat("FloatTextSize", FloatTextSize);
         // Commit the edits!
         editor.apply();
+    }
+
+    @Override
+    public boolean onCreateOptionsMenu(Menu menu) {
+        getMenuInflater().inflate(R.menu.menu_settings, menu);
+        return true;
+    }
+
+    @Override
+    public boolean onOptionsItemSelected(MenuItem item) {
+        // Handle item selection
+        switch (item.getItemId()) {
+            case R.id.action_MainActivity:
+                Intent intent_main = new Intent(this, MainActivity.class);
+                startActivity(intent_main);
+                return true;
+            case R.id.action_show_data_activity:
+                Intent intent_showData = new Intent(this, ShowDataActivity.class);
+                startActivity(intent_showData);
+                return true;
+            case R.id.action_RoutingActivity:
+                Intent intent_routing = new Intent(this, RoutingActivity.class);
+                startActivity(intent_routing);
+                return true;
+            case R.id.action_info:
+                Intent intent_info = new Intent(this, InfoActivity.class);
+                startActivity(intent_info);
+                return true;
+            default:
+                return super.onOptionsItemSelected(item);
+        }
+    }
+
+    private void updateCBCollectData() {
+        final CheckBox CBcollectData = (CheckBox) findViewById(R.id.CBCollectData);
+        CBcollectData.setChecked(mGlobalVariable.isCollectData());
     }
 
     public void onCheckboxClicked(View view) {
@@ -135,11 +157,6 @@ public class SettingsActivity extends ActionBarActivity {
         mGlobalVariable.setChanged_settings(true);
     }
 
-    public void onClickFindRoute(View view) {
-        Intent intent = new Intent(this, RoutingActivity.class);
-        startActivity(intent);
-    }
-
     private void openAlert(String StrEditText) {
         //set up a new alert dialog
         AlertDialog.Builder alertDialogBuilder = new AlertDialog.Builder(SettingsActivity.this);
@@ -158,29 +175,9 @@ public class SettingsActivity extends ActionBarActivity {
         alertDialog.show();
     }
 
-    @Override
-    public boolean onOptionsItemSelected(MenuItem item) {
-        // Handle item selection
-        switch (item.getItemId()) {
-            case R.id.action_MainActivity:
-                Intent intent_main = new Intent(this, MainActivity.class);
-                startActivity(intent_main);
-                return true;
-            case R.id.action_show_data_activity:
-                Intent intent_showData = new Intent(this, ShowDataActivity.class);
-                startActivity(intent_showData);
-                return true;
-            case R.id.action_RoutingActivity:
-                Intent intent_routing = new Intent(this, RoutingActivity.class);
-                startActivity(intent_routing);
-                return true;
-            case R.id.action_info:
-                Intent intent_info = new Intent(this, InfoActivity.class);
-                startActivity(intent_info);
-                return true;
-            default:
-                return super.onOptionsItemSelected(item);
-        }
+    public void onClickFindRoute(View view) {
+        Intent intent = new Intent(this, RoutingActivity.class);
+        startActivity(intent);
     }
 }
 

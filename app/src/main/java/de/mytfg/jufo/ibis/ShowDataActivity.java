@@ -3,9 +3,9 @@ package de.mytfg.jufo.ibis;
 import android.app.AlertDialog;
 import android.content.DialogInterface;
 import android.content.Intent;
+import android.os.Bundle;
 import android.os.Handler;
 import android.support.v7.app.ActionBarActivity;
-import android.os.Bundle;
 import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
@@ -19,7 +19,12 @@ public class ShowDataActivity extends ActionBarActivity {
 
     //create instance of GlobalVariables class
     GlobalVariables mGlobalVariable;
-
+    //alert dialog vars
+    AlertDialog.Builder alertDialogBuilder;
+    AlertDialog alertDialog;
+    //Timer for updating the info boxes
+    Handler timerHandler = new Handler();
+    boolean noGPSAlertOpen;
     //info boxes
     private TextView sGefBox;
     private TextView sZufBox;
@@ -29,16 +34,40 @@ public class ShowDataActivity extends ActionBarActivity {
     private TextView tAnkUntBox;
     private TextView vDMussBox;
     private TextView vDUntBox;
-
     private Menu menu;
-
     private String tAnkMinStr;
     private boolean accuracyAlert, oldAccuracyAlert;
-    //alert dialog vars
-    AlertDialog.Builder alertDialogBuilder;
-    AlertDialog alertDialog;
-    private boolean dialogExists = false;
+    Runnable timerRunnable = new Runnable() {
 
+        @Override
+        public void run() {
+            oldAccuracyAlert = accuracyAlert;
+            if (mGlobalVariable.getLocation() != null) {
+                noGPSAlertOpen = false;
+                if (mGlobalVariable.getLocation().getAccuracy() < 20) {
+                    showData();
+                    accuracyAlert = false;
+                } else {
+                    accuracyAlert = true;
+                }
+                //check, if accuracy alert is necessary
+                if (accuracyAlert != oldAccuracyAlert) {
+                    //check which accuracy alert
+                    if (accuracyAlert) {
+                        openAccuracyAlert(false);
+                    } else {
+                        openAccuracyAlert(true);
+                    }
+                }
+            } else {
+                if (!noGPSAlertOpen) openAccuracyAlert(false);
+                noGPSAlertOpen = true;
+            }
+
+            timerHandler.postDelayed(this, 500);
+        }
+    };
+    private boolean dialogExists = false;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -68,15 +97,6 @@ public class ShowDataActivity extends ActionBarActivity {
         checkTracking();
     }
 
-    private void checkTracking() {
-        //start tracking, if tracking is not running
-        //happens, when tracking was not started from RoutingActivity
-        if (!mGlobalVariable.isTrackingRunning()){
-            Intent intent = new Intent(this, Tracking.class);
-            startService(intent);
-        }
-    }
-
     private void setTextSize() {
         float textSize = mGlobalVariable.getTextSize();
         if (textSize != 0) {
@@ -91,6 +111,19 @@ public class ShowDataActivity extends ActionBarActivity {
         }
     }
 
+    private void updateUI() {
+        Log.i(TAG, "updateUI()");
+        timerHandler.postDelayed(timerRunnable, 0);
+    }
+
+    private void checkTracking() {
+        //start tracking, if tracking is not running
+        //happens, when tracking was not started from RoutingActivity
+        if (!mGlobalVariable.isTrackingRunning()) {
+            Intent intent = new Intent(this, Tracking.class);
+            startService(intent);
+        }
+    }
 
     private void openAccuracyAlert(boolean confirm) {
         if (dialogExists) {
@@ -111,7 +144,7 @@ public class ShowDataActivity extends ActionBarActivity {
 
         } else {
             alertDialogBuilder.setTitle("Positionsbestimmung zu ungenau!");
-            if (mGlobalVariable.getLocation()!= null) {
+            if (mGlobalVariable.getLocation() != null) {
                 alertDialogBuilder.setMessage((int) mGlobalVariable.getLocation().getAccuracy() + "m Abweichung sind zu ungenau zum Navigieren! Haben Sie GPS aktiviert? Signal wird gesucht...");
             } else {
                 alertDialogBuilder.setMessage("Kein Signal! Haben Sie GPS aktiviert? Signal wird gesucht...");
@@ -121,50 +154,6 @@ public class ShowDataActivity extends ActionBarActivity {
         alertDialog = alertDialogBuilder.create();
         alertDialog.show();
         dialogExists = true;
-    }
-
-    //Timer for updating the info boxes
-    Handler timerHandler = new Handler();
-    boolean noGPSAlertOpen;
-    Runnable timerRunnable = new Runnable() {
-
-        @Override
-        public void run() {
-            oldAccuracyAlert = accuracyAlert;
-            if (mGlobalVariable.getLocation() != null) {
-                noGPSAlertOpen = false;
-                if (mGlobalVariable.getLocation().getAccuracy() < 20) {
-                    showData();
-                    accuracyAlert = false;
-                } else {
-                    accuracyAlert = true;
-                }
-                //check, if accuracy alert is necessary
-                if (accuracyAlert != oldAccuracyAlert) {
-                    //check which accuracy alert
-                    if (accuracyAlert) {
-                        openAccuracyAlert(false);
-                    } else {
-                        openAccuracyAlert(true);
-                    }
-                }
-            } else {
-                if (!noGPSAlertOpen)
-                openAccuracyAlert(false);
-                noGPSAlertOpen=true;
-            }
-
-            timerHandler.postDelayed(this, 500);
-        }
-    };
-
-    private void updateUI() {
-        Log.i(TAG, "updateUI()");
-        timerHandler.postDelayed(timerRunnable, 0);
-    }
-
-    private String roundDecimals(double d) {
-        return String.format("%.2f", d);
     }
 
     //read data from global var class and write to info boxes
@@ -230,6 +219,9 @@ public class ShowDataActivity extends ActionBarActivity {
         }
     }
 
+    private String roundDecimals(double d) {
+        return String.format("%.2f", d);
+    }
 
     @Override
     public boolean onCreateOptionsMenu(Menu menu) {
