@@ -79,7 +79,7 @@ public class Calculate {
     }
 
     public void calculateDrivenDistance(double dist) {
-        sGef = dist;
+        sGef = dist/1000d;
     }
 
     public void calculateDrivenTime() {

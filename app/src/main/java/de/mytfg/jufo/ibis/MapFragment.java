@@ -18,10 +18,7 @@ import org.osmdroid.ResourceProxy;
 import org.osmdroid.bonuspack.overlays.Polyline;
 import org.osmdroid.tileprovider.IRegisterReceiver;
 import org.osmdroid.tileprovider.MapTileProviderArray;
-import org.osmdroid.tileprovider.modules.GEMFFileArchive;
-import org.osmdroid.tileprovider.modules.IArchiveFile;
 import org.osmdroid.tileprovider.modules.MapTileDownloader;
-import org.osmdroid.tileprovider.modules.MapTileFileArchiveProvider;
 import org.osmdroid.tileprovider.modules.MapTileFilesystemProvider;
 import org.osmdroid.tileprovider.modules.MapTileModuleProviderBase;
 import org.osmdroid.tileprovider.modules.NetworkAvailabliltyCheck;
@@ -37,8 +34,6 @@ import org.osmdroid.views.overlay.compass.InternalCompassOrientationProvider;
 import org.osmdroid.views.overlay.mylocation.GpsMyLocationProvider;
 import org.osmdroid.views.overlay.mylocation.MyLocationNewOverlay;
 
-import java.io.File;
-import java.io.IOException;
 import java.util.ArrayList;
 
 public class MapFragment extends Fragment {
@@ -64,26 +59,17 @@ public class MapFragment extends Fragment {
         //tile server url
         final String[] url = new String[]{"http://tile.thunderforest.com/cycle/"};
         //tile source
-        final ITileSource mTileSource = new XYTileSource("cyclemap", ResourceProxy.string.cyclemap, 1, 18, 64, ".png", url);
+        final ITileSource mTileSource = new XYTileSource("cyclemap", ResourceProxy.string.cyclemap, 1, 18, 256, ".png", url);
         //file cache provider
         final TileWriter mTileWriter = new TileWriter();
         final MapTileFilesystemProvider fileSystemProvider = new MapTileFilesystemProvider(mRegisterReceiver, mTileSource);
-        //archive file provider
-        final File mArchiveFile = new File(new File(""), "archiveFile");
-        GEMFFileArchive mGemfFileArchive = null;
-        try {
-            mGemfFileArchive = GEMFFileArchive.getGEMFFileArchive(mArchiveFile);
-        } catch (IOException e) {
-            e.printStackTrace();
-        }
-        MapTileFileArchiveProvider mFileArchiveProvider = new MapTileFileArchiveProvider(mRegisterReceiver, mTileSource, new IArchiveFile[]{mGemfFileArchive});
         //download modular tile provider
         final NetworkAvailabliltyCheck mNetworkAvailablityCheck = new NetworkAvailabliltyCheck(context_activity);
         final MapTileDownloader downloaderProvider = new MapTileDownloader(mTileSource, mTileWriter, mNetworkAvailablityCheck);
         //create the tile provider array
-        final MapTileProviderArray mMapTileProviderArray = new MapTileProviderArray(mTileSource, mRegisterReceiver, new MapTileModuleProviderBase[]{fileSystemProvider, mFileArchiveProvider, downloaderProvider});
+        final MapTileProviderArray mMapTileProviderArray = new MapTileProviderArray(mTileSource, mRegisterReceiver, new MapTileModuleProviderBase[]{fileSystemProvider, downloaderProvider});
         //create map
-        mMapView = new MapView(context_activity, 64, new DefaultResourceProxyImpl(context_activity), mMapTileProviderArray);
+        mMapView = new MapView(context_activity, 256, new DefaultResourceProxyImpl(context_activity), mMapTileProviderArray);
         //and return it
         return mMapView;
     }
