@@ -29,6 +29,8 @@ public class ShowDataActivity extends ActionBarActivity {
     private TextView vDMussBox;
     private TextView vDUntBox;
 
+    private Menu menu;
+
     private String tAnkMinStr;
     private boolean accuracyAlert, oldAccuracyAlert;
     //alert dialog vars
@@ -228,6 +230,7 @@ public class ShowDataActivity extends ActionBarActivity {
     public boolean onCreateOptionsMenu(Menu menu) {
         // Inflate the menu; this adds items to the action bar if it is present.
         getMenuInflater().inflate(R.menu.menu_show_data, menu);
+        this.menu = menu;
         return true;
     }
 
@@ -250,6 +253,18 @@ public class ShowDataActivity extends ActionBarActivity {
             case R.id.auto_center:
                 item.setChecked(!item.isChecked());
                 mGlobalVariable.setAutoCenter(item.isChecked());
+                //only enable auto rotation, if auto centering is enabled
+                MenuItem auto_rotate = menu.findItem(R.id.auto_rotate);
+                auto_rotate.setEnabled(item.isChecked());
+                auto_rotate.setChecked(false);
+                //set global variables
+                mGlobalVariable.setAuto_rotate(false);
+                mGlobalVariable.setAlign_north(true);
+                return true;
+            case R.id.auto_rotate:
+                item.setChecked(!item.isChecked());
+                mGlobalVariable.setAuto_rotate(item.isChecked());
+                mGlobalVariable.setAlign_north(!item.isChecked());
                 return true;
             case R.id.action_info:
                 Intent intent_info = new Intent(this, InfoActivity.class);
@@ -259,4 +274,6 @@ public class ShowDataActivity extends ActionBarActivity {
                 return super.onOptionsItemSelected(item);
         }
     }
+
+
 }

@@ -23,10 +23,9 @@ public class Tracking extends Service implements LocationListener, OnConnectionF
     // Log TAG
     protected static final String TAG = "IBisTracking-class";
     // The desired interval for location updates. Inexact. Updates may be more or less frequent.
-    public static final long UPDATE_INTERVAL_IN_MILLISECONDS = 5000;
+    public static final long UPDATE_INTERVAL_IN_MILLISECONDS = 3000;
     // The fastest rate for active location updates. Exact. Updates will never be more frequent than this value.
-    public static final long FASTEST_UPDATE_INTERVAL_IN_MILLISECONDS =
-            UPDATE_INTERVAL_IN_MILLISECONDS / 2;
+    public static final long FASTEST_UPDATE_INTERVAL_IN_MILLISECONDS = 1000;
     // Provides the entry point to Google Play services.
     protected GoogleApiClient mGoogleApiClient;
     //Stores parameters for requests to the FusedLocationProviderApi.

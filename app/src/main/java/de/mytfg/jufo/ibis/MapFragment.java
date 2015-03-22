@@ -13,10 +13,20 @@ import android.view.ViewGroup;
 import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
+import org.osmdroid.DefaultResourceProxyImpl;
 import org.osmdroid.ResourceProxy;
 import org.osmdroid.bonuspack.overlays.Polyline;
+import org.osmdroid.tileprovider.IRegisterReceiver;
+import org.osmdroid.tileprovider.MapTileProviderArray;
+import org.osmdroid.tileprovider.modules.MapTileDownloader;
+import org.osmdroid.tileprovider.modules.MapTileFilesystemProvider;
+import org.osmdroid.tileprovider.modules.MapTileModuleProviderBase;
+import org.osmdroid.tileprovider.modules.NetworkAvailabliltyCheck;
+import org.osmdroid.tileprovider.modules.TileWriter;
+import org.osmdroid.tileprovider.tilesource.ITileSource;
+import org.osmdroid.tileprovider.tilesource.XYTileSource;
+import org.osmdroid.tileprovider.util.SimpleRegisterReceiver;
 import org.osmdroid.util.GeoPoint;
-import org.osmdroid.util.ResourceProxyImpl;
 import org.osmdroid.views.MapView;
 import org.osmdroid.views.overlay.ScaleBarOverlay;
 import org.osmdroid.views.overlay.compass.CompassOverlay;
@@ -30,7 +40,6 @@ public class MapFragment extends Fragment {
 
     //map view and overlays
     private MapView mMapView;
-    private ResourceProxy mResourceProxy;
     private MyLocationNewOverlay mLocationOverlay;
     private CompassOverlay mCompassOverlay;
     private ScaleBarOverlay mScaleBarOverlay;
@@ -43,8 +52,25 @@ public class MapFragment extends Fragment {
 
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
-        mResourceProxy = new ResourceProxyImpl(inflater.getContext().getApplicationContext());
-        mMapView = new MapView(inflater.getContext(), 256, mResourceProxy);
+        //context
+        final Context context_activity = getActivity();
+        //register receiver
+        final IRegisterReceiver mRegisterReceiver = new SimpleRegisterReceiver(context_activity.getApplicationContext());
+        //tile server url
+        final String[] url = new String[]{"http://tile.thunderforest.com/cycle/"};
+        //tile source
+        final ITileSource mTileSource = new XYTileSource("cyclemap", ResourceProxy.string.cyclemap, 1, 18, 256, ".png", url);
+        //file cache provider
+        final TileWriter mTileWriter = new TileWriter();
+        final MapTileFilesystemProvider fileSystemProvider = new MapTileFilesystemProvider(mRegisterReceiver, mTileSource);
+        //download modular tile provider
+        final NetworkAvailabliltyCheck mNetworkAvailablityCheck = new NetworkAvailabliltyCheck(context_activity);
+        final MapTileDownloader downloaderProvider = new MapTileDownloader(mTileSource, mTileWriter, mNetworkAvailablityCheck);
+        //create the tile provider array
+        final MapTileProviderArray mMapTileProviderArray = new MapTileProviderArray(mTileSource, mRegisterReceiver, new MapTileModuleProviderBase[]{fileSystemProvider, downloaderProvider});
+        //create map
+        mMapView = new MapView(context_activity, 256, new DefaultResourceProxyImpl(context_activity), mMapTileProviderArray);
+        //and return it
         return mMapView;
     }
 
@@ -73,7 +99,7 @@ public class MapFragment extends Fragment {
         mScaleBarOverlay.setCentred(true);
         mScaleBarOverlay.setScaleBarOffset(dm.widthPixels / 2, 10);
         //check, if settings were changed by user, else activate overlays by default
-        if (!mGlobalVariables.isChanged_settings()){
+        if (!mGlobalVariables.isChanged_settings()) {
             mGlobalVariables.setShowLocationOverlay(true);
             mGlobalVariables.setShowCompassOverlay(true);
             mGlobalVariables.setShowScaleBarOverlay(true);
@@ -94,7 +120,7 @@ public class MapFragment extends Fragment {
 
     }
 
-    private Polyline createPolyline () {
+    private Polyline createPolyline() {
         Log.i(TAG, "createPolyline()");
         //create waypoints Array
         ArrayList<GeoPoint> waypoints = new ArrayList<>();
@@ -130,9 +156,8 @@ public class MapFragment extends Fragment {
 
         @Override
         public void run() {
-            if (mGlobalVariables.isAutoCenter()) {
-                updateMap();
-            }
+
+            updateMap();
             timerHandler.postDelayed(this, 500);
         }
     };
@@ -143,11 +168,19 @@ public class MapFragment extends Fragment {
 
     private void updateMap() {
         Log.i(TAG, "updateMap()");
-        //center at users position
+        //center at users position,rotate map
         try {
-            GeoPoint currentLocation = new GeoPoint(mGlobalVariables.getLocation().getLatitude(), mGlobalVariables.getLocation().getLongitude());
-            Log.i(TAG, "Geopoint"+currentLocation);
-            mMapView.getController().setCenter(currentLocation);
+            if (mGlobalVariables.isAutoCenter()) {
+                GeoPoint currentLocation = new GeoPoint(mGlobalVariables.getLocation().getLatitude(), mGlobalVariables.getLocation().getLongitude());
+                Log.i(TAG, "Geopoint" + currentLocation);
+                mMapView.getController().setCenter(currentLocation);
+            }
+            if ((mGlobalVariables.isAuto_rotate())&&(mGlobalVariables.getLocation().getSpeed() > 1)) {
+                mMapView.setMapOrientation(360.0f - (mGlobalVariables.getLocation().getBearing()));
+            }
+            else if (mGlobalVariables.isAlign_north()) {
+                mMapView.setMapOrientation(360.0f);
+            }
         } catch (java.lang.NullPointerException e) {
             Log.i(TAG, "NullPointerException");
         }

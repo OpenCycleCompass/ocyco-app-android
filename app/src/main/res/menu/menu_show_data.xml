@@ -9,6 +9,12 @@
         android:checkable="true"
         android:checked="true"/>
 
+    <item android:id="@+id/auto_rotate"
+        android:title="automatisch ausrichten"
+        android:icon="@android:drawable/ic_menu_preferences"
+        android:checkable="true"
+        android:checked="false"/>
+
     <item
         android:id="@+id/action_MainActivity"
         android:orderInCategory="100"
