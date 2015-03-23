@@ -101,10 +101,12 @@ public class Tracking extends Service implements LocationListener, OnConnectionF
             mCalculate.calculateTimeVars(mGlobalVariable.gettAnkEingTime());
             mGPSDb.open();
             mCalculate.calculateDrivenDistance(mGPSDb.getTotalDist());
+            Log.i(TAG, "sEing tf callCalc"+(mGPSDb.getTotalDist()));
             mGPSDb.close();
             mCalculate.calculateDrivenTime();
             mCalculate.calculateSpeed();
             mCalculate.math(mGlobalVariable.isUseTimeFactor(), mGlobalVariable.getsEingTimeFactor() / 1000d);
+            Log.i(TAG, "sEing tf callCalc"+(mGlobalVariable.getsEingTimeFactor() / 1000d));
             //get Variables from calculation
             double sGef = mCalculate.getsGef();
             double sZuf = mCalculate.getsZuf();
@@ -160,6 +162,7 @@ public class Tracking extends Service implements LocationListener, OnConnectionF
         //build and connect Api Client
         buildGoogleApiClient();
         mGoogleApiClient.connect();
+        Log.i(TAG, "checkOnline(): conn");
 
         //initialize global variable class
         mGlobalVariable = (GlobalVariables) getApplicationContext();
@@ -207,7 +210,7 @@ public class Tracking extends Service implements LocationListener, OnConnectionF
         if (mGlobalVariable.isCollectData() && !mGlobalVariable.isTrackingRunning()) {
             startOnlineTracking();
         } else if (mGlobalVariable.isTrackingRunning()) {
-            mGlobalVariable.setCollectData(false);
+            //mGlobalVariable.setCollectData(false);
             stopOnlineTracking();
         }
     }

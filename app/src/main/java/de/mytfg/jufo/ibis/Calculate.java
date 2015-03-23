@@ -39,8 +39,8 @@ public class Calculate {
         if (oldLoc == null) {
             firstLoc = location;
         }
-        // get distance, convert to km
-        sEing = sEingInput / 1000d;
+        // get distance, is already in km!
+        sEing = sEingInput;
     }
 
     public boolean checkFirstLoc() {
