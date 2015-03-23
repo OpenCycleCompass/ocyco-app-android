@@ -333,8 +333,8 @@ public class UploadTrackActivity extends ActionBarActivity {
         try {
             URL url = new URL(lurlstr);
             HttpURLConnection conn = (HttpURLConnection) url.openConnection();
-            conn.setReadTimeout(3000 /* milliseconds */);
-            conn.setConnectTimeout(5000 /* milliseconds */);
+            conn.setReadTimeout(30000 /* milliseconds */);
+            conn.setConnectTimeout(50000 /* milliseconds */);
             Log.i(TAG, "Old User-Agent: " + conn.getRequestProperty("User-Agent"));
             conn.setRequestProperty("User-Agent", "iBis app");
             Log.i(TAG, "New User-Agent: " + conn.getRequestProperty("User-Agent"));

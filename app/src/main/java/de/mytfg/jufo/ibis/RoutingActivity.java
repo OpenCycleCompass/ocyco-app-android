@@ -404,7 +404,7 @@ public class RoutingActivity extends ActionBarActivity implements TimePickerFrag
         try {
             URL url = new URL(lurlstr);
             HttpURLConnection conn = (HttpURLConnection) url.openConnection();
-            conn.setReadTimeout(10000 /* milliseconds */);
+            conn.setReadTimeout(30000 /* milliseconds */);
             conn.setConnectTimeout(5000 /* milliseconds */);
             Log.i(TAG, "Old User-Agent: " + conn.getRequestProperty("User-Agent"));
             conn.setRequestProperty("User-Agent", "iBis app");
