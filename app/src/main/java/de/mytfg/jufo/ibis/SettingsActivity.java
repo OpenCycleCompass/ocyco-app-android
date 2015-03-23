@@ -42,17 +42,14 @@ public class SettingsActivity extends ActionBarActivity {
         // Restore preferences
         SharedPreferences settings = getSharedPreferences(getString(R.string.preference_file_key), Context.MODE_PRIVATE);
         //get variables and set to global class
-        //check, if collectData was set by another activity, else read from preferences
-        if (!mGlobalVariable.isCollectDataSet()) {
-            mGlobalVariable.setCollectData(settings.getBoolean("CollectData", false));
-        }
+        mGlobalVariable.setCollect_data(settings.getBoolean("CollectData", false));
         mGlobalVariable.setShowLocationOverlay(settings.getBoolean("showLocationOverlay", true));
         mGlobalVariable.setShowCompassOverlay(settings.getBoolean("showCompassOverlay", true));
         mGlobalVariable.setShowScaleBarOverlay(settings.getBoolean("showScaleBarOverlay", true));
         FloatTextSize = settings.getFloat("FloatTextSize", 8);
         //set check boxes
         final CheckBox CBcollectData = (CheckBox) findViewById(R.id.CBCollectData);
-        CBcollectData.setChecked(mGlobalVariable.isCollectData());
+        CBcollectData.setChecked(mGlobalVariable.isCollect_data());
         final CheckBox cb_show_compassOverlay = (CheckBox) findViewById(R.id.cb_show_compassOverlay);
         cb_show_compassOverlay.setChecked(mGlobalVariable.isShow_compassOverlay());
         final CheckBox cb_show_locationOverlay = (CheckBox) findViewById(R.id.cb_show_locationOverlay);
@@ -77,7 +74,7 @@ public class SettingsActivity extends ActionBarActivity {
         SharedPreferences settings = getSharedPreferences(getString(R.string.preference_file_key), Context.MODE_PRIVATE);
         //creating a editor and add variables
         SharedPreferences.Editor editor = settings.edit();
-        editor.putBoolean("CollectData", mGlobalVariable.isCollectData());
+        editor.putBoolean("CollectData", mGlobalVariable.isCollect_data());
         editor.putBoolean("showCompassOverlay", mGlobalVariable.isShow_compassOverlay());
         editor.putBoolean("showLocationOverlay", mGlobalVariable.isShow_locationOverlay());
         editor.putBoolean("showScaleBarOverlay", mGlobalVariable.isShow_scaleBarOverlay());
@@ -119,7 +116,7 @@ public class SettingsActivity extends ActionBarActivity {
 
     private void updateCBCollectData() {
         final CheckBox CBcollectData = (CheckBox) findViewById(R.id.CBCollectData);
-        CBcollectData.setChecked(mGlobalVariable.isCollectData());
+        CBcollectData.setChecked(mGlobalVariable.isCollect_data());
     }
 
     public void onCheckboxClicked(View view) {
@@ -129,7 +126,7 @@ public class SettingsActivity extends ActionBarActivity {
         // Check which checkbox was clicked
         switch (view.getId()) {
             case R.id.CBCollectData:
-                mGlobalVariable.setCollectData(checked);
+                mGlobalVariable.setCollect_data(checked);
                 break;
             case R.id.cb_show_locationOverlay:
                 mGlobalVariable.setShowLocationOverlay(checked);

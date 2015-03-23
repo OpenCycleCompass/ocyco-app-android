@@ -52,7 +52,7 @@ public class Tracking extends Service implements LocationListener, OnConnectionF
         //write position to GlobalVariables class
         mGlobalVariable.setLocation(mCurrentLocation);
         //only save data, if accuracy is ok
-        if (mGlobalVariable.isCollectData() && checkAccuracy(location.getAccuracy())) {
+        if (checkAccuracy(location.getAccuracy())) {
             updateDatabase();
             //update Notification
             mGPSDb.open();
@@ -60,12 +60,14 @@ public class Tracking extends Service implements LocationListener, OnConnectionF
             double total_dist = mGPSDb.getTotalDist();
             mGPSDb.close();
             String s_total_dist = roundDecimals(total_dist / 1000d);
-            // Update notification
-            mBuilder.setContentText(accNotiStr + getString(R.string.tracking_status_active) + " - " + num_rows + getString(R.string.coordinates) + s_total_dist + " " + getString(R.string.km));
-            // Sets an ID for the notification
-            int mNotificationId = 42;
-            // Builds the notification and issues it.
-            mNotifyMgr.notify(mNotificationId, mBuilder.build());
+            // Update notification, if online tracking ist running
+            if (mGlobalVariable.isOnline_tracking_running()) {
+                mBuilder.setContentText(accNotiStr + getString(R.string.tracking_status_active) + " - " + num_rows + getString(R.string.coordinates) + s_total_dist + " " + getString(R.string.km));
+                // Sets an ID for the notification
+                int mNotificationId = 42;
+                // Builds the notification and issues it.
+                mNotifyMgr.notify(mNotificationId, mBuilder.build());
+            }
         }
         callCalculate();
     }
@@ -101,12 +103,12 @@ public class Tracking extends Service implements LocationListener, OnConnectionF
             mCalculate.calculateTimeVars(mGlobalVariable.gettAnkEingTime());
             mGPSDb.open();
             mCalculate.calculateDrivenDistance(mGPSDb.getTotalDist());
-            Log.i(TAG, "sEing tf callCalc"+(mGPSDb.getTotalDist()));
+            Log.i(TAG, "sEing tf callCalc" + (mGPSDb.getTotalDist()));
             mGPSDb.close();
             mCalculate.calculateDrivenTime();
             mCalculate.calculateSpeed();
             mCalculate.math(mGlobalVariable.isUseTimeFactor(), mGlobalVariable.getsEingTimeFactor() / 1000d);
-            Log.i(TAG, "sEing tf callCalc"+(mGlobalVariable.getsEingTimeFactor() / 1000d));
+            Log.i(TAG, "sEing tf callCalc" + (mGlobalVariable.getsEingTimeFactor() / 1000d));
             //get Variables from calculation
             double sGef = mCalculate.getsGef();
             double sZuf = mCalculate.getsZuf();
@@ -162,7 +164,6 @@ public class Tracking extends Service implements LocationListener, OnConnectionF
         //build and connect Api Client
         buildGoogleApiClient();
         mGoogleApiClient.connect();
-        Log.i(TAG, "checkOnline(): conn");
 
         //initialize global variable class
         mGlobalVariable = (GlobalVariables) getApplicationContext();
@@ -191,37 +192,23 @@ public class Tracking extends Service implements LocationListener, OnConnectionF
     @Override
     public int onStartCommand(Intent intent, int flags, int startId) {
         Log.i(TAG, "onStartCommand()");
-        //read Extra data from intent. If Service was started by the system, there will be a RuntimeExc.
+        //read Extra data from intent, if exists
         try {
             if (intent.hasExtra("stopOnlineTracking")) {
-                if (intent.getBooleanExtra("stopOnlineTracking", false)) {
-                    mGlobalVariable.setCollectData(false);
+                if (intent.getBooleanExtra("stopOnlineTracking", true)) {
+                    stopOnlineTracking();
                 }
+            } else if (!mGlobalVariable.isOnline_tracking_running() && mGlobalVariable.isCollect_data()) {
+                startOnlineTracking();
             }
-        } catch (RuntimeException e) {
+        }
+        catch (Exception e) {
+            int mNotificationId = 42;
+            NotificationManager mNotifyMgr = (NotificationManager) getSystemService(NOTIFICATION_SERVICE);
+            mNotifyMgr.cancel(mNotificationId);
             stopSelf();
         }
-        checkOnline();
         return super.onStartCommand(intent, flags, startId);
-    }
-
-    public void checkOnline() {
-        Log.i(TAG, "checkOnline(): " + "CollectData: " + mGlobalVariable.isCollectData() + " Running: " + mGlobalVariable.isTrackingRunning());
-        if (mGlobalVariable.isCollectData() && !mGlobalVariable.isTrackingRunning()) {
-            startOnlineTracking();
-        } else if (mGlobalVariable.isTrackingRunning()) {
-            //mGlobalVariable.setCollectData(false);
-            stopOnlineTracking();
-        }
-    }
-
-    private void startOnlineTracking() {
-        Log.i(TAG, "startOnlineTracking()");
-        mGlobalVariable.setTrackingRunning(true);
-        // Create Notification with track info
-        mBuilder.setContentText(accNotiStr + getString(R.string.tracking_status_active));
-        // Builds the notification and issues it.
-        mNotifyMgr.notify(mNotificationId, mBuilder.build());
     }
 
     private void stopOnlineTracking() {
@@ -247,14 +234,27 @@ public class Tracking extends Service implements LocationListener, OnConnectionF
         mGPSDb.open();
         mGPSDb.deleteDatabase();
         mGPSDb.close();
-        mGlobalVariable.setTrackingRunning(false);
+        mGlobalVariable.setOnline_tracking_running(false);
+    }
+
+    private void startOnlineTracking() {
+        Log.i(TAG, "startOnlineTracking()");
+        mGlobalVariable.setOnline_tracking_running(true);
+        // Create Notification with track info
+        mBuilder.setContentText(accNotiStr + getString(R.string.tracking_status_active));
+        // Builds the notification and issues it.
+        mNotifyMgr.notify(mNotificationId, mBuilder.build());
     }
 
     @Override
     public void onDestroy() {
         Log.i(TAG, "onDestroy()");
+        disconnect();
         super.onDestroy();
-        if (mGlobalVariable.isCollectData()) {
+    }
+
+    private void disconnect () {
+        if (mGlobalVariable.isOnline_tracking_running()) {
             stopOnlineTracking();
         }
         stopLocationUpdates();

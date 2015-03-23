@@ -9,7 +9,9 @@ public class GlobalVariables extends Application {
     private double sGef, sZuf, vAkt, vD, tAnk, tAnkUnt, vDMuss, vDunt, tAnkEingTime, sEing, sEingTimeFactor;
     private float textSize;
     private Location location;
-    private boolean show_locationOverlay, show_compassOverlay, show_scaleBarOverlay, collectData, collectDataSet, auto_center = true, trackingRunning = false, use_time_factor, changed_settings, auto_rotate, align_north = false;
+    private boolean show_locationOverlay, show_compassOverlay, show_scaleBarOverlay, collect_data,
+    auto_center = true, use_time_factor,
+            changed_settings, auto_rotate, align_north = false, online_tracking_running;
 
 
     public void setCalculationVars(double sGefIn, double sZufIn, double vAktIn, double vDIn, double tAnkIn, double tAnkUntIn, double vDMussIn, double vDuntIn) {
@@ -38,6 +40,8 @@ public class GlobalVariables extends Application {
     public void setShowScaleBarOverlay(boolean show_scaleBarOverlay_in) {
         show_scaleBarOverlay = show_scaleBarOverlay_in;
     }
+
+    public boolean isOnline_tracking_running() {return online_tracking_running;}
 
     public boolean isAlign_north() {
         return align_north;
@@ -71,14 +75,6 @@ public class GlobalVariables extends Application {
         use_time_factor = tfIn;
     }
 
-    public boolean isTrackingRunning() {
-        return trackingRunning;
-    }
-
-    public void setTrackingRunning(boolean trRunIn) {
-        trackingRunning = trRunIn;
-    }
-
     public boolean isAutoCenter() {
         return auto_center;
     }
@@ -87,17 +83,12 @@ public class GlobalVariables extends Application {
         auto_center = auto_center_in;
     }
 
-    public boolean isCollectData() {
-        return collectData;
+    public boolean isCollect_data() {
+        return collect_data;
     }
 
-    public void setCollectData(boolean collectDataIn) {
-        collectData = collectDataIn;
-        collectDataSet = true;
-    }
-
-    public boolean isCollectDataSet() {
-        return collectDataSet;
+    public void setCollect_data(boolean collect_dataIn) {
+        collect_data = collect_dataIn;
     }
 
     public boolean isShow_locationOverlay() {
@@ -130,6 +121,10 @@ public class GlobalVariables extends Application {
 
     public double getsEing() {
         return sEing;
+    }
+
+    public void setOnline_tracking_running (boolean online_tracking_runningIn){
+        online_tracking_running=online_tracking_runningIn;
     }
 
     public void setsEing(double sEingIn) {

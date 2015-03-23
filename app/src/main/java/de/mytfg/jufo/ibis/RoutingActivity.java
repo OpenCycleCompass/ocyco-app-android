@@ -51,6 +51,18 @@ public class RoutingActivity extends ActionBarActivity implements TimePickerFrag
     //self-written classes
     RoutingDatabase mRDb;
     GlobalVariables mGlobalVariables;
+    //Timer for updating the map
+    Handler timerHandler = new Handler();
+    Runnable timerRunnable = new Runnable() {
+
+        @Override
+        public void run() {
+            if (navigate_from_current_position) {
+                lookForStartPosition();
+            }
+            timerHandler.postDelayed(this, 500);
+        }
+    };
     //Views
     private EditText destination_address;
     private EditText start_address;
@@ -72,19 +84,6 @@ public class RoutingActivity extends ActionBarActivity implements TimePickerFrag
     private Location startLocation;
     //shared preferences
     private SharedPreferences settings;
-
-    //Timer for updating the map
-    Handler timerHandler = new Handler();
-    Runnable timerRunnable = new Runnable() {
-
-        @Override
-        public void run() {
-            if (navigate_from_current_position) {
-                lookForStartPosition();
-            }
-            timerHandler.postDelayed(this, 500);
-        }
-    };
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -176,10 +175,8 @@ public class RoutingActivity extends ActionBarActivity implements TimePickerFrag
     public void startFromCurrentPosition(View view) {
         // start tracking service for getting actual position
         navigate_from_current_position = true;
-        if (!mGlobalVariables.isTrackingRunning()) {
-            Intent intent = new Intent(this, Tracking.class);
-            startService(intent);
-        }
+        Intent intent = new Intent(this, Tracking.class);
+        startService(intent);
         start_address.setText(R.string.search_position);
         startLookingForCurrentLocation();
     }

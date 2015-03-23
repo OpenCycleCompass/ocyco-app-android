@@ -94,7 +94,9 @@ public class ShowDataActivity extends ActionBarActivity {
 
         setTextSize();
         updateUI();
-        checkTracking();
+        //start tracking
+        Intent intent = new Intent(this, Tracking.class);
+        startService(intent);
     }
 
     private void setTextSize() {
@@ -114,15 +116,6 @@ public class ShowDataActivity extends ActionBarActivity {
     private void updateUI() {
         Log.i(TAG, "updateUI()");
         timerHandler.postDelayed(timerRunnable, 0);
-    }
-
-    private void checkTracking() {
-        //start tracking, if tracking is not running
-        //happens, when tracking was not started from RoutingActivity
-        if (!mGlobalVariable.isTrackingRunning()) {
-            Intent intent = new Intent(this, Tracking.class);
-            startService(intent);
-        }
     }
 
     private void openAccuracyAlert(boolean confirm) {
