@@ -3,7 +3,6 @@ package de.mytfg.jufo.ibis;
 
 import android.app.Activity;
 import android.app.Dialog;
-
 import android.app.TimePickerDialog;
 import android.os.Bundle;
 import android.support.v4.app.DialogFragment;
@@ -13,6 +12,22 @@ import android.widget.TimePicker;
 import java.util.Calendar;
 
 public class TimePickerFragment extends DialogFragment implements TimePickerDialog.OnTimeSetListener {
+
+    private OnTimePickedListener mOPTListener;
+
+    public void onTimeSet(TimePicker view, int hour, int minute) {
+        this.mOPTListener.onTimePicked(hour, minute);
+    }
+
+    // make sure the Activity implemented it
+    public void onAttach(Activity activity) {
+        super.onAttach(this.getActivity());
+        try {
+            this.mOPTListener = (OnTimePickedListener) activity;
+        } catch (final ClassCastException e) {
+            throw new ClassCastException(activity.toString() + " must implement OnTimePickedListener");
+        }
+    }
 
     @Override
     public Dialog onCreateDialog(Bundle savedInstanceState) {
@@ -27,23 +42,7 @@ public class TimePickerFragment extends DialogFragment implements TimePickerDial
         return tpd;
     }
 
-    public void onTimeSet(TimePicker view, int hour, int minute) {
-        this.mOPTListener.onTimePicked(hour, minute);
-    }
-
     public static interface OnTimePickedListener {
         public abstract void onTimePicked(int hour, int minute);
-    }
-
-    private OnTimePickedListener mOPTListener;
-
-    // make sure the Activity implemented it
-    public void onAttach(Activity activity) {
-        super.onAttach(this.getActivity());
-        try {
-            this.mOPTListener = (OnTimePickedListener) activity;
-        } catch (final ClassCastException e) {
-            throw new ClassCastException(activity.toString() + " must implement OnTimePickedListener");
-        }
     }
 }

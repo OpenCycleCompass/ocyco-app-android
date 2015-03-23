@@ -11,9 +11,9 @@ import android.net.ConnectivityManager;
 import android.net.NetworkInfo;
 import android.net.Uri;
 import android.os.AsyncTask;
+import android.os.Bundle;
 import android.support.v4.app.NotificationCompat;
 import android.support.v7.app.ActionBarActivity;
-import android.os.Bundle;
 import android.text.InputFilter;
 import android.text.Spanned;
 import android.text.format.DateFormat;
@@ -50,9 +50,13 @@ import java.util.Locale;
 
 public class UploadTrackActivity extends ActionBarActivity {
 
+    public static final String data_empty = "[]"; // empty, but valid JSON
+    private String data = data_empty;
     // Log TAG
     protected static final String TAG = "UploadTrackAct-class";
-
+    //shared preferences
+    SharedPreferences prefs;
+    SharedPreferences.Editor prefs_edit;
     private EditText editText_UploadTrackName;
     private EditText editText_UploadTrackCom;
     private EditText editText_UploadTrackDuration;
@@ -62,25 +66,14 @@ public class UploadTrackActivity extends ActionBarActivity {
     private Switch switch_UploadTrackPublic;
     private TextView textView_UploadTrackName;
     private TextView textView_UploadTrackCom;
-
     private Button button_UploadTrack;
     private Button button_DeleteTrack;
     private Button button_UploadTrackTokenRegenerate;
-
-    public static final String data_empty = "[]"; // empty, but valid JSON
-    private String data = data_empty;
     private String token = null;
-
     private long startTst;
     private long stopTst;
     private double length;
-
     private boolean uploadPublic;
-
-    //shared preferences
-    SharedPreferences prefs;
-    SharedPreferences.Editor prefs_edit;
-
     private GPSDatabase mGPSDb;
 
     @Override
@@ -113,19 +106,17 @@ public class UploadTrackActivity extends ActionBarActivity {
         mGPSDb = new GPSDatabase(this.getApplicationContext());
 
         // Only accept a-z, A-Z, "-" and "_" as name
-        editText_UploadTrackName.setFilters(new InputFilter[]{
-                new InputFilter() {
-                    public CharSequence filter(CharSequence src, int start, int end, Spanned dst, int dstart, int dend) {
-                        if (src.equals("")) { // for backspace
-                            return src;
-                        }
-                        if (src.toString().matches("[a-zA-Z_-]+")) {
-                            return src;
-                        }
-                        return "";
-                    }
+        editText_UploadTrackName.setFilters(new InputFilter[]{new InputFilter() {
+            public CharSequence filter(CharSequence src, int start, int end, Spanned dst, int dstart, int dend) {
+                if (src.equals("")) { // for backspace
+                    return src;
                 }
-        });
+                if (src.toString().matches("[a-zA-Z_-]+")) {
+                    return src;
+                }
+                return "";
+            }
+        }});
 
         //receiving intent
         Intent incomingIntent = getIntent();
@@ -141,21 +132,6 @@ public class UploadTrackActivity extends ActionBarActivity {
 
         initUI();
         updateUI();
-    }
-
-    // Update GUI (enable/disable name and comment editText)
-    private void updateUI() {
-        if (!uploadPublic) {
-            editText_UploadTrackName.setEnabled(false);
-            editText_UploadTrackCom.setEnabled(false);
-            textView_UploadTrackName.setEnabled(false);
-            textView_UploadTrackCom.setEnabled(false);
-        } else {
-            editText_UploadTrackName.setEnabled(true);
-            editText_UploadTrackCom.setEnabled(true);
-            textView_UploadTrackName.setEnabled(true);
-            textView_UploadTrackCom.setEnabled(true);
-        }
     }
 
     // Initialize GUI
@@ -199,8 +175,19 @@ public class UploadTrackActivity extends ActionBarActivity {
         editText_UploadTrackDuration.setKeyListener(null);
     }
 
-    private String roundDecimals(double d) {
-        return String.format("%.2f", d);
+    // Update GUI (enable/disable name and comment editText)
+    private void updateUI() {
+        if (!uploadPublic) {
+            editText_UploadTrackName.setEnabled(false);
+            editText_UploadTrackCom.setEnabled(false);
+            textView_UploadTrackName.setEnabled(false);
+            textView_UploadTrackCom.setEnabled(false);
+        } else {
+            editText_UploadTrackName.setEnabled(true);
+            editText_UploadTrackCom.setEnabled(true);
+            textView_UploadTrackName.setEnabled(true);
+            textView_UploadTrackCom.setEnabled(true);
+        }
     }
 
     private String formatTime(double secondsInput) {
@@ -214,6 +201,27 @@ public class UploadTrackActivity extends ActionBarActivity {
         String secondsStrg = putZero(seconds);
         time = hoursStrg + "h " + minutesStrg + "min " + secondsStrg + "s";
         return time;
+    }
+
+    private String roundDecimals(double d) {
+        return String.format("%.2f", d);
+    }
+
+    private void getToken() {
+        String lurl = this.getString(R.string.api1_base_url) + this.getString(R.string.api1_token_new);
+        Log.i(TAG, lurl);
+        ConnectivityManager connMgr = (ConnectivityManager) getSystemService(Context.CONNECTIVITY_SERVICE);
+        NetworkInfo networkInfo = connMgr.getActiveNetworkInfo();
+        if (networkInfo != null && networkInfo.isConnected()) {
+            GetHttpTask getHttpTask = new GetHttpTask();
+            getHttpTask.setType("token");
+            getHttpTask.execute(lurl);
+        } else {
+            Context context = getApplicationContext();
+            int duration = Toast.LENGTH_LONG;
+            Toast toast = Toast.makeText(context, getString(R.string.upload_error_no_network_try_again_later), duration);
+            toast.show();
+        }
     }
 
     //put 0 before value, if != 0 and < 10
@@ -239,25 +247,9 @@ public class UploadTrackActivity extends ActionBarActivity {
         savePublicToPrefs(uploadPublic);
     }
 
-    private String makeUrl() {
-        String lurlstr;
-        Uri.Builder lurl;
-        lurl = Uri.parse(this.getString(R.string.api1_base_url) + this.getString(R.string.api1_pushtrack_new))
-                .buildUpon()
-                .appendQueryParameter("duration", Long.toString(stopTst - startTst))
-                .appendQueryParameter("length", Double.toString(length * 1000))
-                .appendQueryParameter("user_token", token);
-        if (uploadPublic) {
-            lurl.appendQueryParameter("name", editText_UploadTrackName.getText().toString())
-                    .appendQueryParameter("comment", editText_UploadTrackCom.getText().toString())
-                    .appendQueryParameter("public", "true");
-        } else {
-            lurl.appendQueryParameter("name", "none")
-                    .appendQueryParameter("comment", "none")
-                    .appendQueryParameter("public", "false");
-        }
-        lurlstr = lurl.build().toString();
-        return lurlstr;
+    private void savePublicToPrefs(Boolean p) {
+        prefs_edit.putBoolean("upload_public", p);
+        prefs_edit.apply();
     }
 
     @Override
@@ -294,23 +286,6 @@ public class UploadTrackActivity extends ActionBarActivity {
         getToken();
     }
 
-    private void getToken() {
-        String lurl = this.getString(R.string.api1_base_url) + this.getString(R.string.api1_token_new);
-        Log.i(TAG, lurl);
-        ConnectivityManager connMgr = (ConnectivityManager) getSystemService(Context.CONNECTIVITY_SERVICE);
-        NetworkInfo networkInfo = connMgr.getActiveNetworkInfo();
-        if (networkInfo != null && networkInfo.isConnected()) {
-            GetHttpTask getHttpTask = new GetHttpTask();
-            getHttpTask.setType("token");
-            getHttpTask.execute(lurl);
-        } else {
-            Context context = getApplicationContext();
-            int duration = Toast.LENGTH_LONG;
-            Toast toast = Toast.makeText(context, getString(R.string.upload_error_no_network_try_again_later), duration);
-            toast.show();
-        }
-    }
-
     // Upload Track
     public void uploadTrack(View v) {
         // Disable Button to prevent multiple uploads
@@ -333,19 +308,18 @@ public class UploadTrackActivity extends ActionBarActivity {
         }
     }
 
-    public void deleteTrack() {
-        //delete track
-        mGPSDb.open();
-        mGPSDb.deleteData();
-        mGPSDb.close();
-        //show Toast
-        Toast toast = Toast.makeText(getApplicationContext(), getString(R.string.upload_track_deleted), Toast.LENGTH_LONG);
-        toast.show();
-        //go back to MainActivity
-        Intent intent = new Intent(this, MainActivity.class);
-        startActivity(intent);
+    private String makeUrl() {
+        String lurlstr;
+        Uri.Builder lurl;
+        lurl = Uri.parse(this.getString(R.string.api1_base_url) + this.getString(R.string.api1_pushtrack_new)).buildUpon().appendQueryParameter("duration", Long.toString(stopTst - startTst)).appendQueryParameter("length", Double.toString(length * 1000)).appendQueryParameter("user_token", token);
+        if (uploadPublic) {
+            lurl.appendQueryParameter("name", editText_UploadTrackName.getText().toString()).appendQueryParameter("comment", editText_UploadTrackCom.getText().toString()).appendQueryParameter("public", "true");
+        } else {
+            lurl.appendQueryParameter("name", "none").appendQueryParameter("comment", "none").appendQueryParameter("public", "false");
+        }
+        lurlstr = lurl.build().toString();
+        return lurlstr;
     }
-
 
     // Given a URL, establishes an HttpUrlConnection and retrieves
     // the web page content as a InputStream, which it returns as
@@ -359,8 +333,8 @@ public class UploadTrackActivity extends ActionBarActivity {
         try {
             URL url = new URL(lurlstr);
             HttpURLConnection conn = (HttpURLConnection) url.openConnection();
-            conn.setReadTimeout(3000 /* milliseconds */);
-            conn.setConnectTimeout(5000 /* milliseconds */);
+            conn.setReadTimeout(30000 /* milliseconds */);
+            conn.setConnectTimeout(50000 /* milliseconds */);
             Log.i(TAG, "Old User-Agent: " + conn.getRequestProperty("User-Agent"));
             conn.setRequestProperty("User-Agent", "iBis app");
             Log.i(TAG, "New User-Agent: " + conn.getRequestProperty("User-Agent"));
@@ -379,8 +353,7 @@ public class UploadTrackActivity extends ActionBarActivity {
                 params.add(new BasicNameValuePair("data", ldata));
 
                 OutputStream os = conn.getOutputStream();
-                BufferedWriter writer = new BufferedWriter(
-                        new OutputStreamWriter(os, "UTF-8"));
+                BufferedWriter writer = new BufferedWriter(new OutputStreamWriter(os, "UTF-8"));
 
                 String post = getQuery(params);
                 Log.i(TAG, "POST string: " + post);
@@ -415,10 +388,8 @@ public class UploadTrackActivity extends ActionBarActivity {
         boolean first = true;
 
         for (NameValuePair pair : params) {
-            if (first)
-                first = false;
-            else
-                result.append("&");
+            if (first) first = false;
+            else result.append("&");
 
             result.append(URLEncoder.encode(pair.getName(), "UTF-8"));
             result.append("=");
@@ -437,6 +408,61 @@ public class UploadTrackActivity extends ActionBarActivity {
         return new String(buffer);
     }
 
+    private String getDate(long timestamp) {
+        Calendar calendar = Calendar.getInstance(Locale.ENGLISH);
+        calendar.setTimeInMillis(timestamp * 1000);
+        return DateFormat.format("dd. MM. yyyy, HH:mm", calendar).toString() + "h";
+    }
+
+    private void saveToken(String t) {
+        token = t;
+        if (prefs.contains("upload_token")) {
+            String old_token = prefs.getString("upload_token", "");
+            String old_tokenlist = prefs.getString("upload_oldtokenlist", "");
+            prefs_edit.putString("upload_oldtokenlist", old_tokenlist + ";" + old_token);
+        }
+        prefs_edit.putString("upload_token", t);
+        prefs_edit.apply();
+    }
+
+    public void openDeleteTrackAlert(View view) {
+        //set up a new alert dialog
+        AlertDialog.Builder alertDialogBuilder = new AlertDialog.Builder(UploadTrackActivity.this);
+        alertDialogBuilder.setTitle("Wirklich löschen?");
+        alertDialogBuilder.setMessage("Möchten sie den aufgezeichneten Track wirklich löschen?");
+
+        //create the OK Button and onClickListener
+        alertDialogBuilder.setPositiveButton("Ja", new DialogInterface.OnClickListener() {
+            //close dialog when clicked
+            public void onClick(DialogInterface dialog, int id) {
+                deleteTrack();
+                dialog.cancel();
+            }
+        });
+        //create the cancel Button and onClickListener
+        alertDialogBuilder.setNegativeButton("Nein", new DialogInterface.OnClickListener() {
+            //close dialog when clicked
+            public void onClick(DialogInterface dialog, int id) {
+                dialog.cancel();
+            }
+        });
+        //create and show alert dialog
+        AlertDialog alertDialog = alertDialogBuilder.create();
+        alertDialog.show();
+    }
+
+    public void deleteTrack() {
+        //delete track
+        mGPSDb.open();
+        mGPSDb.deleteData();
+        mGPSDb.close();
+        //show Toast
+        Toast toast = Toast.makeText(getApplicationContext(), getString(R.string.upload_track_deleted), Toast.LENGTH_LONG);
+        toast.show();
+        //go back to MainActivity
+        Intent intent = new Intent(this, MainActivity.class);
+        startActivity(intent);
+    }
 
     private class GetHttpTask extends AsyncTask<String, Void, String> {
         String type = "";
@@ -531,18 +557,11 @@ public class UploadTrackActivity extends ActionBarActivity {
                         // Create notification
                         Intent intentIbisWeb = new Intent(Intent.ACTION_VIEW, Uri.parse("https://ibis.jufo.mytfg.de/map.php"));
                         PendingIntent pIntentIbisWeb = PendingIntent.getActivity(getApplicationContext(), 0, intentIbisWeb, 0);
-                        NotificationCompat.Builder mBuilder =
-                                new NotificationCompat.Builder(getBaseContext())
-                                        .setContentIntent(pIntentIbisWeb)
-                                        .setSmallIcon(R.mipmap.ic_launcher)
-                                        .setContentTitle(getString(R.string.app_name_short) + getString(R.string.trackUploaded))
-                                        .setContentText(notification)
-                                        .setStyle(new NotificationCompat.BigTextStyle().bigText(notification));
+                        NotificationCompat.Builder mBuilder = new NotificationCompat.Builder(getBaseContext()).setContentIntent(pIntentIbisWeb).setSmallIcon(R.mipmap.ic_launcher).setContentTitle(getString(R.string.app_name_short) + getString(R.string.trackUploaded)).setContentText(notification).setStyle(new NotificationCompat.BigTextStyle().bigText(notification));
                         // Sets an ID for the notification
                         int mNotificationId = 43;
                         // Gets an instance of the NotificationManager service
-                        NotificationManager mNotifyMgr =
-                                (NotificationManager) getSystemService(NOTIFICATION_SERVICE);
+                        NotificationManager mNotifyMgr = (NotificationManager) getSystemService(NOTIFICATION_SERVICE);
                         // Builds the notification and issues it.
                         mNotifyMgr.notify(mNotificationId, mBuilder.build());
 
@@ -555,54 +574,6 @@ public class UploadTrackActivity extends ActionBarActivity {
                     break;
             }
         }
-    }
-
-    private String getDate(long timestamp) {
-        Calendar calendar = Calendar.getInstance(Locale.ENGLISH);
-        calendar.setTimeInMillis(timestamp * 1000);
-        return DateFormat.format("dd. MM. yyyy, HH:mm", calendar).toString() + "h";
-    }
-
-    private void saveToken(String t) {
-        token = t;
-        if (prefs.contains("upload_token")) {
-            String old_token = prefs.getString("upload_token", "");
-            String old_tokenlist = prefs.getString("upload_oldtokenlist", "");
-            prefs_edit.putString("upload_oldtokenlist", old_tokenlist + ";" + old_token);
-        }
-        prefs_edit.putString("upload_token", t);
-        prefs_edit.apply();
-    }
-
-    private void savePublicToPrefs(Boolean p) {
-        prefs_edit.putBoolean("upload_public", p);
-        prefs_edit.apply();
-    }
-
-    public void openDeleteTrackAlert(View view) {
-        //set up a new alert dialog
-        AlertDialog.Builder alertDialogBuilder = new AlertDialog.Builder(UploadTrackActivity.this);
-        alertDialogBuilder.setTitle("Wirklich löschen?");
-        alertDialogBuilder.setMessage("Möchten sie den aufgezeichneten Track wirklich löschen?");
-
-        //create the OK Button and onClickListener
-        alertDialogBuilder.setPositiveButton("Ja", new DialogInterface.OnClickListener() {
-            //close dialog when clicked
-            public void onClick(DialogInterface dialog, int id) {
-                deleteTrack();
-                dialog.cancel();
-            }
-        });
-        //create the cancel Button and onClickListener
-        alertDialogBuilder.setNegativeButton("Nein", new DialogInterface.OnClickListener() {
-            //close dialog when clicked
-            public void onClick(DialogInterface dialog, int id) {
-                dialog.cancel();
-            }
-        });
-        //create and show alert dialog
-        AlertDialog alertDialog = alertDialogBuilder.create();
-        alertDialog.show();
     }
 }
 

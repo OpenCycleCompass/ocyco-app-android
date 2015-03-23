@@ -1,9 +1,13 @@
 package de.mytfg.jufo.ibis;
 
+import android.app.AlertDialog;
+import android.content.Context;
+import android.content.DialogInterface;
 import android.content.Intent;
+import android.content.SharedPreferences;
+import android.os.Bundle;
 import android.os.Handler;
 import android.support.v7.app.ActionBarActivity;
-import android.os.Bundle;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
@@ -11,11 +15,20 @@ import android.widget.Button;
 
 public class MainActivity extends ActionBarActivity {
 
+    GlobalVariables mGlobalVars;
+    //Timer for updating the map
+    Handler timerHandler = new Handler();
+    Runnable timerRunnable = new Runnable() {
+
+        @Override
+        public void run() {
+            enableButtons();
+            timerHandler.postDelayed(this, 500);
+        }
+    };
     //views
     private Button stop_tracking_button;
     private Button start_tracking_button;
-
-    GlobalVariables mGlobalVars;
 
     public void openSettings(View view) {
         Intent intent = new Intent(this, SettingsActivity.class);
@@ -28,36 +41,46 @@ public class MainActivity extends ActionBarActivity {
     }
 
     public void onClickStartTracking(View view) {
-        if (!mGlobalVars.isTrackingRunning()) {
-            mGlobalVars.setCollectData(true);
+        if (mGlobalVars.isCollect_data()) {
             enableButtons();
             Intent intent = new Intent(this, Tracking.class);
             startService(intent);
         }
+        else {
+            openAlert();
+        }
     }
 
-    //Timer for updating the map
-    Handler timerHandler = new Handler();
-    Runnable timerRunnable = new Runnable() {
+    private void openAlert() {
+        //set up a new alert dialog
+        AlertDialog.Builder alertDialogBuilder = new AlertDialog.Builder(MainActivity.this);
+        alertDialogBuilder.setTitle("Einstellungen ändern!");
+        alertDialogBuilder.setMessage("Bitte stimmen Sie in den Einstellungen dem Sammeln von Nutzerdaten zu!");
 
-        @Override
-        public void run() {
-            enableButtons();
-            timerHandler.postDelayed(this, 500);
-        }
-    };
+        //create the OK Button and onClickListener
+        alertDialogBuilder.setPositiveButton("OK", new DialogInterface.OnClickListener() {
+            //close dialog when clicked
+            public void onClick(DialogInterface dialog, int id) {
+                dialog.cancel();
+            }
+        });
+        //create and show alert dialog
+        AlertDialog alertDialog = alertDialogBuilder.create();
+        alertDialog.show();
+    }
 
-    public void startUIUpdates() {
-        timerHandler.postDelayed(timerRunnable, 0);
+    private void enableButtons() {
+        //enable buttons - status of trackingRunning is not even changed,
+        //when this statement is executed!
+        start_tracking_button.setEnabled(!mGlobalVars.isOnline_tracking_running());
+        stop_tracking_button.setEnabled(mGlobalVars.isOnline_tracking_running());
     }
 
     public void onClickStopTracking(View view) {
-        if (mGlobalVars.isTrackingRunning()) {
-            mGlobalVars.setCollectData(false);
-            enableButtons();
-            Intent intent = new Intent(this, Tracking.class);
-            startService(intent);
-        }
+        enableButtons();
+        Intent intent = new Intent(this, Tracking.class);
+        intent.putExtra("stopOnlineTracking", true);
+        startService(intent);
     }
 
     @Override
@@ -65,19 +88,19 @@ public class MainActivity extends ActionBarActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
         // initialize
+        // Restore preferences
         mGlobalVars = (GlobalVariables) getApplicationContext();
+        SharedPreferences settings = getSharedPreferences(getString(R.string.preference_file_key), Context.MODE_PRIVATE);
+        //get variables and set to global class
+        mGlobalVars.setCollect_data(settings.getBoolean("CollectData", false));
         start_tracking_button = (Button) findViewById(R.id.button_start_tracking);
         stop_tracking_button = (Button) findViewById(R.id.button_stop_tracking);
         startUIUpdates();
     }
 
-    private void enableButtons() {
-        //enable buttons - status of trackingRunning is not even changed,
-        //when this statement is executed!
-        start_tracking_button.setEnabled(!mGlobalVars.isTrackingRunning());
-        stop_tracking_button.setEnabled(mGlobalVars.isTrackingRunning());
+    public void startUIUpdates() {
+        timerHandler.postDelayed(timerRunnable, 0);
     }
-
 
     @Override
     public boolean onCreateOptionsMenu(Menu menu) {

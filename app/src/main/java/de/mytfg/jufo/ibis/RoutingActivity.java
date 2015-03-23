@@ -10,10 +10,10 @@ import android.net.ConnectivityManager;
 import android.net.NetworkInfo;
 import android.net.Uri;
 import android.os.AsyncTask;
+import android.os.Bundle;
 import android.os.Handler;
 import android.support.v4.app.DialogFragment;
 import android.support.v7.app.ActionBarActivity;
-import android.os.Bundle;
 import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
@@ -48,6 +48,21 @@ public class RoutingActivity extends ActionBarActivity implements TimePickerFrag
 
     //LOG Tag
     private final static String TAG = "RoutingActivity-class";
+    //self-written classes
+    RoutingDatabase mRDb;
+    GlobalVariables mGlobalVariables;
+    //Timer for updating the map
+    Handler timerHandler = new Handler();
+    Runnable timerRunnable = new Runnable() {
+
+        @Override
+        public void run() {
+            if (navigate_from_current_position) {
+                lookForStartPosition();
+            }
+            timerHandler.postDelayed(this, 500);
+        }
+    };
     //Views
     private EditText destination_address;
     private EditText start_address;
@@ -62,9 +77,6 @@ public class RoutingActivity extends ActionBarActivity implements TimePickerFrag
     private Switch switch_manuelDistance;
     private Switch switch_userData;
     private Switch switch_timeFactor;
-    //self-written classes
-    RoutingDatabase mRDb;
-    GlobalVariables mGlobalVariables;
     //vars
     private double tAnkEingTime;
     private boolean manuel_distance, routing_with_user_data, navigate_from_current_position = false;
@@ -72,7 +84,6 @@ public class RoutingActivity extends ActionBarActivity implements TimePickerFrag
     private Location startLocation;
     //shared preferences
     private SharedPreferences settings;
-
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -101,8 +112,7 @@ public class RoutingActivity extends ActionBarActivity implements TimePickerFrag
         mRDb.close();
         // configure select_route_type spinner
         selectRouteType = (Spinner) findViewById(R.id.select_route_type);
-        ArrayAdapter<CharSequence> adapter = ArrayAdapter.createFromResource(this,
-                R.array.route_types, android.R.layout.simple_spinner_item);
+        ArrayAdapter<CharSequence> adapter = ArrayAdapter.createFromResource(this, R.array.route_types, android.R.layout.simple_spinner_item);
         adapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
         selectRouteType.setAdapter(adapter);
         selectRouteType.setOnItemSelectedListener(this);
@@ -113,6 +123,7 @@ public class RoutingActivity extends ActionBarActivity implements TimePickerFrag
         destination_address.setText(settings.getString("dest_string", ""));
         //call updateUI()
         updateUI();
+
         //set onFocusListener
         start_address.setOnFocusChangeListener(new View.OnFocusChangeListener() {
             @Override
@@ -136,34 +147,42 @@ public class RoutingActivity extends ActionBarActivity implements TimePickerFrag
         editor.apply();
     }
 
-    private void openAlert(String missing_value) {
-        //set up a new alert dialog
-        AlertDialog.Builder alertDialogBuilder = new AlertDialog.Builder(RoutingActivity.this);
-        alertDialogBuilder.setTitle("Fehler!");
-        alertDialogBuilder.setMessage("Sie haben keine " + missing_value + " eingegeben!");
-
-        //create the OK Button and onClickListener
-        alertDialogBuilder.setPositiveButton("OK", new DialogInterface.OnClickListener() {
-            //close dialog when clicked
-            public void onClick(DialogInterface dialog, int id) {
-                dialog.cancel();
-            }
-        });
-        //create and show alert dialog
-        AlertDialog alertDialog = alertDialogBuilder.create();
-        alertDialog.show();
+    private void updateUI() {
+        //enable / disable UI elements
+        if (manuel_distance) {
+            start_address.setEnabled(false);
+            destination_address.setEnabled(false);
+            editDistance.setEnabled(true);
+            start_navigation.setEnabled(true);
+            generate_route.setEnabled(false);
+            start_from_current_position.setEnabled(false);
+            switch_userData.setChecked(false);
+            switch_userData.setEnabled(false);
+            switch_timeFactor.setChecked(false);
+            switch_timeFactor.setEnabled(false);
+        } else {
+            start_address.setEnabled(true);
+            destination_address.setEnabled(true);
+            editDistance.setEnabled(false);
+            start_navigation.setEnabled(false);
+            generate_route.setEnabled(true);
+            start_from_current_position.setEnabled(true);
+            switch_userData.setEnabled(true);
+            switch_timeFactor.setEnabled(true);
+        }
     }
-
 
     public void startFromCurrentPosition(View view) {
         // start tracking service for getting actual position
         navigate_from_current_position = true;
-        if (!mGlobalVariables.isTrackingRunning()) {
-            Intent intent = new Intent(this, Tracking.class);
-            startService(intent);
-        }
+        Intent intent = new Intent(this, Tracking.class);
+        startService(intent);
         start_address.setText(R.string.search_position);
         startLookingForCurrentLocation();
+    }
+
+    private void startLookingForCurrentLocation() {
+        timerHandler.postDelayed(timerRunnable, 0);
     }
 
     private void lookForStartPosition() {
@@ -178,24 +197,6 @@ public class RoutingActivity extends ActionBarActivity implements TimePickerFrag
             //nothing
         }
     }
-
-    //Timer for updating the map
-    Handler timerHandler = new Handler();
-    Runnable timerRunnable = new Runnable() {
-
-        @Override
-        public void run() {
-            if (navigate_from_current_position) {
-                lookForStartPosition();
-            }
-            timerHandler.postDelayed(this, 500);
-        }
-    };
-
-    private void startLookingForCurrentLocation() {
-        timerHandler.postDelayed(timerRunnable, 0);
-    }
-
 
     public void onClickGenerateRoute(View view) {
         Log.i(TAG, "onClickGenerateRoute");
@@ -220,6 +221,21 @@ public class RoutingActivity extends ActionBarActivity implements TimePickerFrag
             toast.show();
         }
         showLoadingAnimation();
+    }
+
+    private String makeUrl(String StartAddress, String DestinationAddress) {
+        Log.i(TAG, "makeURL");
+        String optimize = (routing_with_user_data) ? "1" : "0";
+        String lurlstr;
+        Uri.Builder lurl;
+        if (navigate_from_current_position) {
+            lurl = Uri.parse(this.getString(R.string.api1_base_url) + this.getString(R.string.api1_get_route)).buildUpon().appendQueryParameter("start_lat", startLocation.getLatitude() + "").appendQueryParameter("start_lon", startLocation.getLongitude() + "").appendQueryParameter("end", DestinationAddress).appendQueryParameter("optimize", optimize).appendQueryParameter("profile", route_type);
+        } else {
+            lurl = Uri.parse(this.getString(R.string.api1_base_url) + this.getString(R.string.api1_get_route)).buildUpon().appendQueryParameter("start", StartAddress).appendQueryParameter("end", DestinationAddress).appendQueryParameter("optimize", optimize).appendQueryParameter("profile", route_type);
+        }
+        lurlstr = lurl.build().toString();
+        Log.i(TAG, lurlstr);
+        return lurlstr;
     }
 
     private void showLoadingAnimation() {
@@ -299,31 +315,6 @@ public class RoutingActivity extends ActionBarActivity implements TimePickerFrag
         mGlobalVariables.setUseTimeFactor(switch_timeFactor.isChecked());
     }
 
-    private void updateUI() {
-        //enable / disable UI elements
-        if (manuel_distance) {
-            start_address.setEnabled(false);
-            destination_address.setEnabled(false);
-            editDistance.setEnabled(true);
-            start_navigation.setEnabled(true);
-            generate_route.setEnabled(false);
-            start_from_current_position.setEnabled(false);
-            switch_userData.setChecked(false);
-            switch_userData.setEnabled(false);
-            switch_timeFactor.setChecked(false);
-            switch_timeFactor.setEnabled(false);
-        } else {
-            start_address.setEnabled(true);
-            destination_address.setEnabled(true);
-            editDistance.setEnabled(false);
-            start_navigation.setEnabled(false);
-            generate_route.setEnabled(true);
-            start_from_current_position.setEnabled(true);
-            switch_userData.setEnabled(true);
-            switch_timeFactor.setEnabled(true);
-        }
-    }
-
     public void onClickStartNavigation(View view) {
         boolean distanceExc = false;
         boolean timeExc = false;
@@ -362,14 +353,22 @@ public class RoutingActivity extends ActionBarActivity implements TimePickerFrag
         }
     }
 
-    // Reads an InputStream and converts it to a String.
-    public String readIt(InputStream stream, int len) throws IOException {
-        Log.i(TAG, "readIt");
-        Reader reader;
-        reader = new InputStreamReader(stream, "UTF-8");
-        char[] buffer = new char[len];
-        reader.read(buffer);
-        return new String(buffer);
+    private void openAlert(String missing_value) {
+        //set up a new alert dialog
+        AlertDialog.Builder alertDialogBuilder = new AlertDialog.Builder(RoutingActivity.this);
+        alertDialogBuilder.setTitle("Fehler!");
+        alertDialogBuilder.setMessage("Sie haben keine " + missing_value + " eingegeben!");
+
+        //create the OK Button and onClickListener
+        alertDialogBuilder.setPositiveButton("OK", new DialogInterface.OnClickListener() {
+            //close dialog when clicked
+            public void onClick(DialogInterface dialog, int id) {
+                dialog.cancel();
+            }
+        });
+        //create and show alert dialog
+        AlertDialog alertDialog = alertDialogBuilder.create();
+        alertDialog.show();
     }
 
     @Override
@@ -390,6 +389,88 @@ public class RoutingActivity extends ActionBarActivity implements TimePickerFrag
     public void onNothingSelected(AdapterView<?> parent) {
         // nothing
 
+    }
+
+    // Given a URL, establishes an HttpUrlConnection and retrieves
+    // the web page content as a InputStream, which it returns as
+    // a string.
+    private String getUrl(String lurlstr) throws IOException {
+        Log.i(TAG, "getURL");
+        InputStream stream = null;
+        // Only display the first 10 000 000 characters of the retrieved
+        // web page content.
+        final int len = 10000000;
+
+        try {
+            URL url = new URL(lurlstr);
+            HttpURLConnection conn = (HttpURLConnection) url.openConnection();
+            conn.setReadTimeout(30000 /* milliseconds */);
+            conn.setConnectTimeout(5000 /* milliseconds */);
+            Log.i(TAG, "Old User-Agent: " + conn.getRequestProperty("User-Agent"));
+            conn.setRequestProperty("User-Agent", "iBis app");
+            Log.i(TAG, "New User-Agent: " + conn.getRequestProperty("User-Agent"));
+
+            // Get returned body from webserver:
+            conn.setDoInput(true);
+            conn.setRequestMethod("GET");
+
+            // Starts the connection
+            conn.connect();
+            Log.i(TAG, "getUrl(): Response Code: " + conn.getResponseCode());
+            stream = conn.getInputStream();
+
+            // Convert the InputStream into a string
+            return readIt(stream, len);
+
+            // Makes sure that the InputStream is closed after the app is
+            // finished using it.
+        } finally {
+            if (stream != null) {
+                stream.close();
+            }
+        }
+    }
+
+    // Reads an InputStream and converts it to a String.
+    public String readIt(InputStream stream, int len) throws IOException {
+        Log.i(TAG, "readIt");
+        Reader reader;
+        reader = new InputStreamReader(stream, "UTF-8");
+        char[] buffer = new char[len];
+        reader.read(buffer);
+        return new String(buffer);
+    }
+
+    @Override
+    public boolean onCreateOptionsMenu(Menu menu) {
+        // Inflate the menu; this adds items to the action bar if it is present.
+        getMenuInflater().inflate(R.menu.menu_routing, menu);
+        return true;
+    }
+
+    @Override
+    public boolean onOptionsItemSelected(MenuItem item) {
+        // Handle item selection
+        switch (item.getItemId()) {
+            case R.id.action_settings:
+                Intent intent_settings = new Intent(this, SettingsActivity.class);
+                startActivity(intent_settings);
+                return true;
+            case R.id.action_show_data_activity:
+                Intent intent_showData = new Intent(this, ShowDataActivity.class);
+                startActivity(intent_showData);
+                return true;
+            case R.id.action_MainActivity:
+                Intent intent_main = new Intent(this, MainActivity.class);
+                startActivity(intent_main);
+                return true;
+            case R.id.action_info:
+                Intent intent_info = new Intent(this, InfoActivity.class);
+                startActivity(intent_info);
+                return true;
+            default:
+                return super.onOptionsItemSelected(item);
+        }
     }
 
     private class GetHttpTask extends AsyncTask<String, Void, String> {
@@ -465,105 +546,6 @@ public class RoutingActivity extends ActionBarActivity implements TimePickerFrag
                 toast.show();
             }
             removeLoadingAnimation();
-        }
-    }
-
-    // Given a URL, establishes an HttpUrlConnection and retrieves
-    // the web page content as a InputStream, which it returns as
-    // a string.
-    private String getUrl(String lurlstr) throws IOException {
-        Log.i(TAG, "getURL");
-        InputStream stream = null;
-        // Only display the first 10 000 000 characters of the retrieved
-        // web page content.
-        final int len = 10000000;
-
-        try {
-            URL url = new URL(lurlstr);
-            HttpURLConnection conn = (HttpURLConnection) url.openConnection();
-            conn.setReadTimeout(10000 /* milliseconds */);
-            conn.setConnectTimeout(5000 /* milliseconds */);
-            Log.i(TAG, "Old User-Agent: " + conn.getRequestProperty("User-Agent"));
-            conn.setRequestProperty("User-Agent", "iBis app");
-            Log.i(TAG, "New User-Agent: " + conn.getRequestProperty("User-Agent"));
-
-            // Get returned body from webserver:
-            conn.setDoInput(true);
-            conn.setRequestMethod("GET");
-
-            // Starts the connection
-            conn.connect();
-            Log.i(TAG, "getUrl(): Response Code: " + conn.getResponseCode());
-            stream = conn.getInputStream();
-
-            // Convert the InputStream into a string
-            return readIt(stream, len);
-
-            // Makes sure that the InputStream is closed after the app is
-            // finished using it.
-        } finally {
-            if (stream != null) {
-                stream.close();
-            }
-        }
-    }
-
-    private String makeUrl(String StartAddress, String DestinationAddress) {
-        Log.i(TAG, "makeURL");
-        String optimize = (routing_with_user_data) ? "1" : "0";
-        String lurlstr;
-        Uri.Builder lurl;
-        if (navigate_from_current_position) {
-            lurl = Uri.parse(this.getString(R.string.api1_base_url) + this.getString(R.string.api1_get_route))
-                    .buildUpon()
-                    .appendQueryParameter("start_lat", startLocation.getLatitude() + "")
-                    .appendQueryParameter("start_lon", startLocation.getLongitude() + "")
-                    .appendQueryParameter("end", DestinationAddress)
-                    .appendQueryParameter("optimize", optimize)
-                    .appendQueryParameter("profile", route_type);
-        } else {
-            lurl = Uri.parse(this.getString(R.string.api1_base_url) + this.getString(R.string.api1_get_route))
-                    .buildUpon()
-                    .appendQueryParameter("start", StartAddress)
-                    .appendQueryParameter("end", DestinationAddress)
-                    .appendQueryParameter("optimize", optimize)
-                    .appendQueryParameter("profile", route_type);
-        }
-        lurlstr = lurl.build().toString();
-        Log.i(TAG, lurlstr);
-        return lurlstr;
-    }
-
-
-    @Override
-    public boolean onCreateOptionsMenu(Menu menu) {
-        // Inflate the menu; this adds items to the action bar if it is present.
-        getMenuInflater().inflate(R.menu.menu_routing, menu);
-        return true;
-    }
-
-    @Override
-    public boolean onOptionsItemSelected(MenuItem item) {
-        // Handle item selection
-        switch (item.getItemId()) {
-            case R.id.action_settings:
-                Intent intent_settings = new Intent(this, SettingsActivity.class);
-                startActivity(intent_settings);
-                return true;
-            case R.id.action_show_data_activity:
-                Intent intent_showData = new Intent(this, ShowDataActivity.class);
-                startActivity(intent_showData);
-                return true;
-            case R.id.action_MainActivity:
-                Intent intent_main = new Intent(this, MainActivity.class);
-                startActivity(intent_main);
-                return true;
-            case R.id.action_info:
-                Intent intent_info = new Intent(this, InfoActivity.class);
-                startActivity(intent_info);
-                return true;
-            default:
-                return super.onOptionsItemSelected(item);
         }
     }
 }

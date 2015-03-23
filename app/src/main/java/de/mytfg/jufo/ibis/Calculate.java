@@ -1,59 +1,80 @@
 package de.mytfg.jufo.ibis;
 
 import android.location.Location;
-import android.util.Log;
 
 import java.util.Calendar;
 
 public class Calculate {
 
-    //location vars
+    // Durchschnittsgeschwindigkeit
+    // distance
+    double sEing; // eingegebene Strecke
+    double lastDistance;
+    double dateInMilliseconds;
+    // location vars
     private Location firstLoc;
     private Location oldLoc;
     private Location newLoc;
-
-    //calculation and output vars
-    //speed
-    private double vD; //Durchschnittsgeschwindikeit
-    private double vAkt; //aktuelle Geschwindigkeit
-    private double vDMuss; //notwendige Durchscnittsgeschwindigkeit, um am vorgegebenen Zeitpunkt das Ziel zu erreichen
-    private double vDunt; // Unterschied zwischen aktueller- und notwendiger Durchschnittsgeschwindigkeit
-    //distance
-    double sEing; //eingegebene Strecke
-    private double sGef; //gefahrene Strecke
-    private double sZuf; //zu fahrende Strecke
-    double lastDistance;
-    //time
-    private double tGef; //gefahrene Zeit
-    private double tZuf; //zu fahrende Zeit
+    // calculation and output vars
+    // speed
+    private double vD; // Durchschnittsgeschwindikeit
+    private double vAkt; // aktuelle Geschwindigkeit
+    private double vDMuss; // notwendige Durchscnittsgeschwindigkeit, um am vorgegebenen Zeitpunkt
+    // das Ziel zu erreichen
+    private double vDunt; // Unterschied zwischen aktueller- und notwendiger
+    private double sGef; // gefahrene Strecke
+    private double sZuf; // zu fahrende Strecke
+    // time
+    private double tGef; // gefahrene Zeit
+    private double tZuf; // zu fahrende Zeit
     private double tAkt; // aktuelle Zeit
     private double tAnk; // Ankunftszeit
-    private double tAnkEing; //Eingegebene, gewünschte Ankunftszeit
-    private double tAnkUnt; //Unterschied zwischen realer und gewünschter Ankunftszeit
-
-    double dateInMilliseconds;
+    private double tAnkEing; // Eingegebene, gewünschte Ankunftszeit
+    private double tAnkUnt; // Unterschied zwischen realer und gewünschter Ankunftszeit
 
     public void getData(Location location, Double sEingInput) {
-        //get location
+        // get location
         oldLoc = newLoc;
         newLoc = location;
         if (oldLoc == null) {
             firstLoc = location;
         }
-        //get distance, convert to km
-        sEing = sEingInput/1000d;
+        // get distance, is already in km!
+        sEing = sEingInput;
     }
 
     public boolean checkFirstLoc() {
         return (oldLoc == null);
     }
 
+    public void calculateTimeVars(double tAnkEingTimeInput) {
+        // get date in milliseconds
+        final Calendar c = Calendar.getInstance();
+        int current_hour = c.get(Calendar.HOUR_OF_DAY);
+        int current_minute = c.get(Calendar.MINUTE);
+        double milliSeconds = System.currentTimeMillis();
+        double timeInMillis = ((current_hour * 60d + current_minute) * 60d * 1000d);
+        dateInMilliseconds = (milliSeconds - timeInMillis);
+        // add date to time
+        tAnkEing = (((tAnkEingTimeInput + dateInMilliseconds) / 1000d) / 60d) / 60d;
+        // get actual time in hours
+        tAkt = (((timeInMillis + dateInMilliseconds) / 1000d) / 60d) / 60d;
+    }
+
+    public void calculateDrivenDistance(double dist) {
+        sGef = dist / 1000d;
+    }
+
+    public void calculateDrivenTime() {
+        // calculate driven time and convert to hours
+        tGef = ((newLoc.getTime() - firstLoc.getTime()) / 1000d / 60d / 60d);
+    }
 
     public void calculateSpeed() {
         if (newLoc.hasSpeed()) {
             vAkt = (newLoc.getSpeed()) * 3.6;
         } else {
-            //time difference between last GPS points in hours
+            // time difference between last GPS points in hours
             double oldTime = oldLoc.getTime();
             double newTime = newLoc.getTime();
             double timeDiff = (((newTime - oldTime) / 1000d) / 60d) / 60d;
@@ -61,55 +82,28 @@ public class Calculate {
         }
     }
 
-    public void calculateTimeVars(double tAnkEingTimeInput) {
-        Log.i("timeVars", "tAnkEing:" + tAnkEingTimeInput);
-        //get date in milliseconds
-        final Calendar c = Calendar.getInstance();
-        int current_hour = c.get(Calendar.HOUR_OF_DAY);
-        int current_minute = c.get(Calendar.MINUTE);
-        double milliSeconds = System.currentTimeMillis();
-        double timeInMillis = ((current_hour * 60d + current_minute) * 60d * 1000d);
-        Log.i("timeVars", "timeInMs:" + timeInMillis);
-        dateInMilliseconds = (milliSeconds - timeInMillis);
-        Log.i("timeVars", "dateInMs:" + dateInMilliseconds);
-        //add date to time
-        tAnkEing = (((tAnkEingTimeInput + dateInMilliseconds) / 1000d) / 60d) / 60d;
-        //get actual time in hours
-        tAkt = (((timeInMillis + dateInMilliseconds) / 1000d) / 60d) / 60d;
-    }
-
-    public void calculateDrivenDistance(double dist) {
-        sGef = dist/1000d;
-    }
-
-    public void calculateDrivenTime() {
-        //calculate driven time and convert to hours
-        Log.i("TimeCalc", "newLocTime" + newLoc.getTime() + "firstLocTime" + firstLoc.getTime());
-        tGef = ((newLoc.getTime() - firstLoc.getTime()) / 1000d / 60d / 60d);
-    }
-
     public void math(boolean use_time_factor, double sEingTimeFactor) {
-        //average speed
+        // average speed
         vD = sGef / tGef;
-        //distance to drive
+        // distance to drive
         if (use_time_factor) {
             sZuf = sEingTimeFactor - sGef;
         } else {
             sZuf = sEing - sGef;
         }
-        //time to drive
+        // time to drive
         tZuf = sZuf / vD;
-        //arrival time
+        // arrival time
         tAnk = (tAkt + tZuf);
-        //difference between arrival and planed arrival time
+        // difference between arrival and planed arrival time
         tAnkUnt = tAnk - tAnkEing;
-        //necessary speed for arriving in time
+        // necessary speed for arriving in time
         vDMuss = sZuf / (tAnkEing - tAkt);
-        //difference between real and necessary average speed
+        // difference between real and necessary average speed
         vDunt = vDMuss - vD;
     }
 
-    //getters
+    // getters
     public double getsGef() {
         return sGef;
     }
@@ -127,7 +121,7 @@ public class Calculate {
     }
 
     public double gettAnk() {
-        //convert to hours
+        // convert to hours
         return (tAnk - ((((dateInMilliseconds) / 1000d) / 60d) / 60d));
     }
 

@@ -3,12 +3,13 @@ package de.mytfg.jufo.ibis;
 import android.app.AlertDialog;
 import android.content.DialogInterface;
 import android.content.Intent;
+import android.os.Bundle;
 import android.os.Handler;
 import android.support.v7.app.ActionBarActivity;
-import android.os.Bundle;
 import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
+import android.view.WindowManager;
 import android.widget.TextView;
 
 public class ShowDataActivity extends ActionBarActivity {
@@ -18,7 +19,12 @@ public class ShowDataActivity extends ActionBarActivity {
 
     //create instance of GlobalVariables class
     GlobalVariables mGlobalVariable;
-
+    //alert dialog vars
+    AlertDialog.Builder alertDialogBuilder;
+    AlertDialog alertDialog;
+    //Timer for updating the info boxes
+    Handler timerHandler = new Handler();
+    boolean noGPSAlertOpen;
     //info boxes
     private TextView sGefBox;
     private TextView sZufBox;
@@ -28,99 +34,9 @@ public class ShowDataActivity extends ActionBarActivity {
     private TextView tAnkUntBox;
     private TextView vDMussBox;
     private TextView vDUntBox;
-
     private Menu menu;
-
     private String tAnkMinStr;
     private boolean accuracyAlert, oldAccuracyAlert;
-    //alert dialog vars
-    AlertDialog.Builder alertDialogBuilder;
-    AlertDialog alertDialog;
-    private boolean dialogExists = false;
-
-
-    @Override
-    protected void onCreate(Bundle savedInstanceState) {
-        super.onCreate(savedInstanceState);
-        setContentView(R.layout.activity_show_data);
-        Log.i(TAG, "MapLayoutEnde");
-        //initialize global variable class
-        mGlobalVariable = (GlobalVariables) getApplicationContext();
-        //alert dialog for accuracy alerts
-        alertDialogBuilder = new AlertDialog.Builder(ShowDataActivity.this);
-        //info box text fields
-        sGefBox = (TextView) findViewById(R.id.sGefBox);
-        sZufBox = (TextView) findViewById(R.id.sZufBox);
-        vAktBox = (TextView) findViewById(R.id.vAktBox);
-        vDBox = (TextView) findViewById(R.id.vDBox);
-        tAnkBox = (TextView) findViewById(R.id.tAnkBox);
-        tAnkUntBox = (TextView) findViewById(R.id.tAnkUntBox);
-        vDMussBox = (TextView) findViewById(R.id.vDMussBox);
-        vDUntBox = (TextView) findViewById(R.id.vDUntBox);
-
-        setTextSize();
-        updateUI();
-        checkTracking();
-    }
-
-    private void checkTracking() {
-        //start tracking, if tracking is not running
-        //happens, when tracking was not started from RoutingActivity
-        if (!mGlobalVariable.isTrackingRunning()){
-            Intent intent = new Intent(this, Tracking.class);
-            startService(intent);
-        }
-    }
-
-    private void setTextSize() {
-        float textSize = mGlobalVariable.getTextSize();
-        if (textSize != 0) {
-            sGefBox.setTextSize(0x00000003, textSize);
-            sZufBox.setTextSize(0x00000003, textSize);
-            vAktBox.setTextSize(0x00000003, textSize);
-            vDBox.setTextSize(0x00000003, textSize);
-            tAnkBox.setTextSize(0x00000003, textSize);
-            tAnkUntBox.setTextSize(0x00000003, textSize);
-            vDMussBox.setTextSize(0x00000003, textSize);
-            vDUntBox.setTextSize(0x00000003, textSize);
-        }
-    }
-
-
-    private void openAccuracyAlert(boolean confirm) {
-        if (dialogExists) {
-            alertDialog.dismiss();
-            dialogExists = false;
-        }
-        if (confirm) {
-            alertDialogBuilder.setTitle("Positionsbestimmung erfolgreich!");
-            alertDialogBuilder.setMessage((int) mGlobalVariable.getLocation().getAccuracy() + "m Abweichung ist akzeptabel für die Navigation, sie können nun beginnen!");
-            //create the OK Button and onClickListener
-            alertDialogBuilder.setPositiveButton("OK", new DialogInterface.OnClickListener() {
-                //close dialog when clicked
-                public void onClick(DialogInterface dialog, int id) {
-                    dialog.cancel();
-                    dialogExists = false;
-                }
-            });
-
-        } else {
-            alertDialogBuilder.setTitle("Positionsbestimmung zu ungenau!");
-            if (mGlobalVariable.getLocation()!= null) {
-                alertDialogBuilder.setMessage((int) mGlobalVariable.getLocation().getAccuracy() + "m Abweichung sind zu ungenau zum Navigieren! Haben Sie GPS aktiviert? Signal wird gesucht...");
-            } else {
-                alertDialogBuilder.setMessage("Kein Signal! Haben Sie GPS aktiviert? Signal wird gesucht...");
-            }
-        }
-        //create and show alert dialog
-        alertDialog = alertDialogBuilder.create();
-        alertDialog.show();
-        dialogExists = true;
-    }
-
-    //Timer for updating the info boxes
-    Handler timerHandler = new Handler();
-    boolean noGPSAlertOpen;
     Runnable timerRunnable = new Runnable() {
 
         @Override
@@ -144,22 +60,93 @@ public class ShowDataActivity extends ActionBarActivity {
                     }
                 }
             } else {
-                if (!noGPSAlertOpen)
-                openAccuracyAlert(false);
-                noGPSAlertOpen=true;
+                if (!noGPSAlertOpen) openAccuracyAlert(false);
+                noGPSAlertOpen = true;
             }
 
             timerHandler.postDelayed(this, 500);
         }
     };
+    private boolean dialogExists = false;
+
+    @Override
+    protected void onCreate(Bundle savedInstanceState) {
+        super.onCreate(savedInstanceState);
+        //keep screen on
+        getWindow().addFlags(WindowManager.LayoutParams.FLAG_KEEP_SCREEN_ON);
+        //show activity on lock screen
+        getWindow().addFlags(WindowManager.LayoutParams.FLAG_SHOW_WHEN_LOCKED);
+        //set content view
+        setContentView(R.layout.activity_show_data);
+        //initialize global variable class
+        mGlobalVariable = (GlobalVariables) getApplicationContext();
+        //alert dialog for accuracy alerts
+        alertDialogBuilder = new AlertDialog.Builder(ShowDataActivity.this);
+        //info box text fields
+        sGefBox = (TextView) findViewById(R.id.sGefBox);
+        sZufBox = (TextView) findViewById(R.id.sZufBox);
+        vAktBox = (TextView) findViewById(R.id.vAktBox);
+        vDBox = (TextView) findViewById(R.id.vDBox);
+        tAnkBox = (TextView) findViewById(R.id.tAnkBox);
+        tAnkUntBox = (TextView) findViewById(R.id.tAnkUntBox);
+        vDMussBox = (TextView) findViewById(R.id.vDMussBox);
+        vDUntBox = (TextView) findViewById(R.id.vDUntBox);
+
+        setTextSize();
+        updateUI();
+        //start tracking
+        Intent intent = new Intent(this, Tracking.class);
+        startService(intent);
+    }
+
+    private void setTextSize() {
+        float textSize = mGlobalVariable.getTextSize();
+        if (textSize != 0) {
+            sGefBox.setTextSize(0x00000003, textSize);
+            sZufBox.setTextSize(0x00000003, textSize);
+            vAktBox.setTextSize(0x00000003, textSize);
+            vDBox.setTextSize(0x00000003, textSize);
+            tAnkBox.setTextSize(0x00000003, textSize);
+            tAnkUntBox.setTextSize(0x00000003, textSize);
+            vDMussBox.setTextSize(0x00000003, textSize);
+            vDUntBox.setTextSize(0x00000003, textSize);
+        }
+    }
 
     private void updateUI() {
         Log.i(TAG, "updateUI()");
         timerHandler.postDelayed(timerRunnable, 0);
     }
 
-    private String roundDecimals(double d) {
-        return String.format("%.2f", d);
+    private void openAccuracyAlert(boolean confirm) {
+        if (dialogExists) {
+            alertDialog.dismiss();
+            dialogExists = false;
+        }
+        if (confirm) {
+            alertDialogBuilder.setTitle("Positionsbestimmung erfolgreich!");
+            alertDialogBuilder.setMessage((int) mGlobalVariable.getLocation().getAccuracy() + "m Abweichung ist akzeptabel für die Navigation, sie können nun beginnen!");
+            //create the OK Button and onClickListener
+            alertDialogBuilder.setPositiveButton("OK", new DialogInterface.OnClickListener() {
+                //close dialog when clicked
+                public void onClick(DialogInterface dialog, int id) {
+                    dialog.cancel();
+                    dialogExists = false;
+                }
+            });
+
+        } else {
+            alertDialogBuilder.setTitle("Positionsbestimmung zu ungenau!");
+            if (mGlobalVariable.getLocation() != null) {
+                alertDialogBuilder.setMessage((int) mGlobalVariable.getLocation().getAccuracy() + "m Abweichung sind zu ungenau zum Navigieren! Haben Sie GPS aktiviert? Signal wird gesucht...");
+            } else {
+                alertDialogBuilder.setMessage("Kein Signal! Haben Sie GPS aktiviert? Signal wird gesucht...");
+            }
+        }
+        //create and show alert dialog
+        alertDialog = alertDialogBuilder.create();
+        alertDialog.show();
+        dialogExists = true;
     }
 
     //read data from global var class and write to info boxes
@@ -225,6 +212,9 @@ public class ShowDataActivity extends ActionBarActivity {
         }
     }
 
+    private String roundDecimals(double d) {
+        return String.format("%.2f", d);
+    }
 
     @Override
     public boolean onCreateOptionsMenu(Menu menu) {

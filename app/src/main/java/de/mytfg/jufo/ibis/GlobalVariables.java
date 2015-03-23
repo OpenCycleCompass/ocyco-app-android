@@ -6,17 +6,15 @@ import android.location.Location;
 public class GlobalVariables extends Application {
 
     //The variables can be set and read from every Activity or Service!
-    private double sGef, sZuf, vAkt, vD, tAnk, tAnkUnt, vDMuss, vDunt, tAnkEingTime, sEing,
-            sEingTimeFactor;
+    private double sGef, sZuf, vAkt, vD, tAnk, tAnkUnt, vDMuss, vDunt, tAnkEingTime, sEing, sEingTimeFactor;
     private float textSize;
     private Location location;
-    private boolean show_locationOverlay, show_compassOverlay, show_scaleBarOverlay, collectData,
-            collectDataSet, auto_center = true, trackingRunning = false, use_time_factor,
-            changed_settings, auto_rotate, align_north=false;
+    private boolean show_locationOverlay, show_compassOverlay, show_scaleBarOverlay, collect_data,
+    auto_center = true, use_time_factor,
+            changed_settings, auto_rotate, align_north = false, online_tracking_running;
 
 
-    public void setCalculationVars(double sGefIn, double sZufIn, double vAktIn, double vDIn, double
-            tAnkIn, double tAnkUntIn, double vDMussIn, double vDuntIn) {
+    public void setCalculationVars(double sGefIn, double sZufIn, double vAktIn, double vDIn, double tAnkIn, double tAnkUntIn, double vDMussIn, double vDuntIn) {
         sGef = sGefIn;
         sZuf = sZufIn;
         vAkt = vAktIn;
@@ -27,46 +25,8 @@ public class GlobalVariables extends Application {
         vDunt = vDuntIn;
     }
 
-    public void setChanged_settings(boolean changed_settingsIn) {
-        changed_settings = changed_settingsIn;
-    }
-
-    public void setAlign_north (boolean align_northIn) { align_north=align_northIn; }
-
-    public void setAuto_rotate(boolean auto_rotateIn) {
-        auto_rotate = auto_rotateIn;
-    }
-
-    public void setsEingTimeFactor(double sEingTimeVarIn) {
-        sEingTimeFactor = sEingTimeVarIn;
-    }
-
-    public void setUseTimeFactor(boolean tfIn) {
-        use_time_factor = tfIn;
-    }
-
-    public void setTrackingRunning(boolean trRunIn) {
-        trackingRunning = trRunIn;
-    }
-
-    public void setAutoCenter(boolean auto_center_in) {
-        auto_center = auto_center_in;
-    }
-
-    public void setLocation(Location locationIn) {
-        location = locationIn;
-    }
-
     public void setSettingVars(float textSizeIn) {
         textSize = textSizeIn;
-    }
-
-    public void setsEing(double sEingIn) {
-        sEing = sEingIn;
-    }
-
-    public void settAnkEingTime(double tAnkEingTimeIn) {
-        tAnkEingTime = tAnkEingTimeIn;
     }
 
     public void setShowLocationOverlay(boolean show_locationOverlay_in) {
@@ -81,37 +41,54 @@ public class GlobalVariables extends Application {
         show_scaleBarOverlay = show_scaleBarOverlay_in;
     }
 
-    public void setCollectData(boolean collectDataIn) {
-        collectData = collectDataIn;
-        collectDataSet = true;
+    public boolean isOnline_tracking_running() {return online_tracking_running;}
+
+    public boolean isAlign_north() {
+        return align_north;
     }
 
-    public boolean isAlign_north() { return align_north; }
+    public void setAlign_north(boolean align_northIn) {
+        align_north = align_northIn;
+    }
 
-    public boolean isAuto_rotate() { return auto_rotate; }
+    public boolean isAuto_rotate() {
+        return auto_rotate;
+    }
+
+    public void setAuto_rotate(boolean auto_rotateIn) {
+        auto_rotate = auto_rotateIn;
+    }
 
     public boolean isChanged_settings() {
         return changed_settings;
+    }
+
+    public void setChanged_settings(boolean changed_settingsIn) {
+        changed_settings = changed_settingsIn;
     }
 
     public boolean isUseTimeFactor() {
         return use_time_factor;
     }
 
-    public boolean isTrackingRunning() {
-        return trackingRunning;
+    public void setUseTimeFactor(boolean tfIn) {
+        use_time_factor = tfIn;
     }
 
     public boolean isAutoCenter() {
         return auto_center;
     }
 
-    public boolean isCollectData() {
-        return collectData;
+    public void setAutoCenter(boolean auto_center_in) {
+        auto_center = auto_center_in;
     }
 
-    public boolean isCollectDataSet() {
-        return collectDataSet;
+    public boolean isCollect_data() {
+        return collect_data;
+    }
+
+    public void setCollect_data(boolean collect_dataIn) {
+        collect_data = collect_dataIn;
     }
 
     public boolean isShow_locationOverlay() {
@@ -130,16 +107,36 @@ public class GlobalVariables extends Application {
         return sEingTimeFactor;
     }
 
+    public void setsEingTimeFactor(double sEingTimeVarIn) {
+        sEingTimeFactor = sEingTimeVarIn;
+    }
+
     public Location getLocation() {
         return location;
+    }
+
+    public void setLocation(Location locationIn) {
+        location = locationIn;
     }
 
     public double getsEing() {
         return sEing;
     }
 
+    public void setOnline_tracking_running (boolean online_tracking_runningIn){
+        online_tracking_running=online_tracking_runningIn;
+    }
+
+    public void setsEing(double sEingIn) {
+        sEing = sEingIn;
+    }
+
     public double gettAnkEingTime() {
         return tAnkEingTime;
+    }
+
+    public void settAnkEingTime(double tAnkEingTimeIn) {
+        tAnkEingTime = tAnkEingTimeIn;
     }
 
     public float getTextSize() {
