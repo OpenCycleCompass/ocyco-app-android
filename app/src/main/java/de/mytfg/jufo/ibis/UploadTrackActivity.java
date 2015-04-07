@@ -512,9 +512,11 @@ public class UploadTrackActivity extends ActionBarActivity {
                     break;
                 case "upload":
                     String notification = getString(R.string.unknownError);
+                    boolean success = false;
                     try {
                         JSONObject json = new JSONObject(result);
                         if (json.has("track_id")) {
+                            success = true;
                             // Disable button to prevent multiple uploads
                             button_UploadTrack.setEnabled(false);
 
@@ -541,11 +543,13 @@ public class UploadTrackActivity extends ActionBarActivity {
 
                             // Enable upload button to make second upload possible
                             button_UploadTrack.setEnabled(true);
+                            button_UploadTrackTokenRegenerate.setEnabled(true);
                         } else {
                             notification = getString(R.string.unknownError);
 
                             // Enable upload button to make second upload possible
                             button_UploadTrack.setEnabled(true);
+                            button_UploadTrackTokenRegenerate.setEnabled(true);
                         }
                     } catch (JSONException e) {
                         e.printStackTrace();
@@ -555,9 +559,17 @@ public class UploadTrackActivity extends ActionBarActivity {
                         button_UploadTrack.setEnabled(true);
                     } finally {
                         // Create notification
-                        Intent intentIbisWeb = new Intent(Intent.ACTION_VIEW, Uri.parse("https://ibis.jufo.mytfg.de/map.php"));
-                        PendingIntent pIntentIbisWeb = PendingIntent.getActivity(getApplicationContext(), 0, intentIbisWeb, 0);
-                        NotificationCompat.Builder mBuilder = new NotificationCompat.Builder(getBaseContext()).setContentIntent(pIntentIbisWeb).setSmallIcon(R.mipmap.ic_launcher).setContentTitle(getString(R.string.app_name_short) + getString(R.string.trackUploaded)).setContentText(notification).setStyle(new NotificationCompat.BigTextStyle().bigText(notification));
+                        NotificationCompat.Builder mBuilder = new NotificationCompat.Builder(getBaseContext())
+                                .setSmallIcon(R.mipmap.ic_launcher)
+                                .setContentTitle(getString(R.string.app_name_short) + getString(R.string.trackUploaded))
+                                .setContentText(notification)
+                                .setStyle(new NotificationCompat.BigTextStyle().bigText(notification));
+                        if(success) {
+                            // default action (on success): open https://ibis.jufo.mytfg.de/map.html
+                            Intent intentIbisWeb = new Intent(Intent.ACTION_VIEW, Uri.parse("https://ibis.jufo.mytfg.de/map.html"));
+                            PendingIntent pIntentIbisWeb = PendingIntent.getActivity(getApplicationContext(), 0, intentIbisWeb, 0);
+                            mBuilder.setContentIntent(pIntentIbisWeb);
+                        }
                         // Sets an ID for the notification
                         int mNotificationId = 43;
                         // Gets an instance of the NotificationManager service
