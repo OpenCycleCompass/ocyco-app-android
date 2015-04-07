@@ -2,6 +2,21 @@ package de.mytfg.jufo.ibis;
 
 import android.app.Application;
 import android.location.Location;
+import org.acra.*;
+import org.acra.annotation.*;
+
+@ReportsCrashes(
+        formKey = "", // This is required for backward compatibility but not used
+        mailTo = "ibis@mytfg.de",
+        mode = ReportingInteractionMode.DIALOG,
+        resToastText = R.string.crash_toast_text, // optional, displayed as soon as the crash occurs, before collecting data which can take a few seconds
+        resDialogText = R.string.crash_dialog_text,
+        resDialogIcon = R.mipmap.ic_launcher, //optional. default is a warning sign
+        resDialogTitle = R.string.app_name, // optional. default is your application name
+        resDialogCommentPrompt = R.string.crash_dialog_comment_prompt, // optional. When defined, adds a user text field input with this text resource as a label
+        //resDialogEmailPrompt = R.string.crash_user_email_label, // optional. When defined, adds a user email text entry with this text resource as label. The email address will be populated from SharedPreferences and will be provided as an ACRA field if configured.
+        resDialogOkToast = R.string.crash_dialog_ok_toast // optional. displays a Toast message when the user accepts to send a report.
+)
 
 public class GlobalVariables extends Application {
 
@@ -13,6 +28,13 @@ public class GlobalVariables extends Application {
     auto_center = true, use_time_factor,
             changed_settings, auto_rotate, align_north = false, online_tracking_running;
 
+    @Override
+    public void onCreate() {
+        super.onCreate();
+
+        // Initialise ACRA:
+        ACRA.init(this);
+    }
 
     public void setCalculationVars(double sGefIn, double sZufIn, double vAktIn, double vDIn, double tAnkIn, double tAnkUntIn, double vDMussIn, double vDuntIn) {
         sGef = sGefIn;
