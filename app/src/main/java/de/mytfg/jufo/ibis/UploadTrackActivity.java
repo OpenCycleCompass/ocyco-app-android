@@ -32,6 +32,7 @@ import org.apache.http.message.BasicNameValuePair;
 import org.json.JSONException;
 import org.json.JSONObject;
 
+import java.io.BufferedReader;
 import java.io.BufferedWriter;
 import java.io.IOException;
 import java.io.InputStream;
@@ -326,9 +327,6 @@ public class UploadTrackActivity extends ActionBarActivity {
     // a string.
     private String getUrl(String lurlstr, String ldata) throws IOException {
         InputStream stream = null;
-        // Only display the first 10 000 000 characters of the retrieved
-        // web page content.
-        final int len = 10000000;
 
         try {
             URL url = new URL(lurlstr);
@@ -372,7 +370,7 @@ public class UploadTrackActivity extends ActionBarActivity {
             stream = conn.getInputStream();
 
             // Convert the InputStream into a string
-            return readIt(stream, len);
+            return readIt(stream);
 
             // Makes sure that the InputStream is closed after the app is
             // finished using it.
@@ -400,12 +398,14 @@ public class UploadTrackActivity extends ActionBarActivity {
     }
 
     // Reads an InputStream and converts it to a String.
-    public String readIt(InputStream stream, int len) throws IOException {
-        Reader reader;
-        reader = new InputStreamReader(stream, "UTF-8");
-        char[] buffer = new char[len];
-        reader.read(buffer);
-        return new String(buffer);
+    public String readIt(InputStream stream) throws IOException {
+        BufferedReader r = new BufferedReader(new InputStreamReader(stream));
+        StringBuilder total = new StringBuilder();
+        String line;
+        while ((line = r.readLine()) != null) {
+            total.append(line);
+        }
+        return total.toString();
     }
 
     private String getDate(long timestamp) {
