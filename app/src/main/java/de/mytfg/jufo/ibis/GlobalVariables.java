@@ -2,20 +2,20 @@ package de.mytfg.jufo.ibis;
 
 import android.app.Application;
 import android.location.Location;
+
 import org.acra.*;
 import org.acra.annotation.*;
+import org.acra.sender.HttpSender;
 
 @ReportsCrashes(
-        formKey = "", // This is required for backward compatibility but not used
-        mailTo = "ibis@mytfg.de",
-        mode = ReportingInteractionMode.DIALOG,
-        resToastText = R.string.crash_toast_text, // optional, displayed as soon as the crash occurs, before collecting data which can take a few seconds
-        resDialogText = R.string.crash_dialog_text,
-        resDialogIcon = R.mipmap.ic_launcher, //optional. default is a warning sign
-        resDialogTitle = R.string.app_name, // optional. default is your application name
-        resDialogCommentPrompt = R.string.crash_dialog_comment_prompt, // optional. When defined, adds a user text field input with this text resource as a label
-        //resDialogEmailPrompt = R.string.crash_user_email_label, // optional. When defined, adds a user email text entry with this text resource as label. The email address will be populated from SharedPreferences and will be provided as an ACRA field if configured.
-        resDialogOkToast = R.string.crash_dialog_ok_toast // optional. displays a Toast message when the user accepts to send a report.
+        httpMethod = HttpSender.Method.PUT,
+        reportType = HttpSender.Type.JSON,
+        formUri = "https://acra.mytfg.de/acra-ibis/_design/acra-storage/_update/report",
+        formUriBasicAuthLogin = "ibis_android",
+        formUriBasicAuthPassword = "IPNMRXhAuN/YstodKoGdQbxUPkg=",
+
+        mode = ReportingInteractionMode.TOAST,
+        resToastText = R.string.crash_toast
 )
 
 public class GlobalVariables extends Application {
