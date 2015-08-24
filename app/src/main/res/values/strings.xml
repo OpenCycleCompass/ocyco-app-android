@@ -120,8 +120,4 @@
     <string name="info_contact_headline">Kontakt</string>
     <string name="info_contact">Homepage: <a href="https://ibis.jufo.mytfg.de">ibis.jufo.mytfg.de</a>
     \nMail: ibis@mytfg.de</string>
-    <string name="crash_dialog_text">Entschuldigung, iBis hätte nicht abstürzen sollen. Bitte senden Sie den Fehlerbericht ab, sodass dies möglichst nciht erneut Auftritt.</string>
-    <string name="crash_toast_text">iBis ist abgestürzt ... Fehlerinformationen werden gesammelt ...</string>
-    <string name="crash_dialog_comment_prompt">Sie können uns gerne zusätzliche Informationen schreiben (vertraulich):</string>
-    <string name="crash_dialog_ok_toast">Bitte senden Sie die E-Mail ab</string>
 </resources>
