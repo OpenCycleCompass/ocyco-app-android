@@ -6,11 +6,8 @@ before_script:
 
 # Parallel jobs, each line is a parallel build
 build:
-  script: ./gradlew build
-  type: build
-
-on_success:
   script:
+    - ./gradlew build
     - cd app/build/outputs/apk/
     - APK=$(find *.apk)
     - ssh jufo-backup@rleh.de "mkdir -p ~/download/$CI_BUILD_REF_NAME"
@@ -19,4 +16,3 @@ on_success:
     - scp lint-results.html jufo-backup@rleh.de:~/download/$CI_BUILD_REF_NAME
     - echo "App: https://www.rleh.de/download/$CI_BUILD_REF_NAME/$APK"
     - echo "Lint Report: https://www.rleh.de/download/$CI_BUILD_REF_NAME/lint-results.html"
-  type: deploy
