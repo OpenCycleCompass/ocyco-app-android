@@ -1,0 +1,22 @@
+# GitLab CI https://ci.jufo.mytfg.de/
+
+# Run before each script
+before_script:
+  - cp $ANDROID_KEYSTORE_PATH ./app
+
+# Parallel jobs, each line is a parallel build
+build:
+  script: ./gradlew build
+  type: build
+
+on_success:
+  script:
+    - cd app/build/outputs/apk/
+    - APK=$(find *.apk)
+    - ssh jufo-backup@rleh.de "mkdir -p ~/download/$CI_BUILD_REF_NAME"
+    - scp $APK jufo-backup@rleh.de:~/download/$CI_BUILD_REF_NAME
+    - cd ../
+    - scp lint-results.html jufo-backup@rleh.de:~/download/$CI_BUILD_REF_NAME
+    - echo "App: https://www.rleh.de/download/$CI_BUILD_REF_NAME/$APK"
+    - echo "Lint Report: https://www.rleh.de/download/$CI_BUILD_REF_NAME/lint-results.html"
+  type: deploy
