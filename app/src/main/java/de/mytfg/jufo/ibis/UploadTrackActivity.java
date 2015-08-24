@@ -565,8 +565,14 @@ public class UploadTrackActivity extends ActionBarActivity {
                                 .setContentText(notification)
                                 .setStyle(new NotificationCompat.BigTextStyle().bigText(notification));
                         if(success) {
-                            // default action (on success): open https://ibis.jufo.mytfg.de/map.html
-                            Intent intentIbisWeb = new Intent(Intent.ACTION_VIEW, Uri.parse("https://ibis.jufo.mytfg.de/map.html"));
+                            // default action (on success): open https://ibis.jufo.mytfg.de/WebUI/index.html
+                            String tokens = prefs.getString("upload_token", "");
+                            String oldtokens = prefs.getString("upload_oldtokenlist", "");
+                            if (!oldtokens.equals("")) {
+                                tokens = tokens + ";" + oldtokens;
+                            }
+                            tokens = "#token(" + tokens + ")";
+                            Intent intentIbisWeb = new Intent(Intent.ACTION_VIEW, Uri.parse("https://ibis.jufo.mytfg.de/WebUI/index.html" + tokens));
                             PendingIntent pIntentIbisWeb = PendingIntent.getActivity(getApplicationContext(), 0, intentIbisWeb, 0);
                             mBuilder.setContentIntent(pIntentIbisWeb);
                         }
