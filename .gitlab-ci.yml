@@ -9,7 +9,7 @@ build:
   script:
     - ./gradlew build
     - cd app/build/outputs/apk/
-    - APK=$(find *.apk)
+    - APK=$(find app-release.apk)
     - ssh jufo-backup@rleh.de "mkdir -p ~/download/$CI_BUILD_REF_NAME"
     - scp $APK jufo-backup@rleh.de:~/download/$CI_BUILD_REF_NAME
     - cd ../
