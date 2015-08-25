@@ -3,6 +3,21 @@ package de.mytfg.jufo.ibis;
 import android.app.Application;
 import android.location.Location;
 
+import org.acra.*;
+import org.acra.annotation.*;
+import org.acra.sender.HttpSender;
+
+@ReportsCrashes(
+        httpMethod = HttpSender.Method.PUT,
+        reportType = HttpSender.Type.JSON,
+        formUri = "https://acra.mytfg.de/acra-ibis/_design/acra-storage/_update/report",
+        formUriBasicAuthLogin = "ibis_android",
+        formUriBasicAuthPassword = "IPNMRXhAuN/YstodKoGdQbxUPkg=",
+
+        mode = ReportingInteractionMode.TOAST,
+        resToastText = R.string.crash_toast
+)
+
 public class GlobalVariables extends Application {
 
     //The variables can be set and read from every Activity or Service!
@@ -13,6 +28,13 @@ public class GlobalVariables extends Application {
     auto_center = true, use_time_factor,
             changed_settings, auto_rotate, align_north = false, online_tracking_running;
 
+    @Override
+    public void onCreate() {
+        super.onCreate();
+
+        // Initialise ACRA:
+        ACRA.init(this);
+    }
 
     public void setCalculationVars(double sGefIn, double sZufIn, double vAktIn, double vDIn, double tAnkIn, double tAnkUntIn, double vDMussIn, double vDuntIn) {
         sGef = sGefIn;
