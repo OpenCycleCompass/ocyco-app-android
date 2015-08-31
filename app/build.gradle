@@ -27,7 +27,6 @@ android {
                 shrinkResources true
                 proguardFiles getDefaultProguardFile('proguard-android.txt'), 'proguard-rules.pro'
                 signingConfig signingConfigs.releaseSigning
-                zipAlign true
             }
             bintray {
                 applicationIdSuffix ".bintray"
@@ -36,7 +35,6 @@ android {
                 shrinkResources true
                 proguardFiles getDefaultProguardFile('proguard-android.txt'), 'proguard-rules.pro'
                 signingConfig signingConfigs.releaseSigning
-                zipAlign true
             }
         } else {
             unsignedrelease {
