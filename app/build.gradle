@@ -13,7 +13,7 @@ android {
     signingConfigs {
         if (System.getenv("TRAVIS")) {
             releaseSigning {
-                storeFile file("ibis.keystore")
+                storeFile rootProject.file('ibis.keystore')
                 storePassword System.getenv("KEYSTORE_PASS")
                 keyAlias System.getenv("ALIAS_NAME")
                 keyPassword System.getenv("ALIAS_PASS")
