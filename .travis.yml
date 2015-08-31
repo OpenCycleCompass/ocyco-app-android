@@ -1,0 +1,52 @@
+language: android
+
+jdk: oraclejdk8
+
+android:
+  components:
+    # The BuildTools version used by your project
+    - build-tools-22.0.1
+    # The SDK version used to compile your project
+    - android-22
+    # Additional components
+    ## Google Cloud Messaging for Android Library
+    - extra-google-gcm
+    ## Android Support Library (appcompat)
+    - extra-android-support
+    ## Android Support Repository
+    - extra-android-m2repository
+    # Specify at least one system image,
+    # if you need to run emulator(s) during your tests
+    - sys-img-armeabi-v7a-android-19
+
+# decrypt ibis.keystore
+before_install:
+- openssl aes-256-cbc -K $encrypted_ab14c45bfecf_key -iv $encrypted_ab14c45bfecf_iv -in ibis.keystore.enc -out ibis.keystore -d
+
+# Emulator Management: Create, Start and Wait
+before_script:
+  - echo no | android create avd --force -n test -t android-19 --abi armeabi-v7a
+  - emulator -avd test -no-skin -no-audio -no-window &
+  - android-wait-for-emulator
+  - adb shell input keyevent 82 &
+
+after_script:
+  - cat app/build/outputs/lint-results.html
+  - ./gradlew signingReport
+
+before_deploy:
+  - cp app/build/outputs/apk/app-bintray.apk app/build/outputs/apk/ibis-app-$TRAVIS_BRANCH-$TRAVIS_COMMIT.apk
+
+deploy:
+  - provider: bintray
+    skip_cleanup: true
+    file: deploy-bintray.txt
+    user: "rleh"
+    key:
+      secure: K5zoytQcAcc4fmf1hvZ+GOqxQEbBdteT+rOtXKAYyJk99W0YCeP9Huh9imF+h84LZQcN32O8Hhrl1pdjKcVMiCO8gf0zrA5TiG6JMUctv1qmlkz5uxO3Y/M8NSrhCstG0Oi8I8p9swvyZY3gRDdhjhwbvn4CaHa0B/Vu7DP85sQDvveMc7ynxKPZOljC23iBfRsvCA/nQm+2TfM/M4AnxxBM9s/ogQggbDVDxfrw0tAXHkFR1bgEHzSvdcNFOt7YwYOs4CAqGfWSEruzMbVYKclAzXTQ1RYEuK6Isu1H5PUZICkvP1c3uIarz6J2qsH/+AsiI+Fa8vOcizmT52MnK+nvIK9+JpSm6XoAcEnsb8kF4xna2wZp7jJQlS5Qb0/hcd3TJyiTqrlJBwvEfS6X8JoozJNErVLkYTLSbBcgcKopMamoA1l5Cng6tFLdlMaV+xMbZhjp7HtBMJLp6zjzHeWXE6e8LwP6grtuB8wIDKZxZjmMAOk0JIrvxOhHMuDqpbsnlLmT7gj1Ia1eFF5ApVn3ms2P8MXyh3bbXAqkaCL9VV1e22BesdC/2KYlOKmGTs8EDPwgjTy/mfF7Bzca2KpY6fP/McP5djgDm8LtBdZVRq9pHQWDZtgCed7ihF3mek/KRXG+ijhfQTtz30u3rnWWEI5gWOiRlyR/yBR1p7A=
+    on:
+      all_branches: true
+#    on:
+#      branch:
+#        - develop
+#        - master
