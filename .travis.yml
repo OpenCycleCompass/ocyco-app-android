@@ -9,8 +9,8 @@ android:
     # The SDK version used to compile your project
     - android-22
     # Additional components
-    ## Google Cloud Messaging for Android Library
-    - extra-google-gcm
+    ## Google Play Services Library
+    - extra-google-google_play_services
     ## Android Support Library (appcompat)
     - extra-android-support
     ## Android Support Repository
