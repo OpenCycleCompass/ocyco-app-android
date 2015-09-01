@@ -32,6 +32,10 @@ before_script:
   - android-wait-for-emulator
   - adb shell input keyevent 82 &
 
+script:
+  - ./gradelw assembleBintray
+  - ./gradelw assembleRelease
+
 after_script:
   - cat app/build/outputs/lint-results.html
   - ./gradlew signingReport
