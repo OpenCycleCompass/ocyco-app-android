@@ -1,0 +1,22 @@
+{
+    "package": {
+        "name": "iBis-Android-App", // Bintray package name
+        "repo": "iBis-Android-App", // Bintray repository name
+        "subject": "ibis", // Bintray subject (user or organization)
+        "desc": "iBis App latest automated build",
+        "website_url": "https://ibis.jufo.mytfg.de/",
+        "issue_tracker_url": "https://github.com/iBis-project/iBis-Android-App/issues",
+        "vcs_url": "https://github.com/iBis-project/iBis-Android-App",
+        "licenses": ["GPL-3.0"]
+    },
+    "version": {
+        "name": "0.8-pre",
+        "desc": "development version",
+        "gpgSign": false
+    },
+    "files":
+        [
+        {"includePattern": "app\/build\/outputs\/apk\/(ibis-app-.+\.apk)", "uploadPattern": "$1"}
+        ],
+    "publish": true
+}

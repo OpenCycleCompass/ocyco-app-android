@@ -1,32 +1,52 @@
 apply plugin: 'com.android.application'
 
 android {
-    compileSdkVersion 21
-    buildToolsVersion "21.1.2"
+    compileSdkVersion 22
+    buildToolsVersion "22.0.1"
     defaultConfig {
         applicationId 'de.mytfg.jufo.ibis'
         minSdkVersion 15
-        targetSdkVersion 21
+        targetSdkVersion 22
         versionCode 1
         versionName "1.0"
     }
     signingConfigs {
-        releaseSigning {
-            storeFile file("ibis.keystore")
-            storePassword System.getenv("ANDROID_KEYSTORE_PW")
-            keyAlias "ibis"
-            keyPassword System.getenv("ANDROID_KEYSTORE_PW")
+        if (System.getenv("TRAVIS")) {
+            releaseSigning {
+                storeFile rootProject.file('ibis.keystore')
+                storePassword System.getenv("KEYSTORE_PASS")
+                keyAlias System.getenv("ALIAS_NAME")
+                keyPassword System.getenv("ALIAS_PASS")
+            }
         }
     }
     buildTypes {
-        unsignedrelease {
-            minifyEnabled false
-            proguardFiles getDefaultProguardFile('proguard-android.txt'), 'proguard-rules.pro'
-        }
-        release {
-            minifyEnabled false
-            proguardFiles getDefaultProguardFile('proguard-android.txt'), 'proguard-rules.pro'
-            signingConfig signingConfigs.releaseSigning
+        if (System.getenv("TRAVIS")) {
+            release {
+                minifyEnabled true
+                shrinkResources true
+                proguardFiles getDefaultProguardFile('proguard-android.txt'), 'proguard-rules.pro'
+                signingConfig signingConfigs.releaseSigning
+            }
+            bintray {
+                applicationIdSuffix ".bintray"
+                versionNameSuffix " bintray"
+                minifyEnabled true
+                shrinkResources true
+                proguardFiles getDefaultProguardFile('proguard-android.txt'), 'proguard-rules.pro'
+                signingConfig signingConfigs.releaseSigning
+            }
+        } else {
+            unsignedrelease {
+                minifyEnabled false
+                proguardFiles getDefaultProguardFile('proguard-android.txt'), 'proguard-rules.pro'
+            }
+            debug {
+                applicationIdSuffix ".debug"
+                versionNameSuffix " debug"
+                minifyEnabled false
+                proguardFiles getDefaultProguardFile('proguard-android.txt'), 'proguard-rules.pro'
+            }
         }
     }
     productFlavors {
@@ -34,12 +54,11 @@ android {
 }
 
 dependencies {
-    compile fileTree(dir: 'libs', include: ['*.jar'])
-    compile 'com.android.support:appcompat-v7:21.0.3'
-    compile 'com.google.android.gms:play-services:6.5.87'
+    compile 'com.android.support:appcompat-v7:22.2.1'
+    compile 'com.google.android.gms:play-services:7.8.0'
     compile 'org.slf4j:slf4j-android:1.7.7'
     compile 'org.osmdroid:osmdroid-android:4.3'
-    compile 'com.google.code.gson:gson:2.2.4'
+    compile 'com.google.code.gson:gson:2.3'
     compile 'org.apache.commons:commons-lang3:3.3.2'
     compile files('libs/osmbonuspack_v5.1.jar')
     compile 'ch.acra:acra:4.6.1'
