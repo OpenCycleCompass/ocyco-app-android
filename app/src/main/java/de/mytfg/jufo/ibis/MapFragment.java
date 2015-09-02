@@ -1,5 +1,6 @@
 package de.mytfg.jufo.ibis;
 
+import android.app.Activity;
 import android.content.Context;
 import android.os.Bundle;
 import android.os.Handler;
@@ -46,6 +47,23 @@ public class MapFragment extends Fragment {
     private MyLocationNewOverlay mLocationOverlay;
     private CompassOverlay mCompassOverlay;
     private ScaleBarOverlay mScaleBarOverlay;
+
+
+    @Override
+    public void onAttach(Activity activity) {
+        Log.i(TAG, "onAttach()");
+        // call timerRunnable.run() frequently
+        timerHandler.post(timerRunnable);
+        super.onAttach(activity);
+    }
+
+    @Override
+    public void onDetach() {
+        Log.i(TAG, "onDetach()");
+        // stop calling timerRunnable.run() frequently
+        timerHandler.post(null);
+        super.onDetach();
+    }
 
     //Timer for updating the map
     Handler timerHandler = new Handler();
@@ -143,25 +161,21 @@ public class MapFragment extends Fragment {
     }
 
     private void startMapUpdates() {
-        timerHandler.postDelayed(timerRunnable, 0);
+        timerHandler.post(timerRunnable);
     }
 
     private void updateMap() {
-        Log.i(TAG, "updateMap()");
+        Log.i(TAG, "updateMap() (only if map is visible)");
         //center at users position,rotate map
-        try {
-            if (mGlobalVariables.isAutoCenter()) {
-                GeoPoint currentLocation = new GeoPoint(mGlobalVariables.getLocation().getLatitude(), mGlobalVariables.getLocation().getLongitude());
-                Log.i(TAG, "Geopoint" + currentLocation);
-                mMapView.getController().setCenter(currentLocation);
-            }
-            if ((mGlobalVariables.isAuto_rotate()) && (mGlobalVariables.getLocation().getSpeed() > 1)) {
-                mMapView.setMapOrientation(360.0f - (mGlobalVariables.getLocation().getBearing()));
-            } else if (mGlobalVariables.isAlign_north()) {
-                mMapView.setMapOrientation(360.0f);
-            }
-        } catch (java.lang.NullPointerException e) {
-            Log.i(TAG, "NullPointerException");
+        if (mGlobalVariables.isAutoCenter()) {
+            GeoPoint currentLocation = new GeoPoint(mGlobalVariables.getLocation().getLatitude(), mGlobalVariables.getLocation().getLongitude());
+            Log.i(TAG, "Geopoint" + currentLocation);
+            mMapView.getController().setCenter(currentLocation);
+        }
+        if ((mGlobalVariables.isAuto_rotate()) && (mGlobalVariables.getLocation().getSpeed() > 1)) {
+            mMapView.setMapOrientation(360.0f - (mGlobalVariables.getLocation().getBearing()));
+        } else if (mGlobalVariables.isAlign_north()) {
+            mMapView.setMapOrientation(360.0f);
         }
     }
 }
