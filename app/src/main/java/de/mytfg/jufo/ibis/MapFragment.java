@@ -10,9 +10,6 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 
-import org.json.JSONArray;
-import org.json.JSONException;
-import org.json.JSONObject;
 import org.osmdroid.DefaultResourceProxyImpl;
 import org.osmdroid.ResourceProxy;
 import org.osmdroid.bonuspack.overlays.Polyline;
@@ -127,32 +124,16 @@ public class MapFragment extends Fragment {
             mMapView.getOverlays().add(this.mScaleBarOverlay);
         }
         mMapView.getController().setZoom(18);
-        mMapView.getOverlays().add(this.createPolyline());
+        mMapView.getOverlays().add(this.createStaticPolyline());
         startMapUpdates();
-
     }
 
-    private Polyline createPolyline() {
-        Log.i(TAG, "createPolyline()");
+    private Polyline createStaticPolyline() {
+        Log.i(TAG, "createStaticPolyline()");
         //create waypoints Array
-        ArrayList<GeoPoint> waypoints = new ArrayList<>();
-        //get waypoints
         mRDB.open();
-        JSONArray allPoints = mRDB.getAllPoints();
+        ArrayList<GeoPoint> waypoints = mRDB.getAllGeoPoints();
         mRDB.close();
-        try {
-            for (int i = 0; i < allPoints.length(); i++) {
-                JSONObject oneObject = allPoints.getJSONObject(i);
-                // Pulling items from the array
-                double lat = oneObject.getDouble("lat");
-                double lon = oneObject.getDouble("lon");
-                //adding to waypoints array
-                waypoints.add(new GeoPoint(lat, lon));
-            }
-            Log.i(TAG, "for beendet");
-        } catch (JSONException e) {
-            e.printStackTrace();
-        }
         //create and set up the polyline
         Polyline routeOverlay = new Polyline(getActivity().getApplicationContext());
         routeOverlay.setPoints(waypoints);
