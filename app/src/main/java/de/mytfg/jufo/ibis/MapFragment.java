@@ -45,9 +45,12 @@ public class MapFragment extends Fragment {
     private CompassOverlay mCompassOverlay;
     private ScaleBarOverlay mScaleBarOverlay;
 
+    private boolean mapVisible = false;
+
     @Override
     public void onResume() {
         super.onResume();
+        mapVisible = true;
         Log.i(TAG, "onResume()");
         // call timerRunnable.run() frequently
         timerHandler.post(timerRunnable);
@@ -57,19 +60,19 @@ public class MapFragment extends Fragment {
     public void onPause() {
         Log.i(TAG, "onPause()");
         // stop calling timerRunnable.run() frequently
-        timerHandler.post(null);
+        mapVisible = false;
         super.onPause();
     }
 
     //Timer for updating the map
     Handler timerHandler = new Handler();
     Runnable timerRunnable = new Runnable() {
-
         @Override
         public void run() {
-
-            updateMap();
-            timerHandler.postDelayed(this, 500);
+            if(mapVisible) {
+                updateMap();
+                timerHandler.postDelayed(this, 500);
+            }
         }
     };
 
@@ -162,9 +165,14 @@ public class MapFragment extends Fragment {
         Log.i(TAG, "updateMap() (only if map is visible)");
         //center at users position,rotate map
         if (IbisApplication.isAutoCenter()) {
-            GeoPoint currentLocation = new GeoPoint(IbisApplication.getLocation().getLatitude(), IbisApplication.getLocation().getLongitude());
-            Log.i(TAG, "Geopoint" + currentLocation);
-            mMapView.getController().setCenter(currentLocation);
+            if(IbisApplication.getLocation() != null) {
+                GeoPoint currentLocation = new GeoPoint(IbisApplication.getLocation().getLatitude(), IbisApplication.getLocation().getLongitude());
+                Log.i(TAG, "Geopoint" + currentLocation);
+                mMapView.getController().setCenter(currentLocation);
+            }
+            else {
+                Log.i(TAG, "Location is null");
+            }
         }
         if ((IbisApplication.isAuto_rotate()) && (IbisApplication.getLocation().getSpeed() > 1)) {
             mMapView.setMapOrientation(360.0f - (IbisApplication.getLocation().getBearing()));
