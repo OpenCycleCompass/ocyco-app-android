@@ -37,8 +37,6 @@ public class MapFragment extends Fragment {
 
     // Log TAG
     protected static final String TAG = "IBis-MapFragment";
-    //global var class
-    IbisApplication mGlobalVariables;
     RoutingDatabase mRDB;
 
     //map view and overlays
@@ -106,8 +104,6 @@ public class MapFragment extends Fragment {
 
         final Context context = this.getActivity();
         final DisplayMetrics dm = context.getResources().getDisplayMetrics();
-        //initialize global variable class
-        mGlobalVariables = (IbisApplication) getActivity().getApplicationContext();
         //initialize RoutingDatabase
         mRDB = new RoutingDatabase(getActivity().getApplicationContext());
         //set zoom and touch controls
@@ -124,19 +120,19 @@ public class MapFragment extends Fragment {
         mScaleBarOverlay.setCentred(true);
         mScaleBarOverlay.setScaleBarOffset(dm.widthPixels / 2, 10);
         //check, if settings were changed by user, else activate overlays by default
-        if (!mGlobalVariables.isChanged_settings()) {
-            mGlobalVariables.setShowLocationOverlay(true);
-            mGlobalVariables.setShowCompassOverlay(true);
-            mGlobalVariables.setShowScaleBarOverlay(true);
+        if (!IbisApplication.isChanged_settings()) {
+            IbisApplication.setShowLocationOverlay(true);
+            IbisApplication.setShowCompassOverlay(true);
+            IbisApplication.setShowScaleBarOverlay(true);
         }
         //add overlays
-        if (mGlobalVariables.isShow_locationOverlay()) {
+        if (IbisApplication.isShow_locationOverlay()) {
             mMapView.getOverlays().add(this.mLocationOverlay);
         }
-        if (mGlobalVariables.isShow_compassOverlay()) {
+        if (IbisApplication.isShow_compassOverlay()) {
             mMapView.getOverlays().add(this.mCompassOverlay);
         }
-        if (mGlobalVariables.isShow_scaleBarOverlay()) {
+        if (IbisApplication.isShow_scaleBarOverlay()) {
             mMapView.getOverlays().add(this.mScaleBarOverlay);
         }
         mMapView.getController().setZoom(18);
@@ -165,14 +161,14 @@ public class MapFragment extends Fragment {
     private void updateMap() {
         Log.i(TAG, "updateMap() (only if map is visible)");
         //center at users position,rotate map
-        if (mGlobalVariables.isAutoCenter()) {
-            GeoPoint currentLocation = new GeoPoint(mGlobalVariables.getLocation().getLatitude(), mGlobalVariables.getLocation().getLongitude());
+        if (IbisApplication.isAutoCenter()) {
+            GeoPoint currentLocation = new GeoPoint(IbisApplication.getLocation().getLatitude(), IbisApplication.getLocation().getLongitude());
             Log.i(TAG, "Geopoint" + currentLocation);
             mMapView.getController().setCenter(currentLocation);
         }
-        if ((mGlobalVariables.isAuto_rotate()) && (mGlobalVariables.getLocation().getSpeed() > 1)) {
-            mMapView.setMapOrientation(360.0f - (mGlobalVariables.getLocation().getBearing()));
-        } else if (mGlobalVariables.isAlign_north()) {
+        if ((IbisApplication.isAuto_rotate()) && (IbisApplication.getLocation().getSpeed() > 1)) {
+            mMapView.setMapOrientation(360.0f - (IbisApplication.getLocation().getBearing()));
+        } else if (IbisApplication.isAlign_north()) {
             mMapView.setMapOrientation(360.0f);
         }
     }

@@ -50,7 +50,6 @@ public class RoutingActivity extends ActionBarActivity implements TimePickerFrag
     private final static String TAG = "RoutingActivity-class";
     //self-written classes
     RoutingDatabase mRDb;
-    IbisApplication mGlobalVariables;
     //Timer for updating the map
     Handler timerHandler = new Handler();
     Runnable timerRunnable = new Runnable() {
@@ -103,8 +102,6 @@ public class RoutingActivity extends ActionBarActivity implements TimePickerFrag
         switch_manuelDistance = (Switch) findViewById(R.id.switch_manuelDistance);
         switch_userData = (Switch) findViewById(R.id.switch_userData);
         switch_timeFactor = (Switch) findViewById(R.id.switch_timeFactor);
-        //global variables class
-        mGlobalVariables = (IbisApplication) getApplicationContext();
         //set up database, delete old database
         mRDb = new RoutingDatabase(this);
         mRDb.open();
@@ -187,7 +184,7 @@ public class RoutingActivity extends ActionBarActivity implements TimePickerFrag
 
     private void lookForStartPosition() {
         try {
-            startLocation = mGlobalVariables.getLocation();
+            startLocation = IbisApplication.getLocation();
             start_address.setText(startLocation.getLatitude() + "    " + startLocation.getLongitude());
             // focus on next edit text
             destination_address.setFocusable(true);
@@ -274,7 +271,7 @@ public class RoutingActivity extends ActionBarActivity implements TimePickerFrag
         if ((hour < current_hour) || (current_hour == hour) && (minute < current_minute)) {
             tAnkEingTime += 24 * 60 * 60 * 1000;
         }
-        mGlobalVariables.settAnkEingTime(tAnkEingTime);
+        IbisApplication.settAnkEingTime(tAnkEingTime);
 
     }
 
@@ -312,7 +309,7 @@ public class RoutingActivity extends ActionBarActivity implements TimePickerFrag
     }
 
     public void onSwitchTimeFactor(View view) {
-        mGlobalVariables.setUseTimeFactor(switch_timeFactor.isChecked());
+        IbisApplication.setUseTimeFactor(switch_timeFactor.isChecked());
     }
 
     public void onClickStartNavigation(View view) {
@@ -320,19 +317,19 @@ public class RoutingActivity extends ActionBarActivity implements TimePickerFrag
         boolean timeExc = false;
         if (!manuel_distance) {
             mRDb.open();
-            mGlobalVariables.setsEingTimeFactor(mRDb.getTotalDistTimeFactored());
+            IbisApplication.setsEingTimeFactor(mRDb.getTotalDistTimeFactored());
             mRDb.close();
         }
         //read text from EditText and convert to String
         try {
             //try to convert String to Float
             Double sEing = Double.parseDouble(editDistance.getText().toString());
-            mGlobalVariables.setsEing(sEing);
+            IbisApplication.setsEing(sEing);
         } catch (Exception e) {
             distanceExc = true;
         }
         // open alert with correct text
-        if (mGlobalVariables.gettAnkEingTime() == 0) {
+        if (IbisApplication.gettAnkEingTime() == 0) {
             timeExc = true;
         }
         if (timeExc && distanceExc) {
