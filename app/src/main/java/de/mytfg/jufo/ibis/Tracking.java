@@ -34,7 +34,7 @@ public class Tracking extends Service implements LocationListener, OnConnectionF
     protected Location mCurrentLocation;
     //create a new instance of classes
     Calculate mCalculate = new Calculate();
-    GlobalVariables mGlobalVariable;
+    IbisApplication mGlobalVariable;
     private GPSDatabase mGPSDb;
     private boolean saveData = true;
     private String accNotiStr;
@@ -49,7 +49,7 @@ public class Tracking extends Service implements LocationListener, OnConnectionF
     public void onLocationChanged(Location location) {
         Log.i(TAG, "onLocationChanged()");
         mCurrentLocation = location;
-        //write position to GlobalVariables class
+        //write position to IbisApplication class
         mGlobalVariable.setLocation(mCurrentLocation);
         //only save data, if accuracy is ok
         if (checkAccuracy(location.getAccuracy())) {
@@ -166,7 +166,7 @@ public class Tracking extends Service implements LocationListener, OnConnectionF
         mGoogleApiClient.connect();
 
         //initialize global variable class
-        mGlobalVariable = (GlobalVariables) getApplicationContext();
+        mGlobalVariable = (IbisApplication) getApplicationContext();
     }
 
     /**

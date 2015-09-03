@@ -16,8 +16,8 @@ import android.widget.EditText;
 
 public class SettingsActivity extends ActionBarActivity {
 
-    //create instance of GlobalVariables class
-    GlobalVariables mGlobalVariable;
+    //create instance of IbisApplication class
+    IbisApplication mGlobalVariable;
     //Timer for updating the map
     Handler timerHandler = new Handler();
     Runnable timerRunnable = new Runnable() {
@@ -37,7 +37,7 @@ public class SettingsActivity extends ActionBarActivity {
         setContentView(R.layout.activity_settings);
 
         //initialize global variable class
-        mGlobalVariable = (GlobalVariables) getApplicationContext();
+        mGlobalVariable = (IbisApplication) getApplicationContext();
 
         // Restore preferences
         SharedPreferences settings = getSharedPreferences(getString(R.string.preference_file_key), Context.MODE_PRIVATE);

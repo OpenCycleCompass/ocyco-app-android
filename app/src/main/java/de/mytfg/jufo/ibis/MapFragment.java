@@ -1,6 +1,5 @@
 package de.mytfg.jufo.ibis;
 
-import android.app.Activity;
 import android.content.Context;
 import android.os.Bundle;
 import android.os.Handler;
@@ -39,7 +38,7 @@ public class MapFragment extends Fragment {
     // Log TAG
     protected static final String TAG = "IBis-MapFragment";
     //global var class
-    GlobalVariables mGlobalVariables;
+    IbisApplication mGlobalVariables;
     RoutingDatabase mRDB;
 
     //map view and overlays
@@ -108,7 +107,7 @@ public class MapFragment extends Fragment {
         final Context context = this.getActivity();
         final DisplayMetrics dm = context.getResources().getDisplayMetrics();
         //initialize global variable class
-        mGlobalVariables = (GlobalVariables) getActivity().getApplicationContext();
+        mGlobalVariables = (IbisApplication) getActivity().getApplicationContext();
         //initialize RoutingDatabase
         mRDB = new RoutingDatabase(getActivity().getApplicationContext());
         //set zoom and touch controls

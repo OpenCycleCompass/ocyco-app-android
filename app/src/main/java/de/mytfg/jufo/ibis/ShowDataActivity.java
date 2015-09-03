@@ -17,8 +17,8 @@ public class ShowDataActivity extends ActionBarActivity {
     // Log TAG
     protected static final String TAG = "ShowDataActivity-class";
 
-    //create instance of GlobalVariables class
-    GlobalVariables mGlobalVariable;
+    //create instance of IbisApplication class
+    IbisApplication mGlobalVariable;
     //alert dialog vars
     AlertDialog.Builder alertDialogBuilder;
     AlertDialog alertDialog;
@@ -79,7 +79,7 @@ public class ShowDataActivity extends ActionBarActivity {
         //set content view
         setContentView(R.layout.activity_show_data);
         //initialize global variable class
-        mGlobalVariable = (GlobalVariables) getApplicationContext();
+        mGlobalVariable = (IbisApplication) getApplicationContext();
         //alert dialog for accuracy alerts
         alertDialogBuilder = new AlertDialog.Builder(ShowDataActivity.this);
         //info box text fields

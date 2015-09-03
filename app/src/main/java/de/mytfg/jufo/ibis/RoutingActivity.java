@@ -38,7 +38,6 @@ import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
-import java.io.Reader;
 import java.net.HttpURLConnection;
 import java.net.URL;
 import java.util.Calendar;
@@ -51,7 +50,7 @@ public class RoutingActivity extends ActionBarActivity implements TimePickerFrag
     private final static String TAG = "RoutingActivity-class";
     //self-written classes
     RoutingDatabase mRDb;
-    GlobalVariables mGlobalVariables;
+    IbisApplication mGlobalVariables;
     //Timer for updating the map
     Handler timerHandler = new Handler();
     Runnable timerRunnable = new Runnable() {
@@ -105,7 +104,7 @@ public class RoutingActivity extends ActionBarActivity implements TimePickerFrag
         switch_userData = (Switch) findViewById(R.id.switch_userData);
         switch_timeFactor = (Switch) findViewById(R.id.switch_timeFactor);
         //global variables class
-        mGlobalVariables = (GlobalVariables) getApplicationContext();
+        mGlobalVariables = (IbisApplication) getApplicationContext();
         //set up database, delete old database
         mRDb = new RoutingDatabase(this);
         mRDb.open();

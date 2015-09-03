@@ -15,7 +15,7 @@ import android.widget.Button;
 
 public class MainActivity extends ActionBarActivity {
 
-    GlobalVariables mGlobalVars;
+    IbisApplication mGlobalVars;
     //Timer for updating the map
     Handler timerHandler = new Handler();
     Runnable timerRunnable = new Runnable() {
@@ -89,7 +89,7 @@ public class MainActivity extends ActionBarActivity {
         setContentView(R.layout.activity_main);
         // initialize
         // Restore preferences
-        mGlobalVars = (GlobalVariables) getApplicationContext();
+        mGlobalVars = (IbisApplication) getApplicationContext();
         SharedPreferences settings = getSharedPreferences(getString(R.string.preference_file_key), Context.MODE_PRIVATE);
         //get variables and set to global class
         mGlobalVars.setCollect_data(settings.getBoolean("CollectData", false));
