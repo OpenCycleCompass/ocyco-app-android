@@ -48,21 +48,20 @@ public class MapFragment extends Fragment {
     private CompassOverlay mCompassOverlay;
     private ScaleBarOverlay mScaleBarOverlay;
 
-
     @Override
-    public void onAttach(Activity activity) {
-        Log.i(TAG, "onAttach()");
+    public void onResume() {
+        super.onResume();
+        Log.i(TAG, "onResume()");
         // call timerRunnable.run() frequently
         timerHandler.post(timerRunnable);
-        super.onAttach(activity);
     }
 
     @Override
-    public void onDetach() {
-        Log.i(TAG, "onDetach()");
+    public void onPause() {
+        Log.i(TAG, "onPause()");
         // stop calling timerRunnable.run() frequently
         timerHandler.post(null);
-        super.onDetach();
+        super.onPause();
     }
 
     //Timer for updating the map
