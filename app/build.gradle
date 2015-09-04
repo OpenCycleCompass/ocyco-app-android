@@ -23,16 +23,16 @@ android {
     buildTypes {
         if (System.getenv("TRAVIS")) {
             release {
-                minifyEnabled true
-                shrinkResources true
+                minifyEnabled false
+                shrinkResources false
                 proguardFiles getDefaultProguardFile('proguard-android.txt'), 'proguard-rules.pro'
                 signingConfig signingConfigs.releaseSigning
             }
             bintray {
                 applicationIdSuffix ".bintray"
                 versionNameSuffix " bintray"
-                minifyEnabled true
-                shrinkResources true
+                minifyEnabled false
+                shrinkResources false
                 proguardFiles getDefaultProguardFile('proguard-android.txt'), 'proguard-rules.pro'
                 signingConfig signingConfigs.releaseSigning
             }
