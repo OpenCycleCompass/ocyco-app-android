@@ -18,6 +18,8 @@ import com.google.android.gms.location.LocationListener;
 import com.google.android.gms.location.LocationRequest;
 import com.google.android.gms.location.LocationServices;
 
+import de.mytfg.jufo.ibis.util.Utils;
+
 public class Tracking extends Service implements LocationListener, OnConnectionFailedListener, ConnectionCallbacks {
 
     // The desired interval for location updates. Inexact. Updates may be more or less frequent.
@@ -37,9 +39,6 @@ public class Tracking extends Service implements LocationListener, OnConnectionF
     private GPSDatabase mGPSDb;
     private boolean saveData = true;
     private String accNotiStr;
-    // Notification
-    // Sets an ID for the notification
-    private int mNotificationId = 42;
     private NotificationCompat.Builder mBuilder;
     // Gets an instance of the NotificationManager service
     private NotificationManager mNotifyMgr;
@@ -58,7 +57,7 @@ public class Tracking extends Service implements LocationListener, OnConnectionF
             int num_rows = mGPSDb.getNumRows();
             double total_dist = mGPSDb.getTotalDist();
             mGPSDb.close();
-            String s_total_dist = roundDecimals(total_dist / 1000d);
+            String s_total_dist = Utils.roundDecimals(total_dist / 1000d);
             // Update notification, if online tracking ist running
             if (IbisApplication.isOnline_tracking_running()) {
                 mBuilder.setContentText(accNotiStr + getString(R.string.tracking_status_active) + " - " + num_rows + getString(R.string.coordinates) + s_total_dist + " " + getString(R.string.km));
@@ -88,10 +87,6 @@ public class Tracking extends Service implements LocationListener, OnConnectionF
         mGPSDb.open();
         mGPSDb.insertLocation(mCurrentLocation);
         mGPSDb.close();
-    }
-
-    private String roundDecimals(double d) {
-        return String.format("%.2f", d);
     }
 
     private void callCalculate() {
@@ -239,7 +234,7 @@ public class Tracking extends Service implements LocationListener, OnConnectionF
         // Create Notification with track info
         mBuilder.setContentText(accNotiStr + getString(R.string.tracking_status_active));
         // Builds the notification and issues it.
-        mNotifyMgr.notify(mNotificationId, mBuilder.build());
+        mNotifyMgr.notify(42, mBuilder.build());
     }
 
     @Override

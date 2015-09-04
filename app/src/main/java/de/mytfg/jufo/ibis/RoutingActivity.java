@@ -34,15 +34,14 @@ import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
 
-import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.InputStream;
-import java.io.InputStreamReader;
 import java.net.HttpURLConnection;
 import java.net.URL;
 import java.util.Calendar;
 import java.util.Locale;
 
+import de.mytfg.jufo.ibis.util.Utils;
 
 public class RoutingActivity extends ActionBarActivity implements TimePickerFragment.OnTimePickedListener, AdapterView.OnItemSelectedListener {
 
@@ -414,7 +413,7 @@ public class RoutingActivity extends ActionBarActivity implements TimePickerFrag
             stream = conn.getInputStream();
 
             // Convert the InputStream into a string
-            return readIt(stream);
+            return Utils.readStream(stream);
 
             // Makes sure that the InputStream is closed after the app is
             // finished using it.
@@ -423,17 +422,6 @@ public class RoutingActivity extends ActionBarActivity implements TimePickerFrag
                 stream.close();
             }
         }
-    }
-
-    // Reads an InputStream and converts it to a String.
-    public String readIt(InputStream stream) throws IOException {
-        BufferedReader r = new BufferedReader(new InputStreamReader(stream));
-        StringBuilder total = new StringBuilder();
-        String line;
-        while ((line = r.readLine()) != null) {
-            total.append(line);
-        }
-        return total.toString();
     }
 
     @Override

@@ -41,9 +41,6 @@ public class MapFragment extends Fragment {
 
     //map view and overlays
     private MapView mMapView;
-    private MyLocationNewOverlay mLocationOverlay;
-    private CompassOverlay mCompassOverlay;
-    private ScaleBarOverlay mScaleBarOverlay;
 
     private boolean mapVisible = false;
 
@@ -113,13 +110,13 @@ public class MapFragment extends Fragment {
         mMapView.setBuiltInZoomControls(true);
         mMapView.setMultiTouchControls(true);
         //crate and enable CompassOverlay
-        this.mCompassOverlay = new CompassOverlay(context, new InternalCompassOrientationProvider(context), mMapView);
+        CompassOverlay mCompassOverlay = new CompassOverlay(context, new InternalCompassOrientationProvider(context), mMapView);
         mCompassOverlay.enableCompass();
         //crate and enable MyLocationOverlay
-        this.mLocationOverlay = new MyLocationNewOverlay(context, new GpsMyLocationProvider(context), mMapView);
+        MyLocationNewOverlay mLocationOverlay = new MyLocationNewOverlay(context, new GpsMyLocationProvider(context), mMapView);
         mLocationOverlay.enableMyLocation();
         //crate and enable ScaleBarOverlay
-        mScaleBarOverlay = new ScaleBarOverlay(context);
+        ScaleBarOverlay mScaleBarOverlay = new ScaleBarOverlay(context);
         mScaleBarOverlay.setCentred(true);
         mScaleBarOverlay.setScaleBarOffset(dm.widthPixels / 2, 10);
         //check, if settings were changed by user, else activate overlays by default
@@ -130,13 +127,13 @@ public class MapFragment extends Fragment {
         }
         //add overlays
         if (IbisApplication.isShow_locationOverlay()) {
-            mMapView.getOverlays().add(this.mLocationOverlay);
+            mMapView.getOverlays().add(mLocationOverlay);
         }
         if (IbisApplication.isShow_compassOverlay()) {
-            mMapView.getOverlays().add(this.mCompassOverlay);
+            mMapView.getOverlays().add(mCompassOverlay);
         }
         if (IbisApplication.isShow_scaleBarOverlay()) {
-            mMapView.getOverlays().add(this.mScaleBarOverlay);
+            mMapView.getOverlays().add(mScaleBarOverlay);
         }
         mMapView.getController().setZoom(18);
         mMapView.getOverlays().add(this.createStaticPolyline());

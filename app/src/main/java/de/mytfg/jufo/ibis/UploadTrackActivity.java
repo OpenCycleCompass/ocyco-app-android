@@ -49,6 +49,8 @@ import java.util.Calendar;
 import java.util.List;
 import java.util.Locale;
 
+import de.mytfg.jufo.ibis.util.Utils;
+
 public class UploadTrackActivity extends ActionBarActivity {
 
     public static final String data_empty = "[]"; // empty, but valid JSON
@@ -138,8 +140,8 @@ public class UploadTrackActivity extends ActionBarActivity {
     // Initialize GUI
     private void initUI() {
 
-        editText_UploadTrackDuration.setText(formatTime(stopTst - startTst));
-        editText_UploadTrackLength.setText(roundDecimals(length) + " km");
+        editText_UploadTrackDuration.setText(Utils.formatTime(stopTst - startTst));
+        editText_UploadTrackLength.setText(Utils.roundDecimals(length) + " km");
         uploadPublic = prefs.getBoolean("upload_public", false);
         token = prefs.getString("upload_token", null);
         if (token == null) {
@@ -191,23 +193,6 @@ public class UploadTrackActivity extends ActionBarActivity {
         }
     }
 
-    private String formatTime(double secondsInput) {
-        String time;
-        //calculate hours, seconds and minutes
-        int seconds = (int) Math.round(secondsInput % 60);
-        int minutes = (int) Math.round(((secondsInput - seconds) % 3600) / 60);
-        int hours = (int) Math.round((secondsInput - seconds - minutes * 60) / 3600);
-        String hoursStrg = putZero(hours);
-        String minutesStrg = putZero(minutes);
-        String secondsStrg = putZero(seconds);
-        time = hoursStrg + "h " + minutesStrg + "min " + secondsStrg + "s";
-        return time;
-    }
-
-    private String roundDecimals(double d) {
-        return String.format("%.2f", d);
-    }
-
     private void getToken() {
         String lurl = this.getString(R.string.api1_base_url) + this.getString(R.string.api1_token_new);
         Log.i(TAG, lurl);
@@ -223,17 +208,6 @@ public class UploadTrackActivity extends ActionBarActivity {
             Toast toast = Toast.makeText(context, getString(R.string.upload_error_no_network_try_again_later), duration);
             toast.show();
         }
-    }
-
-    //put 0 before value, if != 0 and < 10
-    private String putZero(int time_value_in) {
-        String time_value_out;
-        if ((time_value_in != 0) && (time_value_in < 10)) {
-            time_value_out = "0" + time_value_in;
-        } else {
-            time_value_out = Integer.toString(time_value_in);
-        }
-        return time_value_out;
     }
 
     public void onSwitchPublic(View v) {
@@ -370,7 +344,7 @@ public class UploadTrackActivity extends ActionBarActivity {
             stream = conn.getInputStream();
 
             // Convert the InputStream into a string
-            return readIt(stream);
+            return Utils.readStream(stream);
 
             // Makes sure that the InputStream is closed after the app is
             // finished using it.
@@ -395,17 +369,6 @@ public class UploadTrackActivity extends ActionBarActivity {
         }
 
         return result.toString();
-    }
-
-    // Reads an InputStream and converts it to a String.
-    public String readIt(InputStream stream) throws IOException {
-        BufferedReader r = new BufferedReader(new InputStreamReader(stream));
-        StringBuilder total = new StringBuilder();
-        String line;
-        while ((line = r.readLine()) != null) {
-            total.append(line);
-        }
-        return total.toString();
     }
 
     private String getDate(long timestamp) {
