@@ -14,7 +14,7 @@ import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
 
-import java.util.Random;
+import java.security.SecureRandom;
 
 public class GPSDatabase {
     // Log TAG
@@ -94,7 +94,7 @@ public class GPSDatabase {
         stopTst = System.currentTimeMillis() / 1000;
 
         // random cut begin and end of track
-        Random random = new Random(); // TODO: echter Zufall?
+        SecureRandom random = new SecureRandom();
         int numRows = getNumRows();
         Log.i(TAG, "DB has " + numRows + " rows");
         Cursor cursor = db.rawQuery("SELECT " + COLUMN_ID + ", " + COLUMN_DIST + " FROM " + TABLENAME, null);
