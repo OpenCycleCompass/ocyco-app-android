@@ -520,6 +520,7 @@ public class UploadTrackActivity extends ActionBarActivity {
 
                         // Enable upload button to make second upload possible
                         button_UploadTrack.setEnabled(true);
+                        button_UploadTrackTokenRegenerate.setEnabled(true);
                     } finally {
                         // Create notification
                         NotificationCompat.Builder mBuilder = new NotificationCompat.Builder(getBaseContext())
@@ -539,12 +540,10 @@ public class UploadTrackActivity extends ActionBarActivity {
                             PendingIntent pIntentIbisWeb = PendingIntent.getActivity(getApplicationContext(), 0, intentIbisWeb, 0);
                             mBuilder.setContentIntent(pIntentIbisWeb);
                         }
-                        // Sets an ID for the notification
-                        int mNotificationId = 43;
                         // Gets an instance of the NotificationManager service
                         NotificationManager mNotifyMgr = (NotificationManager) getSystemService(NOTIFICATION_SERVICE);
                         // Builds the notification and issues it.
-                        mNotifyMgr.notify(mNotificationId, mBuilder.build());
+                        mNotifyMgr.notify(43, mBuilder.build());
 
                         // Additionally to notification show Toast message
                         Context context = getApplicationContext();
