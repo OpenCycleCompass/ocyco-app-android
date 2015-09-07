@@ -14,6 +14,7 @@ import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
 
+import java.security.SecureRandom;
 
 public class GPSDatabase {
     // Log TAG
@@ -91,8 +92,46 @@ public class GPSDatabase {
         open();
         //Log.i(TAG, "sendToServer()");
         stopTst = System.currentTimeMillis() / 1000;
+
+        // random cut begin and end of track
+        SecureRandom random = new SecureRandom();
+        int numRows = getNumRows();
+        Log.i(TAG, "DB has " + numRows + " rows");
+        Cursor cursor = db.rawQuery("SELECT " + COLUMN_ID + ", " + COLUMN_DIST + " FROM " + TABLENAME, null);
+        double cutDistBegin = random.nextInt(80) + 20d;
+        double cutDistEnd = random.nextInt(80) + 20d;
+        double distBegin = 0d;
+        double distEnd = 0d;
+        int cutColIdBegin;
+        int cutColIdEnd;
+        cursor.moveToFirst();
+        while(true) {
+            distBegin += cursor.getDouble(0);
+            if(distBegin > cutDistBegin) {
+                cutColIdBegin = cursor.getInt(1);
+                break;
+            }
+            cursor.moveToNext();
+        }
+        cursor.moveToLast();
+        while(true) {
+            distEnd += cursor.getDouble(0);
+            if(distEnd > cutDistEnd) {
+                cutColIdEnd = cursor.getInt(1);
+                break;
+            }
+            cursor.moveToPrevious();
+        }
+        cursor.close();
+        int delRowsBegin = db.delete(TABLENAME, COLUMN_ID + " < " + cutColIdBegin, null);
+        int delRowsEnd = db.delete(TABLENAME, COLUMN_ID + " > " + cutColIdEnd, null);
+        Log.i(TAG, "Random cut: begin=" + delRowsBegin);
+        Log.i(TAG, "Random cut: end=" + delRowsEnd);
+        numRows = getNumRows();
+        Log.i(TAG, "DB has " + numRows + " rows");
+
         JSONArray data = new JSONArray();
-        Cursor cursor = getAllRows();
+        cursor = getAllRows();
         cursor.moveToFirst();
         while (!cursor.isAfterLast()) {
             JSONObject point = new JSONObject();
@@ -109,6 +148,7 @@ public class GPSDatabase {
             data.put(point);
             cursor.moveToNext();
         }
+        cursor.close();
         String data_string = data.toString();
         Log.i(TAG, "data_string" + data_string);
         // Return intent to start UploadTrackActivity with track data attached

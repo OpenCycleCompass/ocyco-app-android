@@ -15,9 +15,6 @@ import android.widget.CheckBox;
 import android.widget.EditText;
 
 public class SettingsActivity extends ActionBarActivity {
-
-    //create instance of GlobalVariables class
-    GlobalVariables mGlobalVariable;
     //Timer for updating the map
     Handler timerHandler = new Handler();
     Runnable timerRunnable = new Runnable() {
@@ -36,26 +33,23 @@ public class SettingsActivity extends ActionBarActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_settings);
 
-        //initialize global variable class
-        mGlobalVariable = (GlobalVariables) getApplicationContext();
-
         // Restore preferences
         SharedPreferences settings = getSharedPreferences(getString(R.string.preference_file_key), Context.MODE_PRIVATE);
         //get variables and set to global class
-        mGlobalVariable.setCollect_data(settings.getBoolean("CollectData", false));
-        mGlobalVariable.setShowLocationOverlay(settings.getBoolean("showLocationOverlay", true));
-        mGlobalVariable.setShowCompassOverlay(settings.getBoolean("showCompassOverlay", true));
-        mGlobalVariable.setShowScaleBarOverlay(settings.getBoolean("showScaleBarOverlay", true));
+        IbisApplication.setCollect_data(settings.getBoolean("CollectData", false));
+        IbisApplication.setShowLocationOverlay(settings.getBoolean("showLocationOverlay", true));
+        IbisApplication.setShowCompassOverlay(settings.getBoolean("showCompassOverlay", true));
+        IbisApplication.setShowScaleBarOverlay(settings.getBoolean("showScaleBarOverlay", true));
         FloatTextSize = settings.getFloat("FloatTextSize", 8);
         //set check boxes
         final CheckBox CBcollectData = (CheckBox) findViewById(R.id.CBCollectData);
-        CBcollectData.setChecked(mGlobalVariable.isCollect_data());
+        CBcollectData.setChecked(IbisApplication.isCollect_data());
         final CheckBox cb_show_compassOverlay = (CheckBox) findViewById(R.id.cb_show_compassOverlay);
-        cb_show_compassOverlay.setChecked(mGlobalVariable.isShow_compassOverlay());
+        cb_show_compassOverlay.setChecked(IbisApplication.isShow_compassOverlay());
         final CheckBox cb_show_locationOverlay = (CheckBox) findViewById(R.id.cb_show_locationOverlay);
-        cb_show_locationOverlay.setChecked(mGlobalVariable.isShow_locationOverlay());
+        cb_show_locationOverlay.setChecked(IbisApplication.isShow_locationOverlay());
         final CheckBox cb_show_scaleBarOverlay = (CheckBox) findViewById(R.id.cb_show_scaleBarOverlay);
-        cb_show_scaleBarOverlay.setChecked(mGlobalVariable.isShow_scaleBarOverlay());
+        cb_show_scaleBarOverlay.setChecked(IbisApplication.isShow_scaleBarOverlay());
         //set default text
         EditText enter_text_size = (EditText) findViewById(R.id.enter_text_size);
         enter_text_size.setText(Float.toString(FloatTextSize));
@@ -74,10 +68,10 @@ public class SettingsActivity extends ActionBarActivity {
         SharedPreferences settings = getSharedPreferences(getString(R.string.preference_file_key), Context.MODE_PRIVATE);
         //creating a editor and add variables
         SharedPreferences.Editor editor = settings.edit();
-        editor.putBoolean("CollectData", mGlobalVariable.isCollect_data());
-        editor.putBoolean("showCompassOverlay", mGlobalVariable.isShow_compassOverlay());
-        editor.putBoolean("showLocationOverlay", mGlobalVariable.isShow_locationOverlay());
-        editor.putBoolean("showScaleBarOverlay", mGlobalVariable.isShow_scaleBarOverlay());
+        editor.putBoolean("CollectData", IbisApplication.isCollect_data());
+        editor.putBoolean("showCompassOverlay", IbisApplication.isShow_compassOverlay());
+        editor.putBoolean("showLocationOverlay", IbisApplication.isShow_locationOverlay());
+        editor.putBoolean("showScaleBarOverlay", IbisApplication.isShow_scaleBarOverlay());
         editor.putFloat("FloatTextSize", FloatTextSize);
         // Commit the edits!
         editor.apply();
@@ -116,7 +110,7 @@ public class SettingsActivity extends ActionBarActivity {
 
     private void updateCBCollectData() {
         final CheckBox CBcollectData = (CheckBox) findViewById(R.id.CBCollectData);
-        CBcollectData.setChecked(mGlobalVariable.isCollect_data());
+        CBcollectData.setChecked(IbisApplication.isCollect_data());
     }
 
     public void onCheckboxClicked(View view) {
@@ -126,16 +120,16 @@ public class SettingsActivity extends ActionBarActivity {
         // Check which checkbox was clicked
         switch (view.getId()) {
             case R.id.CBCollectData:
-                mGlobalVariable.setCollect_data(checked);
+                IbisApplication.setCollect_data(checked);
                 break;
             case R.id.cb_show_locationOverlay:
-                mGlobalVariable.setShowLocationOverlay(checked);
+                IbisApplication.setShowLocationOverlay(checked);
                 break;
             case R.id.cb_show_compassOverlay:
-                mGlobalVariable.setShowCompassOverlay(checked);
+                IbisApplication.setShowCompassOverlay(checked);
                 break;
             case R.id.cb_show_scaleBarOverlay:
-                mGlobalVariable.setShowScaleBarOverlay(checked);
+                IbisApplication.setShowScaleBarOverlay(checked);
                 break;
         }
     }
@@ -150,8 +144,8 @@ public class SettingsActivity extends ActionBarActivity {
         } catch (java.lang.NumberFormatException e) {
             openAlert(strEnterTxtSz);
         }
-        mGlobalVariable.setSettingVars(FloatTextSize);
-        mGlobalVariable.setChanged_settings(true);
+        IbisApplication.setSettingVars(FloatTextSize);
+        IbisApplication.setChanged_settings(true);
     }
 
     private void openAlert(String StrEditText) {

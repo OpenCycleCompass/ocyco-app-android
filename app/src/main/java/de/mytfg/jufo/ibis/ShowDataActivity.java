@@ -17,8 +17,6 @@ public class ShowDataActivity extends ActionBarActivity {
     // Log TAG
     protected static final String TAG = "ShowDataActivity-class";
 
-    //create instance of GlobalVariables class
-    GlobalVariables mGlobalVariable;
     //alert dialog vars
     AlertDialog.Builder alertDialogBuilder;
     AlertDialog alertDialog;
@@ -42,9 +40,9 @@ public class ShowDataActivity extends ActionBarActivity {
         @Override
         public void run() {
             oldAccuracyAlert = accuracyAlert;
-            if (mGlobalVariable.getLocation() != null) {
+            if (IbisApplication.getLocation() != null) {
                 noGPSAlertOpen = false;
-                if (mGlobalVariable.getLocation().getAccuracy() < 20) {
+                if (IbisApplication.getLocation().getAccuracy() < 20) {
                     showData();
                     accuracyAlert = false;
                 } else {
@@ -78,8 +76,6 @@ public class ShowDataActivity extends ActionBarActivity {
         getWindow().addFlags(WindowManager.LayoutParams.FLAG_SHOW_WHEN_LOCKED);
         //set content view
         setContentView(R.layout.activity_show_data);
-        //initialize global variable class
-        mGlobalVariable = (GlobalVariables) getApplicationContext();
         //alert dialog for accuracy alerts
         alertDialogBuilder = new AlertDialog.Builder(ShowDataActivity.this);
         //info box text fields
@@ -100,7 +96,7 @@ public class ShowDataActivity extends ActionBarActivity {
     }
 
     private void setTextSize() {
-        float textSize = mGlobalVariable.getTextSize();
+        float textSize = IbisApplication.getTextSize();
         if (textSize != 0) {
             sGefBox.setTextSize(0x00000003, textSize);
             sZufBox.setTextSize(0x00000003, textSize);
@@ -125,7 +121,7 @@ public class ShowDataActivity extends ActionBarActivity {
         }
         if (confirm) {
             alertDialogBuilder.setTitle("Positionsbestimmung erfolgreich!");
-            alertDialogBuilder.setMessage((int) mGlobalVariable.getLocation().getAccuracy() + "m Abweichung ist akzeptabel für die Navigation, sie können nun beginnen!");
+            alertDialogBuilder.setMessage((int) IbisApplication.getLocation().getAccuracy() + "m Abweichung ist akzeptabel für die Navigation, sie können nun beginnen!");
             //create the OK Button and onClickListener
             alertDialogBuilder.setPositiveButton("OK", new DialogInterface.OnClickListener() {
                 //close dialog when clicked
@@ -137,8 +133,8 @@ public class ShowDataActivity extends ActionBarActivity {
 
         } else {
             alertDialogBuilder.setTitle("Positionsbestimmung zu ungenau!");
-            if (mGlobalVariable.getLocation() != null) {
-                alertDialogBuilder.setMessage((int) mGlobalVariable.getLocation().getAccuracy() + "m Abweichung sind zu ungenau zum Navigieren! Haben Sie GPS aktiviert? Signal wird gesucht...");
+            if (IbisApplication.getLocation() != null) {
+                alertDialogBuilder.setMessage((int) IbisApplication.getLocation().getAccuracy() + "m Abweichung sind zu ungenau zum Navigieren! Haben Sie GPS aktiviert? Signal wird gesucht...");
             } else {
                 alertDialogBuilder.setMessage("Kein Signal! Haben Sie GPS aktiviert? Signal wird gesucht...");
             }
@@ -153,13 +149,13 @@ public class ShowDataActivity extends ActionBarActivity {
     private void showData() {
         Log.i(TAG, "showData()");
         //get variables from global class and round
-        String sGef = roundDecimals(mGlobalVariable.getsGef()) + " km";
-        String sZuf = roundDecimals(mGlobalVariable.getsZuf()) + " km";
-        String vAkt = roundDecimals(mGlobalVariable.getvAkt()) + " km/h";
-        String vD = roundDecimals(mGlobalVariable.getvD()) + " km/h";
+        String sGef = roundDecimals(IbisApplication.getsGef()) + " km";
+        String sZuf = roundDecimals(IbisApplication.getsZuf()) + " km";
+        String vAkt = roundDecimals(IbisApplication.getvAkt()) + " km/h";
+        String vD = roundDecimals(IbisApplication.getvD()) + " km/h";
         int tAnkDays = 0;
         //get the time and format it (tAnk)
-        double tAnkD = mGlobalVariable.gettAnk();
+        double tAnkD = IbisApplication.gettAnk();
         int tAnkStd = (int) tAnkD;
         int tAnkMin = (int) Math.round(((tAnkD - tAnkStd) * 60));
         tAnkMinStr = Integer.toString(tAnkMin);
@@ -173,12 +169,12 @@ public class ShowDataActivity extends ActionBarActivity {
             tAnk = tAnkStd + ":" + tAnkMinStr + " Uhr" + System.getProperty("line.separator") + "in " + tAnkDays + " Tagen";
         }
         //get the time and format it (tAnkUnt)
-        double tAnkUntD = mGlobalVariable.gettAnkUnt();
+        double tAnkUntD = IbisApplication.gettAnkUnt();
         int tAnkUntStd = (int) tAnkUntD;
         int tAnkUntMin = (int) Math.round(((tAnkUntD - tAnkUntStd) * 60));
         String tAnkUnt = tAnkUntStd + "h " + tAnkUntMin + "min";
-        String vDMuss = roundDecimals(mGlobalVariable.getvDMuss()) + " km/h";
-        String vDunt = roundDecimals(mGlobalVariable.getvDunt()) + " km/h";
+        String vDMuss = roundDecimals(IbisApplication.getvDMuss()) + " km/h";
+        String vDunt = roundDecimals(IbisApplication.getvDunt()) + " km/h";
         //show in info boxes
         sGefBox.setText(sGef + "");
         sZufBox.setText(sZuf + "");
@@ -194,18 +190,18 @@ public class ShowDataActivity extends ActionBarActivity {
             tAnkUntBox.setText("--:--");
         }
         //set color
-        if (mGlobalVariable.gettAnkUnt() < 0) {
+        if (IbisApplication.gettAnkUnt() < 0) {
             tAnkUntBox.setTextColor(getResources().getColor(R.color.good_value));
-        } else if (mGlobalVariable.gettAnkUnt() > 0) {
+        } else if (IbisApplication.gettAnkUnt() > 0) {
             tAnkUntBox.setTextColor(getResources().getColor(R.color.bad_value));
         }
-        if (mGlobalVariable.getvDunt() < 0) {
+        if (IbisApplication.getvDunt() < 0) {
             vDUntBox.setTextColor(getResources().getColor(R.color.good_value));
-        } else if (mGlobalVariable.getvDunt() > 0) {
+        } else if (IbisApplication.getvDunt() > 0) {
             vDUntBox.setTextColor(getResources().getColor(R.color.bad_value));
         }
         //set vDMuss & vDunt "---", if it is later then the wanted arrival time
-        if (mGlobalVariable.getvDMuss() < 0) {
+        if (IbisApplication.getvDMuss() < 0) {
             vDMussBox.setText("---");
             vDUntBox.setText("---");
             vDUntBox.setTextColor(getResources().getColor(R.color.default_black));
@@ -242,19 +238,19 @@ public class ShowDataActivity extends ActionBarActivity {
                 return true;
             case R.id.auto_center:
                 item.setChecked(!item.isChecked());
-                mGlobalVariable.setAutoCenter(item.isChecked());
+                IbisApplication.setAutoCenter(item.isChecked());
                 //only enable auto rotation, if auto centering is enabled
                 MenuItem auto_rotate = menu.findItem(R.id.auto_rotate);
                 auto_rotate.setEnabled(item.isChecked());
                 auto_rotate.setChecked(false);
                 //set global variables
-                mGlobalVariable.setAuto_rotate(false);
-                mGlobalVariable.setAlign_north(true);
+                IbisApplication.setAuto_rotate(false);
+                IbisApplication.setAlign_north(true);
                 return true;
             case R.id.auto_rotate:
                 item.setChecked(!item.isChecked());
-                mGlobalVariable.setAuto_rotate(item.isChecked());
-                mGlobalVariable.setAlign_north(!item.isChecked());
+                IbisApplication.setAuto_rotate(item.isChecked());
+                IbisApplication.setAlign_north(!item.isChecked());
                 return true;
             case R.id.action_info:
                 Intent intent_info = new Intent(this, InfoActivity.class);

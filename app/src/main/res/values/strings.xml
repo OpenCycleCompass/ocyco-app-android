@@ -5,7 +5,7 @@
     <string name="app_name_short">iBis</string>
     <string name="crash_toast">Leider ist die iBis App abgestürzt, ein Absturzbericht wird gesendet</string>
     <string name="action_settings">Einstellungen</string>
-    <string name="welcome_headline">Wilkommen bei iBis!</string>
+    <string name="welcome_headline">Willkommen bei iBis!</string>
     <string name="welcome">iBis - intelligent bike information system ist ein Fahrrad Informations- und Navigationssystem.
         Das Ziel ist es, Ihnen eine möglichst für Fahrradfahrer geeignete, schnelle Route zu suchen und
         Ihnen möglichst hilfreiche und konkrete Informationen über Ihren Ankunftszeitpunkt zu geben.

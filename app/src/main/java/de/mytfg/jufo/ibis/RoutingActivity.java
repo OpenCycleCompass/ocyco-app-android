@@ -34,16 +34,14 @@ import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
 
-import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.InputStream;
-import java.io.InputStreamReader;
-import java.io.Reader;
 import java.net.HttpURLConnection;
 import java.net.URL;
 import java.util.Calendar;
 import java.util.Locale;
 
+import de.mytfg.jufo.ibis.util.Utils;
 
 public class RoutingActivity extends ActionBarActivity implements TimePickerFragment.OnTimePickedListener, AdapterView.OnItemSelectedListener {
 
@@ -51,7 +49,6 @@ public class RoutingActivity extends ActionBarActivity implements TimePickerFrag
     private final static String TAG = "RoutingActivity-class";
     //self-written classes
     RoutingDatabase mRDb;
-    GlobalVariables mGlobalVariables;
     //Timer for updating the map
     Handler timerHandler = new Handler();
     Runnable timerRunnable = new Runnable() {
@@ -104,8 +101,6 @@ public class RoutingActivity extends ActionBarActivity implements TimePickerFrag
         switch_manuelDistance = (Switch) findViewById(R.id.switch_manuelDistance);
         switch_userData = (Switch) findViewById(R.id.switch_userData);
         switch_timeFactor = (Switch) findViewById(R.id.switch_timeFactor);
-        //global variables class
-        mGlobalVariables = (GlobalVariables) getApplicationContext();
         //set up database, delete old database
         mRDb = new RoutingDatabase(this);
         mRDb.open();
@@ -188,7 +183,7 @@ public class RoutingActivity extends ActionBarActivity implements TimePickerFrag
 
     private void lookForStartPosition() {
         try {
-            startLocation = mGlobalVariables.getLocation();
+            startLocation = IbisApplication.getLocation();
             start_address.setText(startLocation.getLatitude() + "    " + startLocation.getLongitude());
             // focus on next edit text
             destination_address.setFocusable(true);
@@ -275,7 +270,7 @@ public class RoutingActivity extends ActionBarActivity implements TimePickerFrag
         if ((hour < current_hour) || (current_hour == hour) && (minute < current_minute)) {
             tAnkEingTime += 24 * 60 * 60 * 1000;
         }
-        mGlobalVariables.settAnkEingTime(tAnkEingTime);
+        IbisApplication.settAnkEingTime(tAnkEingTime);
 
     }
 
@@ -313,7 +308,7 @@ public class RoutingActivity extends ActionBarActivity implements TimePickerFrag
     }
 
     public void onSwitchTimeFactor(View view) {
-        mGlobalVariables.setUseTimeFactor(switch_timeFactor.isChecked());
+        IbisApplication.setUseTimeFactor(switch_timeFactor.isChecked());
     }
 
     public void onClickStartNavigation(View view) {
@@ -321,19 +316,19 @@ public class RoutingActivity extends ActionBarActivity implements TimePickerFrag
         boolean timeExc = false;
         if (!manuel_distance) {
             mRDb.open();
-            mGlobalVariables.setsEingTimeFactor(mRDb.getTotalDistTimeFactored());
+            IbisApplication.setsEingTimeFactor(mRDb.getTotalDistTimeFactored());
             mRDb.close();
         }
         //read text from EditText and convert to String
         try {
             //try to convert String to Float
             Double sEing = Double.parseDouble(editDistance.getText().toString());
-            mGlobalVariables.setsEing(sEing);
+            IbisApplication.setsEing(sEing);
         } catch (Exception e) {
             distanceExc = true;
         }
         // open alert with correct text
-        if (mGlobalVariables.gettAnkEingTime() == 0) {
+        if (IbisApplication.gettAnkEingTime() == 0) {
             timeExc = true;
         }
         if (timeExc && distanceExc) {
@@ -418,7 +413,7 @@ public class RoutingActivity extends ActionBarActivity implements TimePickerFrag
             stream = conn.getInputStream();
 
             // Convert the InputStream into a string
-            return readIt(stream);
+            return Utils.readStream(stream);
 
             // Makes sure that the InputStream is closed after the app is
             // finished using it.
@@ -427,17 +422,6 @@ public class RoutingActivity extends ActionBarActivity implements TimePickerFrag
                 stream.close();
             }
         }
-    }
-
-    // Reads an InputStream and converts it to a String.
-    public String readIt(InputStream stream) throws IOException {
-        BufferedReader r = new BufferedReader(new InputStreamReader(stream));
-        StringBuilder total = new StringBuilder();
-        String line;
-        while ((line = r.readLine()) != null) {
-            total.append(line);
-        }
-        return total.toString();
     }
 
     @Override

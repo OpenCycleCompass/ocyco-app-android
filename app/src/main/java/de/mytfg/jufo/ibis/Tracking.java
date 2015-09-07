@@ -18,6 +18,8 @@ import com.google.android.gms.location.LocationListener;
 import com.google.android.gms.location.LocationRequest;
 import com.google.android.gms.location.LocationServices;
 
+import de.mytfg.jufo.ibis.util.Utils;
+
 public class Tracking extends Service implements LocationListener, OnConnectionFailedListener, ConnectionCallbacks {
 
     // The desired interval for location updates. Inexact. Updates may be more or less frequent.
@@ -34,13 +36,9 @@ public class Tracking extends Service implements LocationListener, OnConnectionF
     protected Location mCurrentLocation;
     //create a new instance of classes
     Calculate mCalculate = new Calculate();
-    GlobalVariables mGlobalVariable;
     private GPSDatabase mGPSDb;
     private boolean saveData = true;
     private String accNotiStr;
-    // Notification
-    // Sets an ID for the notification
-    private int mNotificationId = 42;
     private NotificationCompat.Builder mBuilder;
     // Gets an instance of the NotificationManager service
     private NotificationManager mNotifyMgr;
@@ -49,8 +47,8 @@ public class Tracking extends Service implements LocationListener, OnConnectionF
     public void onLocationChanged(Location location) {
         Log.i(TAG, "onLocationChanged()");
         mCurrentLocation = location;
-        //write position to GlobalVariables class
-        mGlobalVariable.setLocation(mCurrentLocation);
+        //write position to IbisApplication class
+        IbisApplication.setLocation(mCurrentLocation);
         //only save data, if accuracy is ok
         if (checkAccuracy(location.getAccuracy())) {
             updateDatabase();
@@ -59,9 +57,9 @@ public class Tracking extends Service implements LocationListener, OnConnectionF
             int num_rows = mGPSDb.getNumRows();
             double total_dist = mGPSDb.getTotalDist();
             mGPSDb.close();
-            String s_total_dist = roundDecimals(total_dist / 1000d);
+            String s_total_dist = Utils.roundDecimals(total_dist / 1000d);
             // Update notification, if online tracking ist running
-            if (mGlobalVariable.isOnline_tracking_running()) {
+            if (IbisApplication.isOnline_tracking_running()) {
                 mBuilder.setContentText(accNotiStr + getString(R.string.tracking_status_active) + " - " + num_rows + getString(R.string.coordinates) + s_total_dist + " " + getString(R.string.km));
                 // Sets an ID for the notification
                 int mNotificationId = 42;
@@ -91,24 +89,20 @@ public class Tracking extends Service implements LocationListener, OnConnectionF
         mGPSDb.close();
     }
 
-    private String roundDecimals(double d) {
-        return String.format("%.2f", d);
-    }
-
     private void callCalculate() {
         Log.i(TAG, "callCalculate()");
-        mCalculate.getData(mCurrentLocation, mGlobalVariable.getsEing());
+        mCalculate.getData(mCurrentLocation, IbisApplication.getsEing());
         //only call mathematical methods, if this is not the first location - else there will be a NPE
         if (!mCalculate.checkFirstLoc()) {
-            mCalculate.calculateTimeVars(mGlobalVariable.gettAnkEingTime());
+            mCalculate.calculateTimeVars(IbisApplication.gettAnkEingTime());
             mGPSDb.open();
             mCalculate.calculateDrivenDistance(mGPSDb.getTotalDist());
             Log.i(TAG, "sEing tf callCalc" + (mGPSDb.getTotalDist()));
             mGPSDb.close();
             mCalculate.calculateDrivenTime();
             mCalculate.calculateSpeed();
-            mCalculate.math(mGlobalVariable.isUseTimeFactor(), mGlobalVariable.getsEingTimeFactor() / 1000d);
-            Log.i(TAG, "sEing tf callCalc" + (mGlobalVariable.getsEingTimeFactor() / 1000d));
+            mCalculate.math(IbisApplication.isUseTimeFactor(), IbisApplication.getsEingTimeFactor() / 1000d);
+            Log.i(TAG, "sEing tf callCalc" + (IbisApplication.getsEingTimeFactor() / 1000d));
             //get Variables from calculation
             double sGef = mCalculate.getsGef();
             double sZuf = mCalculate.getsZuf();
@@ -119,7 +113,7 @@ public class Tracking extends Service implements LocationListener, OnConnectionF
             double vDMuss = mCalculate.getvDMuss();
             double vDunt = mCalculate.getvDunt();
             //write Variables to global class
-            mGlobalVariable.setCalculationVars(sGef, sZuf, vAkt, vD, tAnk, tAnkUnt, vDMuss, vDunt);
+            IbisApplication.setCalculationVars(sGef, sZuf, vAkt, vD, tAnk, tAnkUnt, vDMuss, vDunt);
 
         }
 
@@ -164,9 +158,6 @@ public class Tracking extends Service implements LocationListener, OnConnectionF
         //build and connect Api Client
         buildGoogleApiClient();
         mGoogleApiClient.connect();
-
-        //initialize global variable class
-        mGlobalVariable = (GlobalVariables) getApplicationContext();
     }
 
     /**
@@ -198,7 +189,7 @@ public class Tracking extends Service implements LocationListener, OnConnectionF
                 if (intent.getBooleanExtra("stopOnlineTracking", true)) {
                     stopOnlineTracking();
                 }
-            } else if (!mGlobalVariable.isOnline_tracking_running() && mGlobalVariable.isCollect_data()) {
+            } else if (!IbisApplication.isOnline_tracking_running() && IbisApplication.isCollect_data()) {
                 startOnlineTracking();
             }
         }
@@ -234,16 +225,16 @@ public class Tracking extends Service implements LocationListener, OnConnectionF
         mGPSDb.open();
         mGPSDb.deleteDatabase();
         mGPSDb.close();
-        mGlobalVariable.setOnline_tracking_running(false);
+        IbisApplication.setOnline_tracking_running(false);
     }
 
     private void startOnlineTracking() {
         Log.i(TAG, "startOnlineTracking()");
-        mGlobalVariable.setOnline_tracking_running(true);
+        IbisApplication.setOnline_tracking_running(true);
         // Create Notification with track info
         mBuilder.setContentText(accNotiStr + getString(R.string.tracking_status_active));
         // Builds the notification and issues it.
-        mNotifyMgr.notify(mNotificationId, mBuilder.build());
+        mNotifyMgr.notify(42, mBuilder.build());
     }
 
     @Override
@@ -254,7 +245,7 @@ public class Tracking extends Service implements LocationListener, OnConnectionF
     }
 
     private void disconnect () {
-        if (mGlobalVariable.isOnline_tracking_running()) {
+        if (IbisApplication.isOnline_tracking_running()) {
             stopOnlineTracking();
         }
         stopLocationUpdates();

@@ -17,20 +17,10 @@ android:
     - extra-android-m2repository
     ## Goodle Android Repository
     - extra-google-m2repository
-    # Specify at least one system image,
-    # if you need to run emulator(s) during your tests
-    - sys-img-armeabi-v7a-android-19
 
 # decrypt ibis.keystore
 before_install:
 - openssl aes-256-cbc -K $encrypted_ab14c45bfecf_key -iv $encrypted_ab14c45bfecf_iv -in ibis.keystore.enc -out ibis.keystore -d
-
-# Emulator Management: Create, Start and Wait
-before_script:
-  - echo no | android create avd --force -n test -t android-19 --abi armeabi-v7a
-  - emulator -avd test -no-skin -no-audio -no-window &
-  - android-wait-for-emulator
-  - adb shell input keyevent 82 &
 
 script:
   - ./gradlew assembleRelease

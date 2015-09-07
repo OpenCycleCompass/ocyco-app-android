@@ -5,6 +5,7 @@ import android.app.Activity;
 import android.app.Dialog;
 import android.app.TimePickerDialog;
 import android.os.Bundle;
+import android.support.annotation.NonNull;
 import android.support.v4.app.DialogFragment;
 import android.text.format.DateFormat;
 import android.widget.TimePicker;
@@ -29,6 +30,7 @@ public class TimePickerFragment extends DialogFragment implements TimePickerDial
         }
     }
 
+    @NonNull
     @Override
     public Dialog onCreateDialog(Bundle savedInstanceState) {
         // use current time as default
@@ -42,7 +44,7 @@ public class TimePickerFragment extends DialogFragment implements TimePickerDial
         return tpd;
     }
 
-    public static interface OnTimePickedListener {
-        public abstract void onTimePicked(int hour, int minute);
+    public interface OnTimePickedListener {
+        void onTimePicked(int hour, int minute);
     }
 }

@@ -15,7 +15,6 @@ import android.widget.Button;
 
 public class MainActivity extends ActionBarActivity {
 
-    GlobalVariables mGlobalVars;
     //Timer for updating the map
     Handler timerHandler = new Handler();
     Runnable timerRunnable = new Runnable() {
@@ -41,7 +40,7 @@ public class MainActivity extends ActionBarActivity {
     }
 
     public void onClickStartTracking(View view) {
-        if (mGlobalVars.isCollect_data()) {
+        if (IbisApplication.isCollect_data()) {
             enableButtons();
             Intent intent = new Intent(this, Tracking.class);
             startService(intent);
@@ -72,8 +71,8 @@ public class MainActivity extends ActionBarActivity {
     private void enableButtons() {
         //enable buttons - status of trackingRunning is not even changed,
         //when this statement is executed!
-        start_tracking_button.setEnabled(!mGlobalVars.isOnline_tracking_running());
-        stop_tracking_button.setEnabled(mGlobalVars.isOnline_tracking_running());
+        start_tracking_button.setEnabled(!IbisApplication.isOnline_tracking_running());
+        stop_tracking_button.setEnabled(IbisApplication.isOnline_tracking_running());
     }
 
     public void onClickStopTracking(View view) {
@@ -89,10 +88,9 @@ public class MainActivity extends ActionBarActivity {
         setContentView(R.layout.activity_main);
         // initialize
         // Restore preferences
-        mGlobalVars = (GlobalVariables) getApplicationContext();
         SharedPreferences settings = getSharedPreferences(getString(R.string.preference_file_key), Context.MODE_PRIVATE);
         //get variables and set to global class
-        mGlobalVars.setCollect_data(settings.getBoolean("CollectData", false));
+        IbisApplication.setCollect_data(settings.getBoolean("CollectData", false));
         start_tracking_button = (Button) findViewById(R.id.button_start_tracking);
         stop_tracking_button = (Button) findViewById(R.id.button_stop_tracking);
         startUIUpdates();

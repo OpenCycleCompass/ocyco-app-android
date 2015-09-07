@@ -9,8 +9,8 @@ iBis (*intelligent bike information system*) is an android app for cyclists.
 
 | branch | status |
 |--------|--------|
-| master | [![Build Status](https://travis-ci.org/iBis-project/iBis-Android-App.svg?branch=master)](https://travis-ci.org/MyTFG/mytfg-app-android) |
-| develop | [![Build Status](https://travis-ci.org/iBis-project/iBis-Android-App.svg?branch=develop)](https://travis-ci.org/MyTFG/mytfg-app-android) |
+| master | [![Build Status](https://travis-ci.org/iBis-project/iBis-Android-App.svg?branch=master)](https://travis-ci.org/iBis-project/iBis-Android-App) |
+| develop | [![Build Status](https://travis-ci.org/iBis-project/iBis-Android-App.svg?branch=develop)](https://travis-ci.org/iBis-project/iBis-Android-App) |
 
 
 ## Contributing

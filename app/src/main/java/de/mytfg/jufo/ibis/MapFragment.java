@@ -10,9 +10,6 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 
-import org.json.JSONArray;
-import org.json.JSONException;
-import org.json.JSONObject;
 import org.osmdroid.DefaultResourceProxyImpl;
 import org.osmdroid.ResourceProxy;
 import org.osmdroid.bonuspack.overlays.Polyline;
@@ -40,25 +37,39 @@ public class MapFragment extends Fragment {
 
     // Log TAG
     protected static final String TAG = "IBis-MapFragment";
-    //global var class
-    GlobalVariables mGlobalVariables;
     RoutingDatabase mRDB;
 
     //map view and overlays
     private MapView mMapView;
-    private MyLocationNewOverlay mLocationOverlay;
-    private CompassOverlay mCompassOverlay;
-    private ScaleBarOverlay mScaleBarOverlay;
+
+    private boolean mapVisible = false;
+
+    @Override
+    public void onResume() {
+        super.onResume();
+        mapVisible = true;
+        Log.i(TAG, "onResume()");
+        // call timerRunnable.run() frequently
+        timerHandler.post(timerRunnable);
+    }
+
+    @Override
+    public void onPause() {
+        Log.i(TAG, "onPause()");
+        // stop calling timerRunnable.run() frequently
+        mapVisible = false;
+        super.onPause();
+    }
 
     //Timer for updating the map
     Handler timerHandler = new Handler();
     Runnable timerRunnable = new Runnable() {
-
         @Override
         public void run() {
-
-            updateMap();
-            timerHandler.postDelayed(this, 500);
+            if(mapVisible) {
+                updateMap();
+                timerHandler.postDelayed(this, 500);
+            }
         }
     };
 
@@ -93,66 +104,48 @@ public class MapFragment extends Fragment {
 
         final Context context = this.getActivity();
         final DisplayMetrics dm = context.getResources().getDisplayMetrics();
-        //initialize global variable class
-        mGlobalVariables = (GlobalVariables) getActivity().getApplicationContext();
         //initialize RoutingDatabase
         mRDB = new RoutingDatabase(getActivity().getApplicationContext());
         //set zoom and touch controls
         mMapView.setBuiltInZoomControls(true);
         mMapView.setMultiTouchControls(true);
         //crate and enable CompassOverlay
-        this.mCompassOverlay = new CompassOverlay(context, new InternalCompassOrientationProvider(context), mMapView);
+        CompassOverlay mCompassOverlay = new CompassOverlay(context, new InternalCompassOrientationProvider(context), mMapView);
         mCompassOverlay.enableCompass();
         //crate and enable MyLocationOverlay
-        this.mLocationOverlay = new MyLocationNewOverlay(context, new GpsMyLocationProvider(context), mMapView);
+        MyLocationNewOverlay mLocationOverlay = new MyLocationNewOverlay(context, new GpsMyLocationProvider(context), mMapView);
         mLocationOverlay.enableMyLocation();
         //crate and enable ScaleBarOverlay
-        mScaleBarOverlay = new ScaleBarOverlay(context);
+        ScaleBarOverlay mScaleBarOverlay = new ScaleBarOverlay(context);
         mScaleBarOverlay.setCentred(true);
         mScaleBarOverlay.setScaleBarOffset(dm.widthPixels / 2, 10);
         //check, if settings were changed by user, else activate overlays by default
-        if (!mGlobalVariables.isChanged_settings()) {
-            mGlobalVariables.setShowLocationOverlay(true);
-            mGlobalVariables.setShowCompassOverlay(true);
-            mGlobalVariables.setShowScaleBarOverlay(true);
+        if (!IbisApplication.isChanged_settings()) {
+            IbisApplication.setShowLocationOverlay(true);
+            IbisApplication.setShowCompassOverlay(true);
+            IbisApplication.setShowScaleBarOverlay(true);
         }
         //add overlays
-        if (mGlobalVariables.isShow_locationOverlay()) {
-            mMapView.getOverlays().add(this.mLocationOverlay);
+        if (IbisApplication.isShow_locationOverlay()) {
+            mMapView.getOverlays().add(mLocationOverlay);
         }
-        if (mGlobalVariables.isShow_compassOverlay()) {
-            mMapView.getOverlays().add(this.mCompassOverlay);
+        if (IbisApplication.isShow_compassOverlay()) {
+            mMapView.getOverlays().add(mCompassOverlay);
         }
-        if (mGlobalVariables.isShow_scaleBarOverlay()) {
-            mMapView.getOverlays().add(this.mScaleBarOverlay);
+        if (IbisApplication.isShow_scaleBarOverlay()) {
+            mMapView.getOverlays().add(mScaleBarOverlay);
         }
         mMapView.getController().setZoom(18);
-        mMapView.getOverlays().add(this.createPolyline());
+        mMapView.getOverlays().add(this.createStaticPolyline());
         startMapUpdates();
-
     }
 
-    private Polyline createPolyline() {
-        Log.i(TAG, "createPolyline()");
+    private Polyline createStaticPolyline() {
+        Log.i(TAG, "createStaticPolyline()");
         //create waypoints Array
-        ArrayList<GeoPoint> waypoints = new ArrayList<>();
-        //get waypoints
         mRDB.open();
-        JSONArray allPoints = mRDB.getAllPoints();
+        ArrayList<GeoPoint> waypoints = mRDB.getAllGeoPoints();
         mRDB.close();
-        try {
-            for (int i = 0; i < allPoints.length(); i++) {
-                JSONObject oneObject = allPoints.getJSONObject(i);
-                // Pulling items from the array
-                double lat = oneObject.getDouble("lat");
-                double lon = oneObject.getDouble("lon");
-                //adding to waypoints array
-                waypoints.add(new GeoPoint(lat, lon));
-            }
-            Log.i(TAG, "for beendet");
-        } catch (JSONException e) {
-            e.printStackTrace();
-        }
         //create and set up the polyline
         Polyline routeOverlay = new Polyline(getActivity().getApplicationContext());
         routeOverlay.setPoints(waypoints);
@@ -162,25 +155,26 @@ public class MapFragment extends Fragment {
     }
 
     private void startMapUpdates() {
-        timerHandler.postDelayed(timerRunnable, 0);
+        timerHandler.post(timerRunnable);
     }
 
     private void updateMap() {
-        Log.i(TAG, "updateMap()");
+        Log.i(TAG, "updateMap() (only if map is visible)");
         //center at users position,rotate map
-        try {
-            if (mGlobalVariables.isAutoCenter()) {
-                GeoPoint currentLocation = new GeoPoint(mGlobalVariables.getLocation().getLatitude(), mGlobalVariables.getLocation().getLongitude());
+        if (IbisApplication.isAutoCenter()) {
+            if(IbisApplication.getLocation() != null) {
+                GeoPoint currentLocation = new GeoPoint(IbisApplication.getLocation().getLatitude(), IbisApplication.getLocation().getLongitude());
                 Log.i(TAG, "Geopoint" + currentLocation);
                 mMapView.getController().setCenter(currentLocation);
             }
-            if ((mGlobalVariables.isAuto_rotate()) && (mGlobalVariables.getLocation().getSpeed() > 1)) {
-                mMapView.setMapOrientation(360.0f - (mGlobalVariables.getLocation().getBearing()));
-            } else if (mGlobalVariables.isAlign_north()) {
-                mMapView.setMapOrientation(360.0f);
+            else {
+                Log.i(TAG, "Location is null");
             }
-        } catch (java.lang.NullPointerException e) {
-            Log.i(TAG, "NullPointerException");
+        }
+        if ((IbisApplication.isAuto_rotate()) && (IbisApplication.getLocation().getSpeed() > 1)) {
+            mMapView.setMapOrientation(360.0f - (IbisApplication.getLocation().getBearing()));
+        } else if (IbisApplication.isAlign_north()) {
+            mMapView.setMapOrientation(360.0f);
         }
     }
 }

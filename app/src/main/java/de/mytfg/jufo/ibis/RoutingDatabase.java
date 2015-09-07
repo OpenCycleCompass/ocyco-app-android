@@ -12,6 +12,9 @@ import android.util.Log;
 import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
+import org.osmdroid.util.GeoPoint;
+
+import java.util.ArrayList;
 
 
 public class RoutingDatabase {
@@ -122,6 +125,20 @@ public class RoutingDatabase {
             data.put(point);
             cursor.moveToNext();
         }
+        cursor.close();
+        return data;
+    }
+
+    public ArrayList<GeoPoint> getAllGeoPoints() {
+        Cursor cursor = db.query(TABLENAME, new String[]{COLUMN_LAT, COLUMN_LON}, null, null, null, null, null);
+        ArrayList<GeoPoint> data = new ArrayList<>();
+        cursor.moveToFirst();
+        while (!cursor.isAfterLast()) {
+            GeoPoint point = new GeoPoint(cursor.getDouble(0), cursor.getDouble(1));
+            data.add(point);
+            cursor.moveToNext();
+        }
+        cursor.close();
         return data;
     }
 
