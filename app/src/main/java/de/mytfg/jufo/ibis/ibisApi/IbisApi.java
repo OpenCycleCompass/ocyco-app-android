@@ -1,6 +1,7 @@
 package de.mytfg.jufo.ibis.ibisApi;
 
 import android.os.AsyncTask;
+import android.util.Log;
 
 import org.json.JSONObject;
 
@@ -32,10 +33,10 @@ public class IbisApi {
      * @param callback Function to call when request finished (or timed out).
      */
     public static void call(String apiResource, String apiMethod, JSONObject params, IbisApiCallback callback) {
-        new IbisApi.RequestTask(apiResource, apiMethod, params, callback).execute("");
+        new IbisApi.RequestTask(apiResource, apiMethod, params, callback).execute();
     }
 
-    private static class RequestTask extends AsyncTask<String, String, String> {
+    private static class RequestTask extends AsyncTask<Void, Void, String> {
         private String apiResource;
         private String apiMethod;
         private JSONObject parameters;
@@ -53,7 +54,7 @@ public class IbisApi {
         }
 
         @Override
-        protected String doInBackground(String... useless) {
+        protected String doInBackground(Void... voids) {
             try {
                 URL url = new URL(baseURL + apiResource);
                 HttpsURLConnection connection = (HttpsURLConnection)url.openConnection();
