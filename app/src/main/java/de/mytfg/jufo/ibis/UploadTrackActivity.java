@@ -13,7 +13,7 @@ import android.net.Uri;
 import android.os.AsyncTask;
 import android.os.Bundle;
 import android.support.v4.app.NotificationCompat;
-import android.support.v7.app.ActionBarActivity;
+import android.support.v7.app.AppCompatActivity;
 import android.text.InputFilter;
 import android.text.Spanned;
 import android.text.format.DateFormat;
@@ -27,31 +27,24 @@ import android.widget.Switch;
 import android.widget.TextView;
 import android.widget.Toast;
 
-import org.apache.http.NameValuePair;
-import org.apache.http.message.BasicNameValuePair;
 import org.json.JSONException;
 import org.json.JSONObject;
 
-import java.io.BufferedReader;
 import java.io.BufferedWriter;
 import java.io.IOException;
 import java.io.InputStream;
-import java.io.InputStreamReader;
 import java.io.OutputStream;
 import java.io.OutputStreamWriter;
-import java.io.Reader;
-import java.io.UnsupportedEncodingException;
+
 import java.net.HttpURLConnection;
 import java.net.URL;
-import java.net.URLEncoder;
-import java.util.ArrayList;
+
 import java.util.Calendar;
-import java.util.List;
 import java.util.Locale;
 
 import de.mytfg.jufo.ibis.util.Utils;
 
-public class UploadTrackActivity extends ActionBarActivity {
+public class UploadTrackActivity extends AppCompatActivity {
 
     public static final String data_empty = "[]"; // empty, but valid JSON
     private String data = data_empty;
@@ -96,7 +89,7 @@ public class UploadTrackActivity extends ActionBarActivity {
         button_UploadTrack = (Button) findViewById(R.id.button_UploadTrack);
         button_UploadTrackTokenRegenerate = (Button) findViewById(R.id.button_UploadTrackTokenRegenerate);
 
-        prefs = getSharedPreferences(getString(R.string.preference_file_key), (Context.MODE_MULTI_PROCESS));
+        prefs = getSharedPreferences(getString(R.string.preference_file_key), Context.MODE_PRIVATE);
         prefs_edit = prefs.edit();
 
         uploadPublic = prefs.getBoolean("upload_public", false);
@@ -321,13 +314,13 @@ public class UploadTrackActivity extends ActionBarActivity {
                 // Write POST Data:
                 conn.setDoOutput(true);
 
-                List<NameValuePair> params = new ArrayList<>();
-                params.add(new BasicNameValuePair("data", ldata));
+                //List<NameValuePair> params = new ArrayList<>();
+                //params.add(new BasicNameValuePair("data", ldata));
 
                 OutputStream os = conn.getOutputStream();
                 BufferedWriter writer = new BufferedWriter(new OutputStreamWriter(os, "UTF-8"));
 
-                String post = getQuery(params);
+                String post = "data" + "=" + ldata;
                 Log.i(TAG, "POST string: " + post);
                 writer.write(post);
                 writer.flush();
@@ -353,22 +346,6 @@ public class UploadTrackActivity extends ActionBarActivity {
                 stream.close();
             }
         }
-    }
-
-    private String getQuery(List<NameValuePair> params) throws UnsupportedEncodingException {
-        StringBuilder result = new StringBuilder();
-        boolean first = true;
-
-        for (NameValuePair pair : params) {
-            if (first) first = false;
-            else result.append("&");
-
-            result.append(URLEncoder.encode(pair.getName(), "UTF-8"));
-            result.append("=");
-            result.append(URLEncoder.encode(pair.getValue(), "UTF-8"));
-        }
-
-        return result.toString();
     }
 
     private String getDate(long timestamp) {

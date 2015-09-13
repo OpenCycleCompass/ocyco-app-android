@@ -1,18 +1,20 @@
 package de.mytfg.jufo.ibis;
 
 import android.app.AlertDialog;
+import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
 import android.os.Bundle;
 import android.os.Handler;
-import android.support.v7.app.ActionBarActivity;
+import android.support.v4.content.ContextCompat;
+import android.support.v7.app.AppCompatActivity;
 import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.WindowManager;
 import android.widget.TextView;
 
-public class ShowDataActivity extends ActionBarActivity {
+public class ShowDataActivity extends AppCompatActivity {
 
     // Log TAG
     protected static final String TAG = "ShowDataActivity-class";
@@ -190,21 +192,22 @@ public class ShowDataActivity extends ActionBarActivity {
             tAnkUntBox.setText("--:--");
         }
         //set color
+        Context context = getApplicationContext();
         if (IbisApplication.gettAnkUnt() < 0) {
-            tAnkUntBox.setTextColor(getResources().getColor(R.color.good_value));
+            tAnkUntBox.setTextColor(ContextCompat.getColor(context, R.color.good_value));
         } else if (IbisApplication.gettAnkUnt() > 0) {
-            tAnkUntBox.setTextColor(getResources().getColor(R.color.bad_value));
+            tAnkUntBox.setTextColor(ContextCompat.getColor(context, R.color.bad_value));
         }
         if (IbisApplication.getvDunt() < 0) {
-            vDUntBox.setTextColor(getResources().getColor(R.color.good_value));
+            vDUntBox.setTextColor(ContextCompat.getColor(context, R.color.good_value));
         } else if (IbisApplication.getvDunt() > 0) {
-            vDUntBox.setTextColor(getResources().getColor(R.color.bad_value));
+            vDUntBox.setTextColor(ContextCompat.getColor(context, R.color.bad_value));
         }
         //set vDMuss & vDunt "---", if it is later then the wanted arrival time
         if (IbisApplication.getvDMuss() < 0) {
             vDMussBox.setText("---");
             vDUntBox.setText("---");
-            vDUntBox.setTextColor(getResources().getColor(R.color.default_black));
+            vDUntBox.setTextColor(ContextCompat.getColor(context, R.color.default_black));
         }
     }
 

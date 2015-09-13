@@ -13,7 +13,7 @@ import android.os.AsyncTask;
 import android.os.Bundle;
 import android.os.Handler;
 import android.support.v4.app.DialogFragment;
-import android.support.v7.app.ActionBarActivity;
+import android.support.v7.app.AppCompatActivity;
 import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
@@ -43,7 +43,7 @@ import java.util.Locale;
 
 import de.mytfg.jufo.ibis.util.Utils;
 
-public class RoutingActivity extends ActionBarActivity implements TimePickerFragment.OnTimePickedListener, AdapterView.OnItemSelectedListener {
+public class RoutingActivity extends AppCompatActivity implements TimePickerFragment.OnTimePickedListener, AdapterView.OnItemSelectedListener {
 
     //LOG Tag
     private final static String TAG = "RoutingActivity-class";
