@@ -123,9 +123,6 @@ public class UploadTrackActivity extends AppCompatActivity {
         stopTst = incomingIntent.getLongExtra("stopTst", 0);
         length = incomingIntent.getDoubleExtra("totalDist", 0) / 1000;
 
-        //mGlobalVariables = (IbisApplication) getApplicationContext();
-        //length = mGlobalVariables.getsGef();
-
         initUI();
         updateUI();
     }
