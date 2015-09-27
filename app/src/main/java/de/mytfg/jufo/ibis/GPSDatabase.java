@@ -102,31 +102,32 @@ public class GPSDatabase {
         double cutDistEnd = random.nextInt(80) + 20d;
         double distBegin = 0d;
         double distEnd = 0d;
-        int cutColIdBegin;
-        int cutColIdEnd;
+        int cutColIdBegin = -1;
+        int cutColIdEnd = -1;
         cursor.moveToFirst();
-        while(true) {
+        do {
             distBegin += cursor.getDouble(0);
             if(distBegin > cutDistBegin) {
                 cutColIdBegin = cursor.getInt(1);
                 break;
             }
-            cursor.moveToNext();
-        }
+
+        } while (cursor.moveToNext());
         cursor.moveToLast();
-        while(true) {
+        do {
             distEnd += cursor.getDouble(0);
             if(distEnd > cutDistEnd) {
                 cutColIdEnd = cursor.getInt(1);
                 break;
             }
-            cursor.moveToPrevious();
-        }
+        } while (cursor.moveToPrevious());
         cursor.close();
-        int delRowsBegin = db.delete(TABLENAME, COLUMN_ID + " < " + cutColIdBegin, null);
-        int delRowsEnd = db.delete(TABLENAME, COLUMN_ID + " > " + cutColIdEnd, null);
-        Log.i(TAG, "Random cut: begin=" + delRowsBegin);
-        Log.i(TAG, "Random cut: end=" + delRowsEnd);
+        if ((cutColIdBegin != -1) && (cutColIdEnd != -1)) {
+            int delRowsBegin = db.delete(TABLENAME, COLUMN_ID + " < " + cutColIdBegin, null);
+            int delRowsEnd = db.delete(TABLENAME, COLUMN_ID + " > " + cutColIdEnd, null);
+            Log.i(TAG, "Random cut: begin=" + delRowsBegin);
+            Log.i(TAG, "Random cut: end=" + delRowsEnd);
+        }
         numRows = getNumRows();
         Log.i(TAG, "DB has " + numRows + " rows");
 
