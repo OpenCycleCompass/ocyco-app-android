@@ -42,6 +42,7 @@ import java.net.URL;
 import java.util.Calendar;
 import java.util.Locale;
 
+import de.mytfg.jufo.ibis.util.TransparentLoadingOverlay;
 import de.mytfg.jufo.ibis.util.Utils;
 
 public class UploadTrackActivity extends AppCompatActivity {
@@ -71,6 +72,7 @@ public class UploadTrackActivity extends AppCompatActivity {
     private double length;
     private boolean uploadPublic;
     private GPSDatabase mGPSDb;
+    private TransparentLoadingOverlay mTLoadingOverlay;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -88,7 +90,7 @@ public class UploadTrackActivity extends AppCompatActivity {
         button_DeleteTrack = (Button) findViewById(R.id.button_DeleteTrack);
         button_UploadTrack = (Button) findViewById(R.id.button_UploadTrack);
         button_UploadTrackTokenRegenerate = (Button) findViewById(R.id.button_UploadTrackTokenRegenerate);
-
+        mTLoadingOverlay = new TransparentLoadingOverlay(this);
         prefs = getSharedPreferences(getString(R.string.preference_file_key), Context.MODE_PRIVATE);
         prefs_edit = prefs.edit();
 
@@ -253,15 +255,12 @@ public class UploadTrackActivity extends AppCompatActivity {
 
     // Upload Track
     public void uploadTrack(View v) {
-        // Disable Button to prevent multiple uploads
-        button_DeleteTrack.setEnabled(false);
-        button_UploadTrack.setEnabled(false);
-        button_UploadTrackTokenRegenerate.setEnabled(false);
         String lurl = makeUrl();
         Log.i(TAG, lurl);
         ConnectivityManager connMgr = (ConnectivityManager) getSystemService(Context.CONNECTIVITY_SERVICE);
         NetworkInfo networkInfo = connMgr.getActiveNetworkInfo();
         if (networkInfo != null && networkInfo.isConnected()) {
+            mTLoadingOverlay.show();
             GetHttpTask getHttpTask = new GetHttpTask();
             getHttpTask.setType("upload");
             getHttpTask.execute(lurl, data);
@@ -427,6 +426,7 @@ public class UploadTrackActivity extends AppCompatActivity {
         @Override
         protected void onPostExecute(String result) {
             Log.i(TAG, "HTTP result: " + result);
+            mTLoadingOverlay.dismiss();
             switch (type) {
                 case "token":
                     String ltoken;
@@ -434,7 +434,6 @@ public class UploadTrackActivity extends AppCompatActivity {
                         JSONObject json = new JSONObject(result);
                         if (json.has("token")) {
                             ltoken = json.getString("token");
-                            button_UploadTrack.setEnabled(true);
                             saveToken(ltoken);
                         } else if (json.has("error")) {
                             ltoken = json.getString("error");
@@ -454,8 +453,10 @@ public class UploadTrackActivity extends AppCompatActivity {
                         JSONObject json = new JSONObject(result);
                         if (json.has("track_id")) {
                             success = true;
-                            // Disable button to prevent multiple uploads
+                            // disable button to prevent multiple uploads
                             button_UploadTrack.setEnabled(false);
+                            button_DeleteTrack.setEnabled(false);
+                            button_UploadTrackTokenRegenerate.setEnabled(false);
 
                             // Get track_id
                             String track_id = json.getString("track_id");
@@ -477,24 +478,12 @@ public class UploadTrackActivity extends AppCompatActivity {
                             notification = "Track \"" + track_id + "\" mit " + nodes_s + " GPS-Koordinaten erstellt am " + created_s;
                         } else if (json.has("error")) {
                             notification = getString(R.string.error) + json.getString("error");
-
-                            // Enable upload button to make second upload possible
-                            button_UploadTrack.setEnabled(true);
-                            button_UploadTrackTokenRegenerate.setEnabled(true);
                         } else {
                             notification = getString(R.string.unknownError);
-
-                            // Enable upload button to make second upload possible
-                            button_UploadTrack.setEnabled(true);
-                            button_UploadTrackTokenRegenerate.setEnabled(true);
                         }
                     } catch (JSONException e) {
                         e.printStackTrace();
                         notification = getString(R.string.httpJsonReturnNotificationErrTryCatchHttpJson);
-
-                        // Enable upload button to make second upload possible
-                        button_UploadTrack.setEnabled(true);
-                        button_UploadTrackTokenRegenerate.setEnabled(true);
                     } finally {
                         // Create notification
                         NotificationCompat.Builder mBuilder = new NotificationCompat.Builder(getBaseContext())
