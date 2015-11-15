@@ -2,8 +2,6 @@ package de.mytfg.jufo.ibis.util;
 
 import android.app.Dialog;
 import android.content.Context;
-import android.view.Gravity;
-import android.view.WindowManager;
 import android.view.animation.Animation;
 import android.view.animation.AnimationUtils;
 import android.widget.ImageView;
@@ -12,13 +10,8 @@ import de.mytfg.jufo.ibis.R;
 
 public class TransparentLoadingOverlay extends Dialog {
 
-    private ImageView iv_loading;
-
     public TransparentLoadingOverlay(Context context) {
         super(context, R.style.TransparentLoadingLayout);
-        WindowManager.LayoutParams wmlp = getWindow().getAttributes();
-        wmlp.gravity = Gravity.CENTER;
-        getWindow().setAttributes(wmlp);
         setTitle(null);
         setCancelable(false);
         setOnCancelListener(null);
@@ -29,7 +22,8 @@ public class TransparentLoadingOverlay extends Dialog {
     @Override
     public void show() {
         super.show();
-        iv_loading = (ImageView)findViewById(R.id.iv_loading);
+        // animate ImageView
+        ImageView iv_loading = (ImageView) findViewById(R.id.iv_loading);
         Animation loading_animation = AnimationUtils.loadAnimation(getContext(), R.anim.rotation);
         iv_loading.setAnimation(loading_animation);
         iv_loading.startAnimation(loading_animation);
