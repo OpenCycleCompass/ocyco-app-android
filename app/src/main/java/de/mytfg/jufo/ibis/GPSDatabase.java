@@ -8,6 +8,7 @@ import android.database.SQLException;
 import android.database.sqlite.SQLiteDatabase;
 import android.database.sqlite.SQLiteOpenHelper;
 import android.location.Location;
+import android.support.annotation.Nullable;
 import android.util.Log;
 
 import org.json.JSONArray;
@@ -90,6 +91,7 @@ public class GPSDatabase {
         return d_rows;
     }
 
+    @Nullable
     public Intent sendToServer(Context c) {
         open();
         //Log.i(TAG, "sendToServer()");
@@ -106,23 +108,33 @@ public class GPSDatabase {
         double distEnd = 0d;
         int cutColIdBegin = -1;
         int cutColIdEnd = -1;
-        cursor.moveToFirst();
-        do {
-            distBegin += cursor.getDouble(0);
-            if(distBegin > cutDistBegin) {
-                cutColIdBegin = cursor.getInt(1);
-                break;
-            }
+        if (cursor.moveToFirst()) {
+            do {
+                distBegin += cursor.getDouble(0);
+                if (distBegin > cutDistBegin) {
+                    cutColIdBegin = cursor.getInt(1);
+                    break;
+                }
 
-        } while (cursor.moveToNext());
-        cursor.moveToLast();
-        do {
-            distEnd += cursor.getDouble(0);
-            if(distEnd > cutDistEnd) {
-                cutColIdEnd = cursor.getInt(1);
-                break;
-            }
-        } while (cursor.moveToPrevious());
+            } while (cursor.moveToNext());
+        }
+        else {
+            // don't upload empty track
+            return null;
+        }
+        if (cursor.moveToLast()) {
+            do {
+                distEnd += cursor.getDouble(0);
+                if (distEnd > cutDistEnd) {
+                    cutColIdEnd = cursor.getInt(1);
+                    break;
+                }
+            } while (cursor.moveToPrevious());
+        }
+        else {
+            // don't upload empty track
+            return null;
+        }
         cursor.close();
         if ((cutColIdBegin != -1) && (cutColIdEnd != -1)) {
             int delRowsBegin = db.delete(TABLENAME, COLUMN_ID + " < " + cutColIdBegin, null);

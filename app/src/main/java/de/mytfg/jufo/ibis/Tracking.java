@@ -9,6 +9,7 @@ import android.os.Bundle;
 import android.os.IBinder;
 import android.support.v4.app.NotificationCompat;
 import android.util.Log;
+import android.widget.Toast;
 
 import com.google.android.gms.common.ConnectionResult;
 import com.google.android.gms.common.api.GoogleApiClient;
@@ -216,11 +217,15 @@ public class Tracking extends Service implements LocationListener, OnConnectionF
         Log.i(TAG, Integer.toString(d_rows) + " " + getString(R.string.tracking_prepare_coords_removed_filter1));
         mGPSDb.close();
         Intent intent = mGPSDb.sendToServer(this);
-        intent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
-        //only start activity, if data isn't empty
-        //if (!intent.getStringExtra("data").equals("[]")) {
-        if (!intent.getStringExtra("data").equals(UploadTrackActivity.data_empty)) { // valid but empty JSON defined in UploadTrackActivity ("[]")
+        if(intent != null && !intent.getStringExtra("data").equals(UploadTrackActivity.data_empty)){
+            //only start activity, if data isn't empty
+            intent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
+            // valid but empty JSON defined in UploadTrackActivity ("[]")
             startActivity(intent);
+        }
+        else {
+            Toast.makeText(this, getString(R.string.upload_track_error_too_short),
+                    Toast.LENGTH_LONG).show();
         }
         mGPSDb.open();
         mGPSDb.deleteDatabase();
