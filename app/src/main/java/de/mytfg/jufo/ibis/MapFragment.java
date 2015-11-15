@@ -38,6 +38,9 @@ public class MapFragment extends Fragment {
     // Log TAG
     protected static final String TAG = "IBis-MapFragment";
     RoutingDatabase mRDB;
+    GPSDatabase mGPSDb;
+
+    Polyline oldDrivenPolyline;
 
     //map view and overlays
     private MapView mMapView;
@@ -104,8 +107,9 @@ public class MapFragment extends Fragment {
 
         final Context context = this.getActivity();
         final DisplayMetrics dm = context.getResources().getDisplayMetrics();
-        //initialize RoutingDatabase
+        //initialize Databases
         mRDB = new RoutingDatabase(getActivity().getApplicationContext());
+        mGPSDb = new GPSDatabase(getActivity().getApplicationContext());
         //set zoom and touch controls
         mMapView.setBuiltInZoomControls(true);
         mMapView.setMultiTouchControls(true);
@@ -136,20 +140,34 @@ public class MapFragment extends Fragment {
             mMapView.getOverlays().add(mScaleBarOverlay);
         }
         mMapView.getController().setZoom(18);
-        mMapView.getOverlays().add(this.createStaticPolyline());
+        mMapView.getOverlays().add(this.createRoutePolyline());
         startMapUpdates();
     }
 
-    private Polyline createStaticPolyline() {
-        Log.i(TAG, "createStaticPolyline()");
-        //create waypoints Array
+    private Polyline createRoutePolyline() {
+        Log.i(TAG, "createRoutePolyline()");
+        // create waypoints Array
         mRDB.open();
         ArrayList<GeoPoint> waypoints = mRDB.getAllGeoPoints();
         mRDB.close();
-        //create and set up the polyline
+        // create and set up the polyline
         Polyline routeOverlay = new Polyline(getActivity().getApplicationContext());
         routeOverlay.setPoints(waypoints);
         routeOverlay.setColor(0x880040FF/*half-transparent blue*/);
+
+        return routeOverlay;
+    }
+
+    private Polyline createDrivenPolyline() {
+        Log.i(TAG, "createDrivenPolyline()");
+        //create waypoints Array
+        mGPSDb.open();
+        ArrayList<GeoPoint> waypoints = mGPSDb.getAllGeoPoints();
+        mGPSDb.close();
+        //create and set up the polyline
+        Polyline routeOverlay = new Polyline(getActivity().getApplicationContext());
+        routeOverlay.setPoints(waypoints);
+        routeOverlay.setColor(0x88E77E00/*half-transparent orange*/);
 
         return routeOverlay;
     }
@@ -166,6 +184,15 @@ public class MapFragment extends Fragment {
                 GeoPoint currentLocation = new GeoPoint(IbisApplication.getLocation().getLatitude(), IbisApplication.getLocation().getLongitude());
                 Log.i(TAG, "Geopoint" + currentLocation);
                 mMapView.getController().setCenter(currentLocation);
+                // create polyline for driven route
+                Polyline drivenPolyline = this.createDrivenPolyline();
+                // add polyline
+                mMapView.getOverlays().add(drivenPolyline);
+                // delete old polyline
+                if (oldDrivenPolyline!=null){
+                    mMapView.getOverlays().remove(oldDrivenPolyline);
+                }
+                oldDrivenPolyline=drivenPolyline;
             }
             else {
                 Log.i(TAG, "Location is null");
