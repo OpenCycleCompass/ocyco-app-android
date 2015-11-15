@@ -18,8 +18,6 @@ import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
-import android.view.animation.Animation;
-import android.view.animation.AnimationUtils;
 import android.widget.AdapterView;
 import android.widget.ArrayAdapter;
 import android.widget.Button;
@@ -41,6 +39,7 @@ import java.net.URL;
 import java.util.Calendar;
 import java.util.Locale;
 
+import de.mytfg.jufo.ibis.util.TransparentLoadingOverlay;
 import de.mytfg.jufo.ibis.util.Utils;
 
 public class RoutingActivity extends AppCompatActivity implements TimePickerFragment.OnTimePickedListener, AdapterView.OnItemSelectedListener {
@@ -61,14 +60,13 @@ public class RoutingActivity extends AppCompatActivity implements TimePickerFrag
             timerHandler.postDelayed(this, 500);
         }
     };
+   // private TransparentProgressDialog pd;
     //Views
     private EditText destination_address;
     private EditText start_address;
     private EditText editDistance;
     private TextView arrivalTime;
     private Spinner selectRouteType;
-    private TextView loading_text;
-    private ImageView loading_image;
     private Button start_navigation;
     private Button generate_route;
     private Button start_from_current_position;
@@ -82,6 +80,7 @@ public class RoutingActivity extends AppCompatActivity implements TimePickerFrag
     private Location startLocation;
     //shared preferences
     private SharedPreferences settings;
+    private TransparentLoadingOverlay mTLoadingOverlay;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -95,12 +94,11 @@ public class RoutingActivity extends AppCompatActivity implements TimePickerFrag
         editDistance = (EditText) findViewById(R.id.enter_distance);
         start_address = (EditText) findViewById(R.id.start_address);
         destination_address = (EditText) findViewById(R.id.destination_address);
-        loading_text = (TextView) findViewById(R.id.loading_text);
         arrivalTime = (TextView) findViewById(R.id.arrivalTime);
-        loading_image = (ImageView) findViewById(R.id.loading_image);
         switch_manuelDistance = (Switch) findViewById(R.id.switch_manuelDistance);
         switch_userData = (Switch) findViewById(R.id.switch_userData);
         switch_timeFactor = (Switch) findViewById(R.id.switch_timeFactor);
+        mTLoadingOverlay = new TransparentLoadingOverlay(this);
         //set up database, delete old database
         mRDb = new RoutingDatabase(this);
         mRDb.open();
@@ -216,7 +214,7 @@ public class RoutingActivity extends AppCompatActivity implements TimePickerFrag
             Toast toast = Toast.makeText(context, getString(R.string.upload_error_no_network_try_again_later), duration);
             toast.show();
         }
-        showLoadingAnimation();
+        mTLoadingOverlay.show();
     }
 
     private String makeUrl(String StartAddress, String DestinationAddress) {
@@ -232,21 +230,6 @@ public class RoutingActivity extends AppCompatActivity implements TimePickerFrag
         lurlstr = lurl.build().toString();
         Log.i(TAG, lurlstr);
         return lurlstr;
-    }
-
-    private void showLoadingAnimation() {
-        // set content
-        loading_text.setText(R.string.loading_text);
-        loading_image.setImageResource(R.drawable.ic_launcher);
-        //start rotation
-        Animation rotation = AnimationUtils.loadAnimation(this, R.anim.rotation);
-        loading_image.startAnimation(rotation);
-    }
-
-    private void removeLoadingAnimation() {
-        // remove loading animation
-        loading_text.setText("");
-        loading_image.setImageResource(0);
     }
 
     //create and show the TimePickerFragment
@@ -528,7 +511,7 @@ public class RoutingActivity extends AppCompatActivity implements TimePickerFrag
                 Toast toast = Toast.makeText(getApplicationContext(), R.string.upload_error_no_network_try_again_later, duration);
                 toast.show();
             }
-            removeLoadingAnimation();
+            mTLoadingOverlay.dismiss();
         }
     }
 }
