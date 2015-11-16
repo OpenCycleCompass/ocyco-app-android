@@ -35,10 +35,8 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
 import java.io.OutputStreamWriter;
-
 import java.net.HttpURLConnection;
 import java.net.URL;
-
 import java.util.Calendar;
 import java.util.Locale;
 
@@ -97,8 +95,6 @@ public class UploadTrackActivity extends AppCompatActivity {
         uploadPublic = prefs.getBoolean("upload_public", false);
 
         switch_UploadTrackPublic.setChecked(uploadPublic);
-
-        button_UploadTrack.setEnabled(false);
 
         // Create Database
         mGPSDb = new GPSDatabase(this.getApplicationContext());
