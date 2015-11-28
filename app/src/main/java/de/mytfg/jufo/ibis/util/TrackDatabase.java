@@ -22,7 +22,7 @@ import java.util.ArrayList;
 import de.mytfg.jufo.ibis.UploadTrackActivity;
 
 public class TrackDatabase {
-    private static final String TAG = "GPSDatabase-class";
+    private static final String TAG = "TrackDatabase-class";
     protected String DBNAME; // = "GPSDatabase";
     protected final int DBVERSION = 20;
     private final String COLUMN_ID = "Id";
@@ -32,8 +32,8 @@ public class TrackDatabase {
     private final String COLUMN_SPE = "speed";
     private final String COLUMN_TST = "timestamp";
     private final String COLUMN_ACC = "accuracy";
-    private final String COLUMN_DIST = "distance"; ///distance to last point in meters
-    private final String COLUMN_TDIFF = "tdiff"; ///time difference to last point in milliseconds
+    private final String COLUMN_DIST = "distance";  // distance to last point in meters
+    private final String COLUMN_TDIFF = "tdiff";    // time difference to last point in milliseconds
     private final String COLUMN_TIMEFACTOR = "time_factor";
     private final String TABLENAME = "GPSData";
     private final String CREATERDB = "CREATE TABLE " + TABLENAME + "(" + COLUMN_ID + " INTEGER PRIMARY KEY AUTOINCREMENT," +
@@ -50,9 +50,9 @@ public class TrackDatabase {
     private Context context;
     // SQLite database
     private SQLiteDatabase db;
-    //database variables
+    // database variables
     private DbHelper dbHelper;
-    // Last location used for ??? TODO
+    // Last location used to calculate tdiff column
     private Location lastLocation = null;
 
     //constructor
