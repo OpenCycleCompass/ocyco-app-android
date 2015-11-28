@@ -28,7 +28,6 @@ before_install:
 - openssl aes-256-cbc -K $encrypted_ab14c45bfecf_key -iv $encrypted_ab14c45bfecf_iv -in ibis.keystore.enc -out ibis.keystore -d
 
 script:
-  - ./gradlew assembleRelease
   - ./gradlew assembleBintray
 
 after_script:
