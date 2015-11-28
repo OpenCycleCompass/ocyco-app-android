@@ -110,9 +110,9 @@ public class GPSDatabase {
         int cutColIdEnd = -1;
         if (cursor.moveToFirst()) {
             do {
-                distBegin += cursor.getDouble(0);
+                distBegin += cursor.getDouble(1);
                 if (distBegin > cutDistBegin) {
-                    cutColIdBegin = cursor.getInt(1);
+                    cutColIdBegin = cursor.getInt(0);
                     break;
                 }
 
@@ -124,9 +124,9 @@ public class GPSDatabase {
         }
         if (cursor.moveToLast()) {
             do {
-                distEnd += cursor.getDouble(0);
+                distEnd += cursor.getDouble(1);
                 if (distEnd > cutDistEnd) {
-                    cutColIdEnd = cursor.getInt(1);
+                    cutColIdEnd = cursor.getInt(0);
                     break;
                 }
             } while (cursor.moveToPrevious());
