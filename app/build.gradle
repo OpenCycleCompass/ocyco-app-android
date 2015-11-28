@@ -23,6 +23,7 @@ android {
     buildTypes {
         if (System.getenv("TRAVIS")) {
             release {
+                versionNameSuffix "-" + getDate() + "-" + getCommit()
                 minifyEnabled false
                 shrinkResources false
                 proguardFiles getDefaultProguardFile('proguard-android.txt'), 'proguard-rules.pro'
@@ -30,26 +31,37 @@ android {
             }
             bintray {
                 applicationIdSuffix ".bintray"
-                versionNameSuffix " bintray"
+                versionNameSuffix "-bintray-" + getDate() + "-" + getCommit()
                 minifyEnabled false
                 shrinkResources false
                 proguardFiles getDefaultProguardFile('proguard-android.txt'), 'proguard-rules.pro'
                 signingConfig signingConfigs.releaseSigning
             }
         } else {
-            unsignedrelease {
-                minifyEnabled false
-                proguardFiles getDefaultProguardFile('proguard-android.txt'), 'proguard-rules.pro'
-            }
             debug {
                 applicationIdSuffix ".debug"
-                versionNameSuffix " debug"
+                versionNameSuffix "-debug-" + getDate()
                 minifyEnabled false
                 proguardFiles getDefaultProguardFile('proguard-android.txt'), 'proguard-rules.pro'
             }
         }
     }
     productFlavors {
+    }
+}
+
+def getDate() {
+    def date = new Date()
+    def formattedDate = date.format('yyyyMMddHHmmss')
+    return formattedDate
+}
+
+def getCommit() {
+    if (System.getenv("TRAVIS_COMMIT")) {
+        return System.getenv("TRAVIS_COMMIT")
+    }
+    else {
+        return "local"
     }
 }
 
