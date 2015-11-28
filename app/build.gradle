@@ -23,6 +23,7 @@ android {
     buildTypes {
         if (System.getenv("TRAVIS")) {
             release {
+                versionNameSuffix "-" + getDate() + "-" + getCommit()
                 minifyEnabled false
                 shrinkResources false
                 proguardFiles getDefaultProguardFile('proguard-android.txt'), 'proguard-rules.pro'
@@ -30,20 +31,16 @@ android {
             }
             bintray {
                 applicationIdSuffix ".bintray"
-                versionNameSuffix " bintray"
+                versionNameSuffix "-bintray-" + getDate() + "-" + getCommit()
                 minifyEnabled false
                 shrinkResources false
                 proguardFiles getDefaultProguardFile('proguard-android.txt'), 'proguard-rules.pro'
                 signingConfig signingConfigs.releaseSigning
             }
         } else {
-            unsignedrelease {
-                minifyEnabled false
-                proguardFiles getDefaultProguardFile('proguard-android.txt'), 'proguard-rules.pro'
-            }
             debug {
                 applicationIdSuffix ".debug"
-                versionNameSuffix " debug"
+                versionNameSuffix "-debug-" + getDate()
                 minifyEnabled false
                 proguardFiles getDefaultProguardFile('proguard-android.txt'), 'proguard-rules.pro'
             }
@@ -53,13 +50,28 @@ android {
     }
 }
 
+def getDate() {
+    def date = new Date()
+    def formattedDate = date.format('yyyyMMddHHmmss')
+    return formattedDate
+}
+
+def getCommit() {
+    if (System.getenv("TRAVIS_COMMIT")) {
+        return System.getenv("TRAVIS_COMMIT")
+    }
+    else {
+        return "local"
+    }
+}
+
 dependencies {
-    compile 'com.android.support:appcompat-v7:23.0.1'
-    compile 'com.google.android.gms:play-services:7.8.0'
+    compile 'com.android.support:appcompat-v7:23.1.1'
+    compile 'com.google.android.gms:play-services-location:8.3.0'
     compile 'org.slf4j:slf4j-android:1.7.7'
     compile 'org.osmdroid:osmdroid-android:4.3'
-    compile 'com.google.code.gson:gson:2.3'
+    compile 'com.google.code.gson:gson:2.4'
     compile 'org.apache.commons:commons-lang3:3.3.2'
     compile files('libs/osmbonuspack_v5.1.jar')
-    compile 'ch.acra:acra:4.6.1'
+    compile 'ch.acra:acra:4.6.2'
 }

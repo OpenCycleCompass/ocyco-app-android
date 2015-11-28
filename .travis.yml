@@ -28,7 +28,6 @@ before_install:
 - openssl aes-256-cbc -K $encrypted_ab14c45bfecf_key -iv $encrypted_ab14c45bfecf_iv -in ibis.keystore.enc -out ibis.keystore -d
 
 script:
-  - ./gradlew assembleRelease
   - ./gradlew assembleBintray
 
 after_script:
@@ -36,7 +35,7 @@ after_script:
   - ./gradlew signingReport
 
 before_deploy:
-  - cp app/build/outputs/apk/app-bintray.apk app/build/outputs/apk/ibis-app-$TRAVIS_BRANCH-$TRAVIS_COMMIT.apk
+  - cp app/build/outputs/apk/app-bintray.apk app/build/outputs/apk/ibis-app-$(date +%Y-%m-%d_%H-%M-%S)-$TRAVIS_BRANCH-$TRAVIS_COMMIT.apk
 
 deploy:
   - provider: bintray
