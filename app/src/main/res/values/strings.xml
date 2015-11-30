@@ -106,6 +106,7 @@
         Das Ziel ist es, Ihnen eine möglichst für Fahrradfahrer geeignete, schnelle Route zu suchen und
         Ihnen möglichst hilfreiche und konkrete Informationen über Ihren Ankunftszeitpunkt zu geben.</string>
     <string name="info_license_headline">Lizenzen</string>
+    <string name="info_version_headline">Version</string>
     <string name="info_license">Open Streetmap Karten und Daten:
     <a href ="http://www.openstreetmap.org/copyright/">© OpenStreetMap contributors</a>
     \niBis App: <a href="http://www.gnu.de/documents/gpl.de.html">GPL v3 Lizenz</a></string>
