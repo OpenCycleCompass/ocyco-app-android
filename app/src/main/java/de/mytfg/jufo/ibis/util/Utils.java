@@ -4,6 +4,10 @@ import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
+import java.text.ParseException;
+import java.text.SimpleDateFormat;
+import java.util.Date;
+import java.util.Locale;
 
 public class Utils {
 
@@ -46,4 +50,20 @@ public class Utils {
         return time_value_out;
     }
 
+    public static String getDateTime(long millis) {
+        // get date time in "dd.MM.yyy HH:mm:ss" format
+        SimpleDateFormat sdf = new SimpleDateFormat("dd.MM.yyy HH:mm:ss", Locale.GERMAN);
+        return sdf.format(new Date(millis));
+    }
+
+    public static long parseDateTime(String pattern, String date) {
+        SimpleDateFormat dateFormat = new SimpleDateFormat(pattern, Locale.GERMAN);
+        Date convertedDate = new Date();
+        try {
+            convertedDate = dateFormat.parse(date);
+        } catch (ParseException e) {
+            e.printStackTrace();
+        }
+        return convertedDate.getTime();
+    }
 }
