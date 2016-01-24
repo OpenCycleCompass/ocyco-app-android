@@ -19,6 +19,8 @@ import com.google.android.gms.location.LocationListener;
 import com.google.android.gms.location.LocationRequest;
 import com.google.android.gms.location.LocationServices;
 
+import org.json.JSONArray;
+
 import de.mytfg.jufo.ibis.util.Utils;
 
 public class Tracking extends Service implements LocationListener, OnConnectionFailedListener, ConnectionCallbacks {
@@ -37,7 +39,6 @@ public class Tracking extends Service implements LocationListener, OnConnectionF
     protected Location mCurrentLocation;
     //create a new instance of classes
     Calculate mCalculate = new Calculate();
-    private GPSDatabase mGPSDb;
     private boolean saveData = true;
     private String accNotiStr;
     private NotificationCompat.Builder mBuilder;
@@ -54,10 +55,8 @@ public class Tracking extends Service implements LocationListener, OnConnectionF
         if (checkAccuracy(location.getAccuracy())) {
             updateDatabase();
             //update Notification
-            mGPSDb.open();
-            int num_rows = mGPSDb.getNumRows();
-            double total_dist = mGPSDb.getTotalDist();
-            mGPSDb.close();
+            int num_rows = IbisApplication.mGPSDB.getNumRows();
+            double total_dist = IbisApplication.mGPSDB.getTotalDist();
             String s_total_dist = Utils.roundDecimals(total_dist / 1000d);
             // Update notification, if online tracking ist running
             if (IbisApplication.isOnline_tracking_running()) {
@@ -85,9 +84,7 @@ public class Tracking extends Service implements LocationListener, OnConnectionF
 
     private void updateDatabase() {
         Log.i(TAG, "updateDatabase()");
-        mGPSDb.open();
-        mGPSDb.insertLocation(mCurrentLocation);
-        mGPSDb.close();
+        IbisApplication.mGPSDB.insertLocation(mCurrentLocation);
     }
 
     private void callCalculate() {
@@ -96,14 +93,12 @@ public class Tracking extends Service implements LocationListener, OnConnectionF
         //only call mathematical methods, if this is not the first location - else there will be a NPE
         if (!mCalculate.checkFirstLoc()) {
             mCalculate.calculateTimeVars(IbisApplication.gettAnkEingTime());
-            mGPSDb.open();
-            mCalculate.calculateDrivenDistance(mGPSDb.getTotalDist());
-            Log.i(TAG, "sEing tf callCalc" + (mGPSDb.getTotalDist()));
-            mGPSDb.close();
+            mCalculate.calculateDrivenDistance(IbisApplication.mGPSDB.getTotalDist());
+            Log.i(TAG, "sEing tf callCalc " + (IbisApplication.mGPSDB.getTotalDist()));
             mCalculate.calculateDrivenTime();
             mCalculate.calculateSpeed();
             mCalculate.math(IbisApplication.isUseTimeFactor(), IbisApplication.getsEingTimeFactor() / 1000d);
-            Log.i(TAG, "sEing tf callCalc" + (IbisApplication.getsEingTimeFactor() / 1000d));
+            Log.i(TAG, "sEing tf callCalc " + (IbisApplication.getsEingTimeFactor() / 1000d));
             //get Variables from calculation
             double sGef = mCalculate.getsGef();
             double sZuf = mCalculate.getsZuf();
@@ -124,12 +119,8 @@ public class Tracking extends Service implements LocationListener, OnConnectionF
     public void onCreate() {
         Log.i(TAG, "onCreate()");
         super.onCreate();
-        // Create Database
-        mGPSDb = new GPSDatabase(this.getApplicationContext());
         // Delete old data from database
-        mGPSDb.open();
-        mGPSDb.deleteDatabase();
-        mGPSDb.close();
+        IbisApplication.mGPSDB.deleteDatabase();
 
         accNotiStr = getString(R.string.tracking_gps_searching);
 
@@ -209,27 +200,21 @@ public class Tracking extends Service implements LocationListener, OnConnectionF
         int mNotificationId = 42;
         NotificationManager mNotifyMgr = (NotificationManager) getSystemService(NOTIFICATION_SERVICE);
         mNotifyMgr.cancel(mNotificationId);
-        // Start Intent returned by mGPSDb.sendToServer()
-        // intent has track data as "Extra"
-        mGPSDb.open();
-        //ATTENTION: can have the effect, that the UploadActivity will not be started!
-        int d_rows = mGPSDb.prepareDB();
-        Log.i(TAG, Integer.toString(d_rows) + " " + getString(R.string.tracking_prepare_coords_removed_filter1));
-        mGPSDb.close();
-        Intent intent = mGPSDb.sendToServer(this);
-        if(intent != null && !intent.getStringExtra("data").equals(UploadTrackActivity.data_empty)){
-            //only start activity, if data isn't empty
-            intent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
-            // valid but empty JSON defined in UploadTrackActivity ("[]")
-            startActivity(intent);
-        }
-        else {
+        if ((IbisApplication.mGPSDB.getNumRows() < 10) || !IbisApplication.mGPSDB.removeRandomStartEnd()) {
+            // don't upload empty or too short track
             Toast.makeText(this, getString(R.string.upload_track_error_too_short),
                     Toast.LENGTH_LONG).show();
         }
-        mGPSDb.open();
-        mGPSDb.deleteDatabase();
-        mGPSDb.close();
+        else {
+            Intent intent = new Intent(this, UploadTrackActivity.class);
+            JSONArray data = IbisApplication.mGPSDB.getJSONArray();
+            intent.putExtra("data", data.toString());
+            intent.putExtra("totalDist", IbisApplication.mGPSDB.getTotalDist());
+            intent.putExtra("coordCnt", IbisApplication.mGPSDB.getNumRows());
+            intent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
+            startActivity(intent);
+        }
+        IbisApplication.mGPSDB.deleteDatabase();
         IbisApplication.setOnline_tracking_running(false);
     }
 
