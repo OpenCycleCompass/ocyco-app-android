@@ -22,7 +22,6 @@ import android.widget.AdapterView;
 import android.widget.ArrayAdapter;
 import android.widget.Button;
 import android.widget.EditText;
-import android.widget.ImageView;
 import android.widget.Spinner;
 import android.widget.Switch;
 import android.widget.TextView;
@@ -46,8 +45,7 @@ public class RoutingActivity extends AppCompatActivity implements TimePickerFrag
 
     //LOG Tag
     private final static String TAG = "RoutingActivity-class";
-    //self-written classes
-    RoutingDatabase mRDb;
+
     //Timer for updating the map
     Handler timerHandler = new Handler();
     Runnable timerRunnable = new Runnable() {
@@ -99,11 +97,8 @@ public class RoutingActivity extends AppCompatActivity implements TimePickerFrag
         switch_userData = (Switch) findViewById(R.id.switch_userData);
         switch_timeFactor = (Switch) findViewById(R.id.switch_timeFactor);
         mTLoadingOverlay = new TransparentLoadingOverlay(this);
-        //set up database, delete old database
-        mRDb = new RoutingDatabase(this);
-        mRDb.open();
-        mRDb.deleteDatabase();
-        mRDb.close();
+        // delete old database
+        IbisApplication.mRDB.deleteDatabase();
         // configure select_route_type spinner
         selectRouteType = (Spinner) findViewById(R.id.select_route_type);
         ArrayAdapter<CharSequence> adapter = ArrayAdapter.createFromResource(this, R.array.route_types, android.R.layout.simple_spinner_item);
@@ -298,9 +293,7 @@ public class RoutingActivity extends AppCompatActivity implements TimePickerFrag
         boolean distanceExc = false;
         boolean timeExc = false;
         if (!manuel_distance) {
-            mRDb.open();
-            IbisApplication.setsEingTimeFactor(mRDb.getTotalDistTimeFactored());
-            mRDb.close();
+            IbisApplication.setsEingTimeFactor(IbisApplication.mRDB.getTotalTime());
         }
         //read text from EditText and convert to String
         try {
@@ -469,18 +462,16 @@ public class RoutingActivity extends AppCompatActivity implements TimePickerFrag
                 e.printStackTrace();
             }
             if (jObject != null) {
-                mRDb.open();
                 try {
                     //get JSON Array
                     JSONArray jArray = jObject.getJSONArray("points");
                     // delete old database
-                    mRDb.deleteData();
+                    IbisApplication.mRDB.deleteData();
                     //read and insert points from jArrray
-                    mRDb.readPointsArray(jArray);
+                    IbisApplication.mRDB.readPointsArray(jArray);
                     //get total dist, convert to km an round
-                    double totalDist = mRDb.getTotalDist() / 1000;
+                    double totalDist = IbisApplication.mRDB.getTotalDist() / 1000;
                     String totalDistRounded = roundDecimals(totalDist);
-                    mRDb.close();
                     //show Toast
                     int duration = Toast.LENGTH_LONG;
                     Toast toast = Toast.makeText(getApplicationContext(), "Die Route wurde generiert, die Strecke beträgt " + totalDistRounded + "km", duration);
@@ -495,7 +486,6 @@ public class RoutingActivity extends AppCompatActivity implements TimePickerFrag
                     int duration = Toast.LENGTH_LONG;
                     Toast toast = Toast.makeText(getApplicationContext(), R.string.rout_find_error, duration);
                     toast.show();
-                    mRDb.close();
                 }
                 try {
                     //get JSON Array

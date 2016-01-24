@@ -33,12 +33,12 @@ import org.osmdroid.views.overlay.mylocation.MyLocationNewOverlay;
 
 import java.util.ArrayList;
 
+import de.mytfg.jufo.ibis.util.TrackDatabase;
+
 public class MapFragment extends Fragment {
 
     // Log TAG
     protected static final String TAG = "IBis-MapFragment";
-    RoutingDatabase mRDB;
-    GPSDatabase mGPSDb;
 
     Polyline oldDrivenPolyline;
 
@@ -107,9 +107,6 @@ public class MapFragment extends Fragment {
 
         final Context context = this.getActivity();
         final DisplayMetrics dm = context.getResources().getDisplayMetrics();
-        //initialize Databases
-        mRDB = new RoutingDatabase(getActivity().getApplicationContext());
-        mGPSDb = new GPSDatabase(getActivity().getApplicationContext());
         //set zoom and touch controls
         mMapView.setBuiltInZoomControls(true);
         mMapView.setMultiTouchControls(true);
@@ -140,36 +137,25 @@ public class MapFragment extends Fragment {
             mMapView.getOverlays().add(mScaleBarOverlay);
         }
         mMapView.getController().setZoom(18);
-        mMapView.getOverlays().add(this.createRoutePolyline());
+        // add half-transparent blue polyline
+        mMapView.getOverlays().add(this.createPolylineFromDB(IbisApplication.mRDB, 0x880040FF));
         startMapUpdates();
     }
 
-    private Polyline createRoutePolyline() {
-        Log.i(TAG, "createRoutePolyline()");
-        // create waypoints Array
-        mRDB.open();
-        ArrayList<GeoPoint> waypoints = mRDB.getAllGeoPoints();
-        mRDB.close();
-        // create and set up the polyline
-        Polyline routeOverlay = new Polyline(getActivity().getApplicationContext());
-        routeOverlay.setPoints(waypoints);
-        routeOverlay.setColor(0x880040FF/*half-transparent blue*/);
-
-        return routeOverlay;
-    }
-
-    private Polyline createDrivenPolyline() {
+    private Polyline createPolylineFromDB(TrackDatabase lTDB, int color) {
         Log.i(TAG, "createDrivenPolyline()");
         //create waypoints Array
-        mGPSDb.open();
-        ArrayList<GeoPoint> waypoints = mGPSDb.getAllGeoPoints();
-        mGPSDb.close();
-        //create and set up the polyline
-        Polyline routeOverlay = new Polyline(getActivity().getApplicationContext());
-        routeOverlay.setPoints(waypoints);
-        routeOverlay.setColor(0x88E77E00/*half-transparent orange*/);
-
-        return routeOverlay;
+        Log.i(TAG, "database size: " + lTDB.getNumRows() + " rows");
+        Polyline polyline = new Polyline(getActivity().getApplicationContext());
+        polyline.setColor(color);
+        ArrayList<GeoPoint> waypoints = lTDB.getGeoPointArrayList();
+        if (waypoints != null) {
+            Log.i(TAG, "waypoints.size()=" + waypoints.size());
+            //create and set up the polyline
+            polyline.setPoints(waypoints);
+        }
+        // return empty Polyline instead of null if db is empty
+        return polyline;
     }
 
     private void startMapUpdates() {
@@ -185,7 +171,7 @@ public class MapFragment extends Fragment {
                 Log.i(TAG, "Geopoint" + currentLocation);
                 mMapView.getController().setCenter(currentLocation);
                 // create polyline for driven route
-                Polyline drivenPolyline = this.createDrivenPolyline();
+                Polyline drivenPolyline = this.createPolylineFromDB(IbisApplication.mGPSDB, 0x88E77E00); // half-transparent orange
                 // add polyline
                 mMapView.getOverlays().add(drivenPolyline);
                 // delete old polyline

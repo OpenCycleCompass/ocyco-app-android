@@ -69,7 +69,6 @@ public class UploadTrackActivity extends AppCompatActivity {
     private long stopTst;
     private double length;
     private boolean uploadPublic;
-    private GPSDatabase mGPSDb;
     private TransparentLoadingOverlay mTLoadingOverlay;
 
     @Override
@@ -95,9 +94,6 @@ public class UploadTrackActivity extends AppCompatActivity {
         uploadPublic = prefs.getBoolean("upload_public", false);
 
         switch_UploadTrackPublic.setChecked(uploadPublic);
-
-        // Create Database
-        mGPSDb = new GPSDatabase(this.getApplicationContext());
 
         // Only accept a-z, A-Z, "-" and "_" as name
         editText_UploadTrackName.setFilters(new InputFilter[]{new InputFilter() {
@@ -292,7 +288,6 @@ public class UploadTrackActivity extends AppCompatActivity {
             HttpURLConnection conn = (HttpURLConnection) url.openConnection();
             conn.setReadTimeout(30000 /* milliseconds */);
             conn.setConnectTimeout(50000 /* milliseconds */);
-            Log.i(TAG, "Old User-Agent: " + conn.getRequestProperty("User-Agent"));
             conn.setRequestProperty("User-Agent", "iBis app");
             Log.i(TAG, "New User-Agent: " + conn.getRequestProperty("User-Agent"));
 
@@ -384,10 +379,8 @@ public class UploadTrackActivity extends AppCompatActivity {
     }
 
     public void deleteTrack() {
-        //delete track
-        mGPSDb.open();
-        mGPSDb.deleteData();
-        mGPSDb.close();
+        //delete track database data
+        IbisApplication.mGPSDB.deleteData();
         //show Toast
         Toast toast = Toast.makeText(getApplicationContext(), getString(R.string.upload_track_deleted), Toast.LENGTH_LONG);
         toast.show();

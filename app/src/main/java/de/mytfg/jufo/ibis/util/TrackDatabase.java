@@ -61,6 +61,7 @@ public class TrackDatabase {
         dbHelper = new DbHelper(context);
         this.context = context;
         this.DBNAME = name;
+        open();
     }
 
     // insert methods
@@ -146,6 +147,7 @@ public class TrackDatabase {
 
     // data manipulating methods
     // previous prepareDB():
+    @Deprecated
     public int removeTdiffDistTooShort(double threshold) {
         String thresholdString = Double.toString(threshold);
         int d_rows = db.delete(TABLENAME, COLUMN_TDIFF + " < " + thresholdString, null);
@@ -165,9 +167,9 @@ public class TrackDatabase {
         int cutColIdEnd = -1;
         if (cursor.moveToFirst()) {
             do {
-                distBegin += cursor.getDouble(0);
+                distBegin += cursor.getDouble(1);
                 if (distBegin > cutDistBegin) {
-                    cutColIdBegin = cursor.getInt(1);
+                    cutColIdBegin = cursor.getInt(0);
                     break;
                 }
 
@@ -179,9 +181,9 @@ public class TrackDatabase {
         }
         if (cursor.moveToLast()) {
             do {
-                distEnd += cursor.getDouble(0);
+                distEnd += cursor.getDouble(1);
                 if (distEnd > cutDistEnd) {
-                    cutColIdEnd = cursor.getInt(1);
+                    cutColIdEnd = cursor.getInt(0);
                     break;
                 }
             } while (cursor.moveToPrevious());
@@ -222,14 +224,18 @@ public class TrackDatabase {
     }
 
     public JSONArray getJSONArray() {
-        Cursor cursor = db.query(TABLENAME, new String[]{COLUMN_LAT, COLUMN_LON}, null, null, null, null, null);
         JSONArray data = new JSONArray();
+        Cursor cursor = getAllRows();
         cursor.moveToFirst();
         while (!cursor.isAfterLast()) {
             JSONObject point = new JSONObject();
             try {
-                point.put("lat", cursor.getDouble(0));
-                point.put("lon", cursor.getDouble(1));
+                point.put("lat", cursor.getDouble(1));
+                point.put("lon", cursor.getDouble(2));
+                point.put("alt", cursor.getDouble(3));
+                point.put("spe", cursor.getDouble(4));
+                point.put("tst", (double) cursor.getLong(5) / 1000);
+                point.put("acc", cursor.getDouble(6));
             } catch (JSONException e) {
                 e.printStackTrace();
             }
@@ -268,9 +274,8 @@ public class TrackDatabase {
     }
 
 
-
-
     // deprecated methods
+    @Deprecated
     @Nullable
     public Intent sendToServer(Context c) {
         open();
@@ -313,9 +318,14 @@ public class TrackDatabase {
         db = dbHelper.getWritableDatabase();
     }
 
-    private void close() {
+    private void open_ro() {
+        Log.i(TAG, "open_ro()");
+        db = dbHelper.getReadableDatabase();
+    }
+
+    public void close() {
         Log.i(TAG, "close()");
-        dbHelper.close();
+        db.close();
     }
 
     private Cursor getAllRows() {
