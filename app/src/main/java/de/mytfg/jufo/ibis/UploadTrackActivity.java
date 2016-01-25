@@ -44,9 +44,6 @@ import de.mytfg.jufo.ibis.util.TransparentLoadingOverlay;
 import de.mytfg.jufo.ibis.util.Utils;
 
 public class UploadTrackActivity extends AppCompatActivity {
-
-    public static final String data_empty = "[]"; // empty, but valid JSON
-    private String data = data_empty;
     // Log TAG
     protected static final String TAG = "UploadTrackAct-class";
     //shared preferences
@@ -65,8 +62,7 @@ public class UploadTrackActivity extends AppCompatActivity {
     private Button button_DeleteTrack;
     private Button button_UploadTrackTokenRegenerate;
     private String token = null;
-    private long startTst;
-    private long stopTst;
+    private long duration;
     private double length;
     private boolean uploadPublic;
     private TransparentLoadingOverlay mTLoadingOverlay;
@@ -108,14 +104,8 @@ public class UploadTrackActivity extends AppCompatActivity {
             }
         }});
 
-        //receiving intent
-        Intent incomingIntent = getIntent();
-        if (incomingIntent.hasExtra("data")) {
-            data = incomingIntent.getStringExtra("data");
-        }
-        startTst = incomingIntent.getLongExtra("startTst", 0);
-        stopTst = incomingIntent.getLongExtra("stopTst", 0);
-        length = incomingIntent.getDoubleExtra("totalDist", 0) / 1000;
+        length = IbisApplication.mGPSDB.getTotalDist() / 1000;
+        duration = IbisApplication.mGPSDB.getDuration() / 1000;
 
         initUI();
         updateUI();
@@ -124,7 +114,7 @@ public class UploadTrackActivity extends AppCompatActivity {
     // Initialize GUI
     private void initUI() {
 
-        editText_UploadTrackDuration.setText(Utils.formatTime(stopTst - startTst));
+        editText_UploadTrackDuration.setText(Utils.formatTime(duration));
         editText_UploadTrackLength.setText(Utils.roundDecimals(length) + " km");
         uploadPublic = prefs.getBoolean("upload_public", false);
         token = prefs.getString("upload_token", null);
@@ -255,7 +245,16 @@ public class UploadTrackActivity extends AppCompatActivity {
             mTLoadingOverlay.show();
             GetHttpTask getHttpTask = new GetHttpTask();
             getHttpTask.setType("upload");
-            getHttpTask.execute(lurl, data);
+            JSONObject obj = new JSONObject();
+            try {
+                obj.put("track", IbisApplication.mGPSDB.getJSONArray());
+                obj.put("vibrations", IbisApplication.mGPSDB.getVibrations());
+                obj.put("vibrationTsts", IbisApplication.mGPSDB.getVibrationTsts());
+            } catch (JSONException e) {
+                Log.i(TAG, "Error concatenating POST string");
+                e.printStackTrace();
+            }
+            getHttpTask.execute(lurl, "data=" + obj.toString());
         } else {
             Context context = getApplicationContext();
             int duration = Toast.LENGTH_LONG;
@@ -267,7 +266,7 @@ public class UploadTrackActivity extends AppCompatActivity {
     private String makeUrl() {
         String lurlstr;
         Uri.Builder lurl;
-        lurl = Uri.parse(this.getString(R.string.api1_base_url) + this.getString(R.string.api1_pushtrack_new)).buildUpon().appendQueryParameter("duration", Long.toString(stopTst - startTst)).appendQueryParameter("length", Double.toString(length * 1000)).appendQueryParameter("user_token", token);
+        lurl = Uri.parse(this.getString(R.string.api1_base_url) + this.getString(R.string.api1_pushtrack_new)).buildUpon().appendQueryParameter("duration", Long.toString(duration)).appendQueryParameter("length", Double.toString(length * 1000)).appendQueryParameter("user_token", token);
         if (uploadPublic) {
             lurl.appendQueryParameter("name", editText_UploadTrackName.getText().toString()).appendQueryParameter("comment", editText_UploadTrackCom.getText().toString()).appendQueryParameter("public", "true");
         } else {
@@ -280,7 +279,7 @@ public class UploadTrackActivity extends AppCompatActivity {
     // Given a URL, establishes an HttpUrlConnection and retrieves
     // the web page content as a InputStream, which it returns as
     // a string.
-    private String getUrl(String lurlstr, String ldata) throws IOException {
+    private String getUrl(String lurlstr, String post) throws IOException {
         InputStream stream = null;
 
         try {
@@ -294,21 +293,15 @@ public class UploadTrackActivity extends AppCompatActivity {
             // Get returned body from webserver:
             conn.setDoInput(true);
 
-            if (ldata != null) {
+            if (post != null) {
                 conn.setRequestMethod("POST");
-                Log.i(TAG, "POST: " + ldata);
+                Log.i(TAG, "POST: " + post);
 
                 // Write POST Data:
                 conn.setDoOutput(true);
 
-                //List<NameValuePair> params = new ArrayList<>();
-                //params.add(new BasicNameValuePair("data", ldata));
-
                 OutputStream os = conn.getOutputStream();
                 BufferedWriter writer = new BufferedWriter(new OutputStreamWriter(os, "UTF-8"));
-
-                String post = "data" + "=" + ldata;
-                Log.i(TAG, "POST string: " + post);
                 writer.write(post);
                 writer.flush();
                 writer.close();
@@ -465,6 +458,9 @@ public class UploadTrackActivity extends AppCompatActivity {
 
                             // getString(R.string.upload_track_success_trackid);
                             notification = "Track \"" + track_id + "\" mit " + nodes_s + " GPS-Koordinaten erstellt am " + created_s;
+
+                            // Success: delete database
+                            IbisApplication.mGPSDB.deleteDatabase();
                         } else if (json.has("error")) {
                             notification = getString(R.string.error) + json.getString("error");
                         } else {

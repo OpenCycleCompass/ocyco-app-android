@@ -18,6 +18,7 @@ import org.osmdroid.util.GeoPoint;
 
 import java.security.SecureRandom;
 import java.util.ArrayList;
+import java.util.List;
 
 import de.mytfg.jufo.ibis.UploadTrackActivity;
 
@@ -35,6 +36,8 @@ public class TrackDatabase {
     private final String COLUMN_DIST = "distance";  // distance to last point in meters
     private final String COLUMN_TDIFF = "tdiff";    // time difference to last point in milliseconds
     private final String COLUMN_TIMEFACTOR = "time_factor";
+    private final String COLUMN_VIBRATION = "vibration";
+    private final String COLUMN_VIBRATIONTST = "vibrationtst";
     private final String TABLENAME = "GPSData";
     private final String CREATERDB = "CREATE TABLE " + TABLENAME + "(" + COLUMN_ID + " INTEGER PRIMARY KEY AUTOINCREMENT," +
             COLUMN_LAT + " REAL NOT NULL, " +
@@ -45,7 +48,9 @@ public class TrackDatabase {
             COLUMN_ACC + " REAL, " +
             COLUMN_DIST + " REAL, " +
             COLUMN_TDIFF + " INTEGER, " +
-            COLUMN_TIMEFACTOR + " REAL);";
+            COLUMN_TIMEFACTOR + " REAL, " +
+            COLUMN_VIBRATION + " TEXT, " +
+            COLUMN_VIBRATIONTST + " TEXT);";
     // context
     private Context context;
     // SQLite database
@@ -66,6 +71,10 @@ public class TrackDatabase {
 
     // insert methods
     public long insertLocation(Location loc) {
+        return insertLocation(loc, null, null);
+    }
+
+    public long insertLocation(Location loc, List<Double> vibrations, List<Long> vibrationTsts) {
         ContentValues value = new ContentValues();
         value.put(COLUMN_LAT, loc.getLatitude());
         value.put(COLUMN_LON, loc.getLongitude());
@@ -73,6 +82,24 @@ public class TrackDatabase {
         value.put(COLUMN_SPE, loc.getSpeed());
         value.put(COLUMN_TST, loc.getTime());
         value.put(COLUMN_ACC, loc.getAccuracy());
+        if (vibrations != null && vibrationTsts != null) {
+            StringBuilder vibrations_string = new StringBuilder();
+            StringBuilder vibrationTsts_string = new StringBuilder();
+            for (Double d : vibrations) {
+                vibrations_string.append(d);
+                vibrations_string.append(',');
+            }
+            for (Long l : vibrationTsts) {
+                vibrationTsts_string.append(l);
+                vibrationTsts_string.append(',');
+            }
+            value.put(COLUMN_VIBRATION, vibrations_string.toString());
+            value.put(COLUMN_VIBRATIONTST, vibrationTsts_string.toString());
+            Log.i(TAG, "(size=" + vibrations.size() +
+                    ")   vibrations=" + vibrations_string.toString());
+            Log.i(TAG, "(size=" + vibrationTsts.size() +
+                    ")vibrationtsts=" + vibrationTsts_string.toString());
+        }
         double dist;
         long tdiff;
         if (lastLocation == null) {
@@ -271,6 +298,39 @@ public class TrackDatabase {
         num = mCount.getInt(0);
         mCount.close();
         return num;
+    }
+
+    public String getVibrations() {
+        String vibration = "";
+        Cursor cursor = db.rawQuery("SELECT GROUP_CONCAT(" + COLUMN_VIBRATION + ", '') FROM " +
+                TABLENAME + " ORDER BY " + COLUMN_TST, null);
+        if (cursor.moveToFirst()) {
+            vibration = cursor.getString(0);
+        }
+        cursor.close();
+        return vibration;
+    }
+
+    public String getVibrationTsts() {
+        String vibration = "";
+        Cursor cursor = db.rawQuery("SELECT GROUP_CONCAT(" + COLUMN_VIBRATIONTST + ", '') FROM " +
+                TABLENAME + " ORDER BY " + COLUMN_TST, null);
+        if (cursor.moveToFirst()) {
+            vibration = cursor.getString(0);
+        }
+        cursor.close();
+        return vibration;
+    }
+
+    public long getDuration() {
+        long duration = 0;
+        Cursor cursor = db.rawQuery("SELECT MIN(" + COLUMN_TST + "), MAX(" + COLUMN_TST + ") FROM "
+                + TABLENAME + " ORDER BY " + COLUMN_TST, null);
+        if (cursor.moveToFirst()) {
+            duration = cursor.getLong(1) - cursor.getLong(0);
+        }
+        cursor.close();
+        return duration;
     }
 
 

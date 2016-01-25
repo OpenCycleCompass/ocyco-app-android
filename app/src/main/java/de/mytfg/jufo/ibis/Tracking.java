@@ -3,7 +3,12 @@ package de.mytfg.jufo.ibis;
 import android.app.NotificationManager;
 import android.app.PendingIntent;
 import android.app.Service;
+import android.content.Context;
 import android.content.Intent;
+import android.hardware.Sensor;
+import android.hardware.SensorEvent;
+import android.hardware.SensorEventListener;
+import android.hardware.SensorManager;
 import android.location.Location;
 import android.os.Bundle;
 import android.os.IBinder;
@@ -19,11 +24,14 @@ import com.google.android.gms.location.LocationListener;
 import com.google.android.gms.location.LocationRequest;
 import com.google.android.gms.location.LocationServices;
 
-import org.json.JSONArray;
+import java.util.ArrayList;
+import java.util.List;
 
 import de.mytfg.jufo.ibis.util.Utils;
 
-public class Tracking extends Service implements LocationListener, OnConnectionFailedListener, ConnectionCallbacks {
+import static java.lang.Math.sqrt;
+
+public class Tracking extends Service implements LocationListener, OnConnectionFailedListener, ConnectionCallbacks, SensorEventListener {
 
     // The desired interval for location updates. Inexact. Updates may be more or less frequent.
     public static final long UPDATE_INTERVAL_IN_MILLISECONDS = 3000;
@@ -44,6 +52,12 @@ public class Tracking extends Service implements LocationListener, OnConnectionF
     private NotificationCompat.Builder mBuilder;
     // Gets an instance of the NotificationManager service
     private NotificationManager mNotifyMgr;
+
+    private SensorManager mSensorManager;
+    private Sensor mSensor;
+    private boolean vibrationMeasure = false;
+    private List<Double> vibrationList;
+    private List<Long> vibrationListTimestamps;
 
     @Override
     public void onLocationChanged(Location location) {
@@ -84,7 +98,15 @@ public class Tracking extends Service implements LocationListener, OnConnectionF
 
     private void updateDatabase() {
         Log.i(TAG, "updateDatabase()");
-        IbisApplication.mGPSDB.insertLocation(mCurrentLocation);
+        if (vibrationMeasure) {
+            IbisApplication.mGPSDB.insertLocation(mCurrentLocation, vibrationList,
+                    vibrationListTimestamps);
+            vibrationList.clear();
+            vibrationListTimestamps.clear();
+        }
+        else {
+            IbisApplication.mGPSDB.insertLocation(mCurrentLocation);
+        }
     }
 
     private void callCalculate() {
@@ -150,6 +172,12 @@ public class Tracking extends Service implements LocationListener, OnConnectionF
         //build and connect Api Client
         buildGoogleApiClient();
         mGoogleApiClient.connect();
+
+        // Acceleration Sensor
+        mSensorManager = (SensorManager) getSystemService(Context.SENSOR_SERVICE);
+        mSensor = mSensorManager.getDefaultSensor(Sensor.TYPE_ACCELEROMETER);
+        vibrationList = new ArrayList<>(150);
+        vibrationListTimestamps = new ArrayList<>(150);
     }
 
     /**
@@ -206,15 +234,12 @@ public class Tracking extends Service implements LocationListener, OnConnectionF
                     Toast.LENGTH_LONG).show();
         }
         else {
+            Log.i(TAG, "Creating UploadTrackActivity intent");
             Intent intent = new Intent(this, UploadTrackActivity.class);
-            JSONArray data = IbisApplication.mGPSDB.getJSONArray();
-            intent.putExtra("data", data.toString());
-            intent.putExtra("totalDist", IbisApplication.mGPSDB.getTotalDist());
-            intent.putExtra("coordCnt", IbisApplication.mGPSDB.getNumRows());
             intent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
+            Log.i(TAG, "Starting UploadTrackActivity intent");
             startActivity(intent);
         }
-        IbisApplication.mGPSDB.deleteDatabase();
         IbisApplication.setOnline_tracking_running(false);
     }
 
@@ -253,6 +278,7 @@ public class Tracking extends Service implements LocationListener, OnConnectionF
         if (mGoogleApiClient.isConnected()) {
             LocationServices.FusedLocationApi.removeLocationUpdates(mGoogleApiClient, this);
         }
+        mSensorManager.unregisterListener(this);
     }
 
     @Override
@@ -265,6 +291,7 @@ public class Tracking extends Service implements LocationListener, OnConnectionF
     protected void startLocationUpdates() {
         Log.i(TAG, "startLocationUpdates()");
         LocationServices.FusedLocationApi.requestLocationUpdates(mGoogleApiClient, mLocationRequest, this);
+        mSensorManager.registerListener(this, mSensor, SensorManager.SENSOR_DELAY_FASTEST);
     }
 
     @Override
@@ -283,4 +310,22 @@ public class Tracking extends Service implements LocationListener, OnConnectionF
         -> Wir tun nix */
     }
 
+    private double sqr(float number) {
+        return (double) (number * number);
+    }
+
+    @Override
+    public void onSensorChanged(SensorEvent event) {
+        if (vibrationMeasure) {
+            vibrationList.add(
+                    sqrt(sqr(event.values[0]) + sqr(event.values[1]) + sqr(event.values[2])));
+            vibrationListTimestamps.add(event.timestamp);
+        }
+    }
+
+    @Override
+    // Activate vibrationMeasure if accuracy is good enough
+    public void onAccuracyChanged(Sensor sensor, int accuracy) {
+        vibrationMeasure = !(accuracy == SensorManager.SENSOR_STATUS_UNRELIABLE);
+    }
 }
