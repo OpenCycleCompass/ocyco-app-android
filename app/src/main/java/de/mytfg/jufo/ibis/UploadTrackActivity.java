@@ -254,7 +254,7 @@ public class UploadTrackActivity extends AppCompatActivity {
                 Log.i(TAG, "Error concatenating POST string");
                 e.printStackTrace();
             }
-            getHttpTask.execute(lurl, "data=" + obj.toString());
+            getHttpTask.execute(lurl, "data2=" + obj.toString());
         } else {
             Context context = getApplicationContext();
             int duration = Toast.LENGTH_LONG;
