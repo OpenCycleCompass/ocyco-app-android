@@ -2,6 +2,9 @@ package de.mytfg.jufo.ibis.storage;
 
 import android.location.Location;
 
+/**
+ * IbisLocation class representing a location in a track
+ */
 public class IbisLocation {
     public static final double DISTANCE_INVALID = -1;
     public static final double TIMEINTERVAL_INVALID = -1;
@@ -32,6 +35,21 @@ public class IbisLocation {
         this.distance = DISTANCE_INVALID;
         this.timeInterval = TIMEINTERVAL_INVALID;
         this.timeFactor = NO_TIMEFACTOR;
+    }
+
+    /**
+     * copy constructor
+     */
+    public IbisLocation(IbisLocation location) {
+        this.latitude = location.getLatitude();
+        this.longitude = location.getLongitude();
+        this.altitude = location.getAltitude();
+        this.speed = location.getSpeed();
+        this.accuracy = location.getAccuracy();
+        this.timestamp = location.getTimestamp();
+        this.distance = location.getDistance();
+        this.timeInterval = location.getTimeInterval();
+        this.timeFactor = location.getTimeFactor();
     }
 
     /**
