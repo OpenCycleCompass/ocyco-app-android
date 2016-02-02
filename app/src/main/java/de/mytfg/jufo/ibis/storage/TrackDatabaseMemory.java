@@ -1,6 +1,5 @@
 package de.mytfg.jufo.ibis.storage;
 
-import android.content.Context;
 import android.location.Location;
 
 import org.json.JSONArray;
@@ -13,6 +12,9 @@ import java.util.ArrayList;
 import java.util.LinkedList;
 import java.util.ListIterator;
 
+/**
+ * TrackDatabaseMemory class to store a track
+ */
 public class TrackDatabaseMemory {
     private LinkedList<IbisLocation> locations;
 
@@ -87,7 +89,7 @@ public class TrackDatabaseMemory {
             }
         }
         // Recalculate distances and total distance
-        recalcDistances();
+        recalculateDistances();
         calculateTotalDistance();
     }
 
@@ -145,17 +147,17 @@ public class TrackDatabaseMemory {
 
         // success
         // Recalculate distances and total distance
-        recalcDistances();
+        recalculateDistances();
         calculateTotalDistance();
         return true;
     }
 
     /**
      * recalculate distances between locations of track
-     * for each {@link IbisLocation} (except the first one) to distanec to the previous one
+     * for each {@link IbisLocation} (except the first one) to distance to the previous one
      *  is calculated and saved
      */
-    public void recalcDistances() {
+    public void recalculateDistances() {
         // set distance of first {@link IbisLocation} to DISTANCE_INVALID (handled as zero)
         if (locations.size() > 0) {
             locations.get(0).setDistance(IbisLocation.DISTANCE_INVALID);
@@ -183,7 +185,7 @@ public class TrackDatabaseMemory {
      * Get total distance of track
      *
      * requires {@link IbisLocation}s distances to be set,
-     *  maybe you should recalculate them using {@see recalcDistances()}
+     *  maybe you should recalculate them using {@see recalculateDistances()}
      */
     private void calculateTotalDistance() {
         totalDistance = 0.0;
@@ -197,7 +199,7 @@ public class TrackDatabaseMemory {
     /**
      * Get total distance of track
      *
-     * You can to recalculate distances between locations using {@see recalcDistances()}
+     * You can to recalculate distances between locations using {@see recalculateDistances()}
      * before using this method to get a more precise result.
      *
      * The total distance is calculated on each modification made to the location list
@@ -273,95 +275,5 @@ public class TrackDatabaseMemory {
             data.put(point);
         }
         return data;
-    }
-
-
-    // DEPRECATED methods
-    /**
-     * @deprecated
-     * constructor for backward compatibility
-     *
-     * @param context unused
-     * @param name unused
-     */
-    @Deprecated
-    public TrackDatabaseMemory(Context context, String name) {
-        this();
-    }
-
-    /**
-     * @deprecated
-     * use {@see appendLocation()} instead
-     *
-     * @param loc {@link android.location.Location} object to create {@link IbisLocation} from
-     * @return unused
-     */
-    @Deprecated
-    public long insertLocation(Location loc) {
-        appendLocation(loc);
-        return 0;
-    }
-
-    /**
-     * @deprecated
-     * use {@see appendJsonLocationArray(JSONArray jsonLocationArray)} instead
-     *
-     * @param jArray jArray
-     */
-    @Deprecated
-    public void readPointsArray(JSONArray jArray) {
-        appendJsonLocationArray(jArray);
-    }
-
-    /**
-     * @deprecated
-     * use {@code appendLocation(IbisLocation location)} instead
-     *
-     * @param lat lat
-     * @param lon lon
-     * @param dist dist
-     * @param tf tf
-     * @return unused (backward compatibility)
-     */
-    @Deprecated
-    public long insertData(double lat, double lon, double dist, double tf) {
-        IbisLocation location = new IbisLocation(lat, lon);
-        location.setDistance(dist);
-        location.setTimeFactor(tf);
-        appendLocation(location);
-        return 0;
-    }
-
-    /**
-     * @deprecated
-     * use {@code deleteData()} instead
-     *
-     * removes all locations from track
-     */
-    @Deprecated
-    public void deleteDatabase() {
-        deleteData();
-    }
-
-    /**
-     * @deprecated
-     * use {@code getNumberOfLocations()} instead
-     *
-     * @return number of locations in track
-     */
-    @Deprecated
-    public int getNumRows() {
-        return getNumberOfLocations();
-    }
-
-    /**
-     * @deprecated
-     * use {@code getTotalDistance()} instead
-     *
-     * @return total distance of track
-     */
-    @Deprecated
-    public double getTotalDist() {
-        return getTotalDistance();
     }
 }

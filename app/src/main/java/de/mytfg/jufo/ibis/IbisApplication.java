@@ -59,8 +59,8 @@ public class IbisApplication extends Application {
         ACRA.init(this);
 
         // create TrackDatabases
-        mGPSDB = new TrackDatabaseMemory(this, "mGPSDB");
-        mRDB = new TrackDatabaseMemory(this, "mRBD");
+        mGPSDB = new TrackDatabaseMemory();
+        mRDB = new TrackDatabaseMemory();
     }
 
     public static void setCalculationVars(double sGefIn, double sZufIn, double vAktIn, double vDIn, double tAnkIn, double tAnkUntIn, double vDMussIn, double vDuntIn) {

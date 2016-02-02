@@ -145,7 +145,7 @@ public class MapFragment extends Fragment {
     private Polyline createPolylineFromDB(TrackDatabaseMemory lTDB, int color) {
         Log.i(TAG, "createDrivenPolyline()");
         //create waypoints Array
-        Log.i(TAG, "database size: " + lTDB.getNumRows() + " rows");
+        Log.i(TAG, "database size: " + lTDB.getNumberOfLocations() + " rows");
         Polyline polyline = new Polyline(getActivity().getApplicationContext());
         polyline.setColor(color);
         ArrayList<GeoPoint> waypoints = lTDB.getGeoPointArrayList();

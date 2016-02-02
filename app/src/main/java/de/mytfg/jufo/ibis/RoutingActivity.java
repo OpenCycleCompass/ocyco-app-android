@@ -98,7 +98,7 @@ public class RoutingActivity extends AppCompatActivity implements TimePickerFrag
         switch_timeFactor = (Switch) findViewById(R.id.switch_timeFactor);
         mTLoadingOverlay = new TransparentLoadingOverlay(this);
         // delete old database
-        IbisApplication.mRDB.deleteDatabase();
+        IbisApplication.mRDB.deleteData();
         // configure select_route_type spinner
         selectRouteType = (Spinner) findViewById(R.id.select_route_type);
         ArrayAdapter<CharSequence> adapter = ArrayAdapter.createFromResource(this, R.array.route_types, android.R.layout.simple_spinner_item);
@@ -468,9 +468,9 @@ public class RoutingActivity extends AppCompatActivity implements TimePickerFrag
                     // delete old database
                     IbisApplication.mRDB.deleteData();
                     //read and insert points from jArrray
-                    IbisApplication.mRDB.readPointsArray(jArray);
+                    IbisApplication.mRDB.appendJsonLocationArray(jArray);
                     //get total dist, convert to km an round
-                    double totalDist = IbisApplication.mRDB.getTotalDist() / 1000;
+                    double totalDist = IbisApplication.mRDB.getTotalDistance() / 1000;
                     String totalDistRounded = roundDecimals(totalDist);
                     //show Toast
                     int duration = Toast.LENGTH_LONG;
