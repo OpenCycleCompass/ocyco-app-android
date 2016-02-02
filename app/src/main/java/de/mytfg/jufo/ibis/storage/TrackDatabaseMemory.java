@@ -9,14 +9,13 @@ import org.osmdroid.util.GeoPoint;
 
 import java.security.SecureRandom;
 import java.util.ArrayList;
-import java.util.LinkedList;
 import java.util.ListIterator;
 
 /**
  * TrackDatabaseMemory class to store a track
  */
 public class TrackDatabaseMemory {
-    private LinkedList<IbisLocation> locations;
+    private ArrayList<IbisLocation> locations;
 
     private double totalDistance;
 
@@ -24,7 +23,8 @@ public class TrackDatabaseMemory {
      * default constructor
      */
     public TrackDatabaseMemory() {
-        locations = new LinkedList<>();
+        // initial size of ArrayList: 128
+        locations = new ArrayList<>(128);
         totalDistance = 0.0;
     }
 
@@ -37,7 +37,7 @@ public class TrackDatabaseMemory {
      */
     public void appendLocation(IbisLocation loc) {
         if (!locations.isEmpty()) {
-            loc.setDistanceTo(locations.getLast());
+            loc.setDistanceTo(locations.get(locations.size() - 1));
             totalDistance += loc.getDistance();
         }
         locations.add(loc);
@@ -66,6 +66,8 @@ public class TrackDatabaseMemory {
      * @param jsonLocationArray jsonLocationArray
      */
     public void appendJsonLocationArray(JSONArray jsonLocationArray) {
+        // ensure ArrayList capacity before appending multiple IbisLocations
+        locations.ensureCapacity(locations.size() + jsonLocationArray.length());
         IbisLocation oldLocation = null;
         for (int i = 0; i < jsonLocationArray.length(); i++) {
             try {
@@ -162,20 +164,9 @@ public class TrackDatabaseMemory {
         if (locations.size() > 0) {
             locations.get(0).setDistance(IbisLocation.DISTANCE_INVALID);
         }
-        /*
         // for loop begins at second element (index 1)
-        // O(n^2) (?)
         for (int i = 1; i < locations.size(); i++) {
             locations.get(i).setDistanceTo(locations.get(i - 1));
-        }
-        // OR
-        */
-        // two iterators, one element offset
-        // O(n) (?)
-        ListIterator<IbisLocation> iterator_before = locations.listIterator(0);
-        ListIterator<IbisLocation> iterator = locations.listIterator(1);
-        while (iterator.hasNext()) {
-            iterator.next().setDistanceTo(iterator_before.next());
         }
     }
 
