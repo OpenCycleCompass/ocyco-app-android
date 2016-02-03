@@ -33,7 +33,7 @@ import org.osmdroid.views.overlay.mylocation.MyLocationNewOverlay;
 
 import java.util.ArrayList;
 
-import de.mytfg.jufo.ibis.util.TrackDatabase;
+import de.mytfg.jufo.ibis.storage.TrackDatabaseMemory;
 
 public class MapFragment extends Fragment {
 
@@ -142,10 +142,10 @@ public class MapFragment extends Fragment {
         startMapUpdates();
     }
 
-    private Polyline createPolylineFromDB(TrackDatabase lTDB, int color) {
+    private Polyline createPolylineFromDB(TrackDatabaseMemory lTDB, int color) {
         Log.i(TAG, "createDrivenPolyline()");
         //create waypoints Array
-        Log.i(TAG, "database size: " + lTDB.getNumRows() + " rows");
+        Log.i(TAG, "database size: " + lTDB.getNumberOfLocations() + " rows");
         Polyline polyline = new Polyline(getActivity().getApplicationContext());
         polyline.setColor(color);
         ArrayList<GeoPoint> waypoints = lTDB.getGeoPointArrayList();
