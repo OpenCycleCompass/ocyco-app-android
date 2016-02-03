@@ -127,17 +127,15 @@ public class IbisLocation {
         if (to == null) {
             return DISTANCE_INVALID;
         }
-        // inspired by http://stackoverflow.com/q/27928
-        double R = 6371000; // meters
-        double φ1 = degree2radiant(latitude);
-        double φ2 = degree2radiant(to.getLatitude());
-        double Δφ = Math.abs(degree2radiant(to.getLatitude() - latitude));
-        double Δλ = Math.abs(degree2radiant(to.getLongitude() - longitude));
-        double a = Math.sin(Δφ/2) * Math.sin(Δφ/2) +
-                Math.cos(φ1) * Math.cos(φ2) *
-                        Math.sin(Δλ/2) * Math.sin(Δλ/2);
+        // Haversine formula (https://en.wikipedia.org/wiki/Haversine_formula)
+        double earthRadius = 6371000; // meters
+        double phi1 = degree2radiant(latitude);
+        double phi2 = degree2radiant(to.getLatitude());
+        double deltaPhi = Math.abs(degree2radiant(to.getLatitude() - latitude));
+        double deltaLambda = Math.abs(degree2radiant(to.getLongitude() - longitude));
+        double a = (Math.sin(deltaPhi / 2) * Math.sin(deltaPhi / 2)) + (Math.cos(phi1) * Math.cos(phi2) * Math.sin(deltaLambda / 2) * Math.sin(deltaLambda / 2));
         double c = 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1-a));
-        return R * c;
+        return earthRadius * c;
     }
 
     private double degree2radiant(double degree) {
