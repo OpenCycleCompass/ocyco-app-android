@@ -20,6 +20,7 @@
     <string name="title_activity_show_data">iBis</string>
     <string name="action_show_data_activity">Navigation</string>
     <string name="preference_file_key">pref_file_key</string>
+    <string name="preference_file_key_upload_later">pref_file_key_upload_later</string>
     <string name="tracking_stop">Tracking beenden</string>
     <string name="tracking_stop_notification">Beenden</string>
     <string name="tracking_status_active">Tracking läuft</string>
@@ -42,6 +43,9 @@
     <string name="upload_track_deleted">Track gelöscht</string>
     <string name="upload_track_debugurl">DEBUG: URL</string>
     <string name="upload_track_debugdata">DEBUG: DATA</string>
+    <string name="upload_track_later">Später Hochladen</string>
+    <string name="upload_track_later_success">Der Track wurde zum späteren Hochladen archiviert.</string>
+    <string name="upload_track_error_no_track">Fehler: Der Track konnte nicht verarbeitet werden</string>
     <string name="api1_base_url">https://ibis.jufo.mytfg.de/api1/</string>
     <string name="api1_token_new">token.php?newtoken=newtoken</string>
     <string name="api1_pushtrack_new">pushtrack.php?newtrack=newtrack</string>
@@ -94,6 +98,8 @@
     <string name="tracking">Tracking - anonym Routendaten sammeln</string>
     <string name="start_tracking">Tracking starten</string>
     <string name="stop_tracking">Tracking stoppen</string>
+    <string name="track_archive">Track Archiv (Später Hochladen)</string>
+    <string name="track_archive_delete">Track Archiv löschen</string>
     <string name="start_from_current_position">Von aktueller Position aus navigieren</string>
     <string name="search_position">Position wird gesucht...</string>
     <string name="switch_timeFactor">Möchten Sie für die Berechnung der Ankunftszeit die gesammelten Daten anderer User nutzen?</string>
