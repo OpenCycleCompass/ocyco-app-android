@@ -19,8 +19,6 @@ import com.google.android.gms.location.LocationListener;
 import com.google.android.gms.location.LocationRequest;
 import com.google.android.gms.location.LocationServices;
 
-import org.json.JSONArray;
-
 import de.mytfg.jufo.ibis.util.Utils;
 
 public class Tracking extends Service implements LocationListener, OnConnectionFailedListener, ConnectionCallbacks {
@@ -208,14 +206,10 @@ public class Tracking extends Service implements LocationListener, OnConnectionF
         }
         else {
             Intent intent = new Intent(this, UploadTrackActivity.class);
-            JSONArray data = IbisApplication.mGPSDB.getJSONArray();
-            intent.putExtra("data", data.toString());
-            intent.putExtra("totalDist", IbisApplication.mGPSDB.getTotalDistance());
-            intent.putExtra("coordCnt", IbisApplication.mGPSDB.getNumberOfLocations());
+            intent.putExtra("track", "current");
             intent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
             startActivity(intent);
         }
-        IbisApplication.mGPSDB.deleteData();
         IbisApplication.setOnline_tracking_running(false);
     }
 

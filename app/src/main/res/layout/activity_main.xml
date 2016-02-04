@@ -66,6 +66,13 @@
                 android:text="@string/stop_tracking"
                 android:onClick="onClickStopTracking"/>
 
+            <Button
+                android:id="@+id/button_track_archive"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:text="@string/track_archive"
+                android:onClick="onClickTrackArchive"/>
+
         </LinearLayout>
     </ScrollView>
 
