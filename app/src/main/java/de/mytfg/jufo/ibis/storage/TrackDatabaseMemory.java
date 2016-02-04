@@ -241,6 +241,16 @@ public class TrackDatabaseMemory {
     }
 
     /**
+     * @return duration of track in milliseconds or -1 if track is empty
+     */
+    public long getDuration() {
+        if (locations.isEmpty()) {
+            return -1;
+        }
+        return (locations.get(locations.size() - 1).getTimestamp() - locations.get(0).getTimestamp());
+    }
+
+    /**
      * This method creates a {@link JSONArray} of {@link JSONObject}s from all locations in the
      *  track.
      *
