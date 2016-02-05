@@ -62,7 +62,9 @@
             android:name=".InfoActivity"
             android:label="@string/title_activity_info" >
         </activity>
-        <activity android:name=".TrackArchiveActivity"></activity>
+        <activity android:name=".TrackArchiveActivity"
+            android:label="@string/title_activity_archive">
+        </activity>
     </application>
 
 </manifest>
