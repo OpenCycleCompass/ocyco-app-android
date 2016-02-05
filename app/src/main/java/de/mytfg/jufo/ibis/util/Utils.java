@@ -8,10 +8,16 @@ import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.Date;
 import java.util.Locale;
+import java.util.concurrent.TimeUnit;
 
 public class Utils {
 
-    // Reads an InputStream and converts it to a String.
+    /**
+     * Reads an InputStream and converts it to a String.
+     * @param stream the InputStream
+     * @return string from the stream
+     * @throws IOException
+     */
     public static String readStream(InputStream stream) throws IOException {
         BufferedReader r = new BufferedReader(new InputStreamReader(stream));
         StringBuilder total = new StringBuilder();
@@ -22,40 +28,48 @@ public class Utils {
         return total.toString();
     }
 
+    /**
+     * rounds double to two decimal places and return as string
+     * @param d input double number
+     * @return number rounded to tro decimal places as string
+     */
     public static String roundDecimals(double d) {
         return String.format("%.2f", d);
     }
 
-    public static String formatTime(double secondsInput) {
-        String time;
-        //calculate hours, seconds and minutes
-        int seconds = (int) Math.round(secondsInput % 60);
-        int minutes = (int) Math.round(((secondsInput - seconds) % 3600) / 60);
-        int hours = (int) Math.round((secondsInput - seconds - minutes * 60) / 3600);
-        String hoursStrg = putZero(hours);
-        String minutesStrg = putZero(minutes);
-        String secondsStrg = putZero(seconds);
-        time = hoursStrg + "h " + minutesStrg + "min " + secondsStrg + "s";
-        return time;
+    /**
+     * format time (interval)
+     * @param ms time interval in milliseconds
+     * @return sting with formatted time interval
+     */
+    public static String formatTime(long ms) {
+        long hours = TimeUnit.MILLISECONDS.toHours(ms);
+        long minutes = TimeUnit.MILLISECONDS.toMinutes(ms);
+        return String.format(
+                "%02dh %02dmin %02ds",
+                hours,
+                minutes - TimeUnit.HOURS.toMinutes(hours),
+                TimeUnit.MILLISECONDS.toSeconds(ms) - TimeUnit.MINUTES.toSeconds(minutes)
+        );
     }
 
-    //put 0 before value, if != 0 and < 10
-    private static String putZero(int time_value_in) {
-        String time_value_out;
-        if ((time_value_in != 0) && (time_value_in < 10)) {
-            time_value_out = "0" + time_value_in;
-        } else {
-            time_value_out = Integer.toString(time_value_in);
-        }
-        return time_value_out;
+    /**
+     * get date time in "dd.MM.yyyy HH:mm:ss" format from timestamp
+     * @param ms timestamp (milliseconds)
+     * @return formatted date time
+     */
+    public static String getDateTime(long ms) {
+        // get date time in "dd.MM.yyyy HH:mm:ss" format
+        SimpleDateFormat sdf = new SimpleDateFormat("dd.MM.yyyy HH:mm:ss", Locale.GERMAN);
+        return sdf.format(new Date(ms));
     }
 
-    public static String getDateTime(long millis) {
-        // get date time in "dd.MM.yyy HH:mm:ss" format
-        SimpleDateFormat sdf = new SimpleDateFormat("dd.MM.yyy HH:mm:ss", Locale.GERMAN);
-        return sdf.format(new Date(millis));
-    }
-
+    /**
+     * parse date time (sting) formatted as pattern (string)
+     * @param pattern date time pattern (see {@link SimpleDateFormat})
+     * @param date the date time string to parse
+     * @return timestamp from date (milliseconds)
+     */
     public static long parseDateTime(String pattern, String date) {
         SimpleDateFormat dateFormat = new SimpleDateFormat(pattern, Locale.GERMAN);
         Date convertedDate = new Date();

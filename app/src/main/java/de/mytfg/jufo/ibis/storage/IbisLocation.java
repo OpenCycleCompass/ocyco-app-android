@@ -15,9 +15,9 @@ public class IbisLocation {
     private double altitude;
     private double speed;
     private double accuracy;
-    private long timestamp;
+    private long timestamp; // milliseconds
 
-    private double distance; // to next/last IbisLocation
+    private double distance; // to next/last IbisLocation (in meter)
     private double timeInterval; // to next/last IbisLocation
 
     private double timeFactor; // correction factor for speed
@@ -123,6 +123,11 @@ public class IbisLocation {
         return location;
     }
 
+    /**
+     * Calculate distance to {@link IbisLocation} {@code to_location}
+     * @param to location to calculate distance to
+     * @return the calculated distance in meter
+     */
     public double distanceTo(IbisLocation to) {
         if (to == null) {
             return DISTANCE_INVALID;

@@ -69,7 +69,7 @@ public class UploadTrackActivity extends AppCompatActivity {
     private TransparentLoadingOverlay mTLoadingOverlay;
 
     private String data;
-    private long duration;
+    private long duration; // milliseconds
     private double distance;
 
     @Override
@@ -145,7 +145,7 @@ public class UploadTrackActivity extends AppCompatActivity {
         editText_UploadTrackDuration.setText(
                 Utils.formatTime(duration));
         editText_UploadTrackLength.setText(
-                Utils.roundDecimals(distance) + " km");
+                String.format("%s km", Utils.roundDecimals(distance/1000.0)));
         uploadPublic = prefs.getBoolean("upload_public", false);
         token = prefs.getString("upload_token", null);
         if (token == null) {
@@ -501,6 +501,7 @@ public class UploadTrackActivity extends AppCompatActivity {
                             button_UploadTrack.setEnabled(false);
                             button_DeleteTrack.setEnabled(false);
                             button_UploadTrackTokenRegenerate.setEnabled(false);
+                            button_UploadTrackTLater.setEnabled(false);
 
                             // Get track_id
                             String track_id = json.getString("track_id");

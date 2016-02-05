@@ -9,6 +9,7 @@ import android.os.Handler;
 import android.support.v4.content.ContextCompat;
 import android.support.v7.app.AppCompatActivity;
 import android.util.Log;
+import android.util.TypedValue;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.WindowManager;
@@ -100,14 +101,14 @@ public class ShowDataActivity extends AppCompatActivity {
     private void setTextSize() {
         float textSize = IbisApplication.getTextSize();
         if (textSize != 0) {
-            sGefBox.setTextSize(0x00000003, textSize);
-            sZufBox.setTextSize(0x00000003, textSize);
-            vAktBox.setTextSize(0x00000003, textSize);
-            vDBox.setTextSize(0x00000003, textSize);
-            tAnkBox.setTextSize(0x00000003, textSize);
-            tAnkUntBox.setTextSize(0x00000003, textSize);
-            vDMussBox.setTextSize(0x00000003, textSize);
-            vDUntBox.setTextSize(0x00000003, textSize);
+            sGefBox.setTextSize(TypedValue.TYPE_STRING, textSize);
+            sZufBox.setTextSize(TypedValue.TYPE_STRING, textSize);
+            vAktBox.setTextSize(TypedValue.TYPE_STRING, textSize);
+            vDBox.setTextSize(TypedValue.TYPE_STRING, textSize);
+            tAnkBox.setTextSize(TypedValue.TYPE_STRING, textSize);
+            tAnkUntBox.setTextSize(TypedValue.TYPE_STRING, textSize);
+            vDMussBox.setTextSize(TypedValue.TYPE_STRING, textSize);
+            vDUntBox.setTextSize(TypedValue.TYPE_STRING, textSize);
         }
     }
 

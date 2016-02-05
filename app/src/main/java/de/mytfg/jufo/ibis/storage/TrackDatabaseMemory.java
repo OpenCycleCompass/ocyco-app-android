@@ -113,8 +113,8 @@ public class TrackDatabaseMemory {
      */
     public boolean removeRandomStartEnd() {
         SecureRandom random = new SecureRandom();
-        double cutDistBegin = random.nextInt(80) + 20d;
-        double cutDistEnd = random.nextInt(80) + 20d;
+        double cutDistBegin = random.nextInt(80) + 20d; // meter
+        double cutDistEnd = random.nextInt(80) + 20d; // meter
         double distBegin = 0d;
         double distEnd = 0d;
         int cutIndexBegin = -1;
@@ -173,7 +173,7 @@ public class TrackDatabaseMemory {
 
     // read methods
     /**
-     * Get total distance of track
+     * Calculate the total distance of the track
      *
      * requires {@link IbisLocation}s distances to be set,
      *  maybe you should recalculate them using {@see recalculateDistances()}
@@ -188,14 +188,14 @@ public class TrackDatabaseMemory {
     }
 
     /**
-     * Get total distance of track
+     * Get total distance of track in meter
      *
      * You can to recalculate distances between locations using {@see recalculateDistances()}
      * before using this method to get a more precise result.
      *
      * The total distance is calculated on each modification made to the location list
      *
-     * @return total distance of track
+     * @return total distance of track in meter
      */
     public double getTotalDistance() {
         return totalDistance;
@@ -268,7 +268,8 @@ public class TrackDatabaseMemory {
                 point.put("lon", location.getLongitude());
                 point.put("alt", location.getAltitude());
                 point.put("spe", location.getSpeed());
-                point.put("tst", (double) location.getTimestamp() / 1000);
+                point.put("tst", (double) location.getTimestamp() / 1000.0);
+                point.put("tst_ms", location.getTimestamp());
                 point.put("acc", location.getAccuracy());
             } catch (JSONException e) {
                 e.printStackTrace();
