@@ -43,14 +43,32 @@ public class Utils {
      * @return sting with formatted time interval
      */
     public static String formatTime(long ms) {
-        long hours = TimeUnit.MILLISECONDS.toHours(ms);
-        long minutes = TimeUnit.MILLISECONDS.toMinutes(ms);
-        return String.format(
-                "%02dh %02dmin %02ds",
-                hours,
-                minutes - TimeUnit.HOURS.toMinutes(hours),
-                TimeUnit.MILLISECONDS.toSeconds(ms) - TimeUnit.MINUTES.toSeconds(minutes)
-        );
+        if (ms < 60*1000) {
+            // < 1 minute -> solely display seconds
+            return String.format(
+                    "%02ds",
+                    TimeUnit.MILLISECONDS.toSeconds(ms)
+            );
+        }
+        else if (ms < 3600*1000) {
+            // < 1 hour -> solely display minutes and seconds
+            long minutes = TimeUnit.MILLISECONDS.toMinutes(ms);
+            return String.format(
+                    "%02dmin %02ds",
+                    minutes,
+                    TimeUnit.MILLISECONDS.toSeconds(ms) - TimeUnit.MINUTES.toSeconds(minutes)
+            );
+        }
+        else {
+            long hours = TimeUnit.MILLISECONDS.toHours(ms);
+            long minutes = TimeUnit.MILLISECONDS.toMinutes(ms);
+            return String.format(
+                    "%02dh %02dmin %02ds",
+                    hours,
+                    minutes - TimeUnit.HOURS.toMinutes(hours),
+                    TimeUnit.MILLISECONDS.toSeconds(ms) - TimeUnit.MINUTES.toSeconds(minutes)
+            );
+        }
     }
 
     /**
