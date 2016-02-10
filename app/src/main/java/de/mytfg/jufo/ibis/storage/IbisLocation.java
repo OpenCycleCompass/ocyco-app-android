@@ -2,10 +2,12 @@ package de.mytfg.jufo.ibis.storage;
 
 import android.location.Location;
 
+import java.io.Serializable;
+
 /**
  * IbisLocation class representing a location in a track
  */
-public class IbisLocation {
+public class IbisLocation implements Serializable {
     public static final double DISTANCE_INVALID = -1;
     public static final double TIMEINTERVAL_INVALID = -1;
     public static final double NO_TIMEFACTOR = 1.0;

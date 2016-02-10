@@ -7,6 +7,7 @@ import org.json.JSONException;
 import org.json.JSONObject;
 import org.osmdroid.util.GeoPoint;
 
+import java.io.Serializable;
 import java.security.SecureRandom;
 import java.util.ArrayList;
 import java.util.ListIterator;
@@ -14,7 +15,7 @@ import java.util.ListIterator;
 /**
  * TrackDatabaseMemory class to store a track
  */
-public class TrackDatabaseMemory {
+public class TrackDatabaseMemory implements Serializable {
     private ArrayList<IbisLocation> locations;
 
     private double totalDistance;
@@ -277,5 +278,15 @@ public class TrackDatabaseMemory {
             data.put(point);
         }
         return data;
+    }
+
+    /**
+     * @return timestamp of first track location, or -1 if track is empty
+     */
+    public long getStartTime() {
+        if (locations.isEmpty()) {
+            return -1;
+        }
+        return locations.get(0).getTimestamp();
     }
 }
