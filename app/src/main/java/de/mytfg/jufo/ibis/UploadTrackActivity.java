@@ -46,7 +46,7 @@ import java.net.URL;
 import java.util.Calendar;
 import java.util.Locale;
 
-import de.mytfg.jufo.ibis.storage.TrackDatabaseMemory;
+import de.mytfg.jufo.ibis.storage.IbisTrack;
 import de.mytfg.jufo.ibis.util.TransparentLoadingOverlay;
 import de.mytfg.jufo.ibis.util.Utils;
 
@@ -73,7 +73,7 @@ public class UploadTrackActivity extends AppCompatActivity {
     private boolean uploadPublic;
     private TransparentLoadingOverlay mTLoadingOverlay;
 
-    private TrackDatabaseMemory data;
+    private IbisTrack data;
     private long duration; // milliseconds
     private double distance;
 
@@ -136,7 +136,7 @@ public class UploadTrackActivity extends AppCompatActivity {
 
                 try {
                     input = new ObjectInputStream(new FileInputStream(new File(new File(getFilesDir(),"")+ File.separator+filename)));
-                    data = (TrackDatabaseMemory) input.readObject();
+                    data = (IbisTrack) input.readObject();
                     input.close();
                     duration = data.getDuration();
                     distance = data.getTotalDistance();

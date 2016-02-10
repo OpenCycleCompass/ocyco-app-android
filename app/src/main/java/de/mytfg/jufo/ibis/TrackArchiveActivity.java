@@ -16,7 +16,7 @@ import java.io.FileInputStream;
 import java.io.ObjectInputStream;
 import java.util.ArrayList;
 
-import de.mytfg.jufo.ibis.storage.TrackDatabaseMemory;
+import de.mytfg.jufo.ibis.storage.IbisTrack;
 import de.mytfg.jufo.ibis.util.Utils;
 
 /**
@@ -29,7 +29,7 @@ public class TrackArchiveActivity extends AppCompatActivity {
     private ArrayList<String> arrayList = new ArrayList<>();
     private ArrayAdapter<String> adapter;
     private SharedPreferences sharedPrefs;
-    private ArrayList<TrackDatabaseMemory> tracks;
+    private ArrayList<IbisTrack> tracks;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -76,7 +76,7 @@ public class TrackArchiveActivity extends AppCompatActivity {
                 String filename = track_names_string[i] + ".track";
                 try {
                     input = new ObjectInputStream(new FileInputStream(new File(new File(getFilesDir(),"")+ File.separator+filename)));
-                    TrackDatabaseMemory track = (TrackDatabaseMemory) input.readObject();
+                    IbisTrack track = (IbisTrack) input.readObject();
                     input.close();
                     tracks.add(track);
                     arrayList.add(Utils.getDateTime(track.getStartTime())

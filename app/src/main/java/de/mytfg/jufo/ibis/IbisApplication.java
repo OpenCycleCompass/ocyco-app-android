@@ -8,7 +8,7 @@ import org.acra.ReportingInteractionMode;
 import org.acra.annotation.ReportsCrashes;
 import org.acra.sender.HttpSender;
 
-import de.mytfg.jufo.ibis.storage.TrackDatabaseMemory;
+import de.mytfg.jufo.ibis.storage.IbisTrack;
 
 @ReportsCrashes(
         httpMethod = HttpSender.Method.PUT,
@@ -48,8 +48,8 @@ public class IbisApplication extends Application {
     private static boolean align_north = false;
     private static boolean online_tracking_running;
 
-    public static TrackDatabaseMemory mGPSDB;
-    public static TrackDatabaseMemory mRDB;
+    public static IbisTrack mGPSDB;
+    public static IbisTrack mRDB;
 
     @Override
     public void onCreate() {
@@ -59,8 +59,8 @@ public class IbisApplication extends Application {
         ACRA.init(this);
 
         // create TrackDatabases
-        mGPSDB = new TrackDatabaseMemory();
-        mRDB = new TrackDatabaseMemory();
+        mGPSDB = new IbisTrack();
+        mRDB = new IbisTrack();
     }
 
     public static void setCalculationVars(double sGefIn, double sZufIn, double vAktIn, double vDIn, double tAnkIn, double tAnkUntIn, double vDMussIn, double vDuntIn) {

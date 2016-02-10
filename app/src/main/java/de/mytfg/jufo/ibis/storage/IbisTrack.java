@@ -13,9 +13,9 @@ import java.util.ArrayList;
 import java.util.ListIterator;
 
 /**
- * TrackDatabaseMemory class to store a track
+ * IbisTrack class to store a track
  */
-public class TrackDatabaseMemory implements Serializable {
+public class IbisTrack implements Serializable {
     private ArrayList<IbisLocation> locations;
 
     private double totalDistance;
@@ -23,7 +23,7 @@ public class TrackDatabaseMemory implements Serializable {
     /**
      * default constructor
      */
-    public TrackDatabaseMemory() {
+    public IbisTrack() {
         // initial size of ArrayList: 128
         locations = new ArrayList<>(128);
         totalDistance = 0.0;
