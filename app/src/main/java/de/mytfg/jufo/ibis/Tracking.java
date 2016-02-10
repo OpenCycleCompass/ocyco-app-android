@@ -206,7 +206,7 @@ public class Tracking extends Service implements LocationListener, OnConnectionF
         }
         else {
             Intent intent = new Intent(this, UploadTrackActivity.class);
-            intent.putExtra("track", "current");
+            intent.putExtra("track", 0l); // 0 means IbisAplication.mGPSDb as track
             intent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
             startActivity(intent);
         }

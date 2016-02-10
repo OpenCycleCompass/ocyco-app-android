@@ -31,17 +31,22 @@ import org.json.JSONException;
 import org.json.JSONObject;
 
 import java.io.BufferedWriter;
+import java.io.File;
+import java.io.FileInputStream;
+import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
+import java.io.ObjectInputStream;
+import java.io.ObjectOutput;
+import java.io.ObjectOutputStream;
 import java.io.OutputStream;
 import java.io.OutputStreamWriter;
 import java.net.HttpURLConnection;
 import java.net.URL;
-import java.text.SimpleDateFormat;
 import java.util.Calendar;
-import java.util.Date;
 import java.util.Locale;
 
+import de.mytfg.jufo.ibis.storage.TrackDatabaseMemory;
 import de.mytfg.jufo.ibis.util.TransparentLoadingOverlay;
 import de.mytfg.jufo.ibis.util.Utils;
 
@@ -68,9 +73,11 @@ public class UploadTrackActivity extends AppCompatActivity {
     private boolean uploadPublic;
     private TransparentLoadingOverlay mTLoadingOverlay;
 
-    private String data;
+    private TrackDatabaseMemory data;
     private long duration; // milliseconds
     private double distance;
+
+    private long track_source;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -113,24 +120,41 @@ public class UploadTrackActivity extends AppCompatActivity {
         //receiving intent
         Intent incomingIntent = getIntent();
         if (incomingIntent.hasExtra("track")) {
-            if (incomingIntent.getStringExtra("track").equals("current")) {
-                data = IbisApplication.mGPSDB.getJSONArray().toString();
+            track_source = incomingIntent.getLongExtra("track", -1);
+            if (track_source == -1l) {
+                Toast.makeText(this,getString(R.string.upload_track_error_no_track),
+                        Toast.LENGTH_LONG).show();
+                return;
+            }
+            else if (track_source == 0) {
+                data = IbisApplication.mGPSDB;
                 duration = IbisApplication.mGPSDB.getDuration();
                 distance = IbisApplication.mGPSDB.getTotalDistance();
             } else {
-                SharedPreferences sharedPrefs = getSharedPreferences(
-                        getString(R.string.preference_file_key_upload_later), Context.MODE_PRIVATE);
-                data = sharedPrefs.getString(incomingIntent.getStringExtra("track"), "");
-                duration = 0; // TODO
-                distance = 0; // TODO
+                ObjectInputStream input;
+                String filename = Long.toString(track_source) + ".track";
+
+                try {
+                    input = new ObjectInputStream(new FileInputStream(new File(new File(getFilesDir(),"")+ File.separator+filename)));
+                    data = (TrackDatabaseMemory) input.readObject();
+                    input.close();
+                    duration = data.getDuration();
+                    distance = data.getTotalDistance();
+                } catch (Exception e) {
+                    e.printStackTrace();
+                    Toast.makeText(this,getString(R.string.upload_track_error_no_track),
+                            Toast.LENGTH_LONG).show();
+                    return;
+                }
                 button_UploadTrackTLater.setVisibility(View.INVISIBLE);
                 button_DeleteTrack.setVisibility(View.INVISIBLE);
             }
         }
         else {
+            track_source = -1;
             Toast.makeText(this,
                     getString(R.string.upload_track_error_no_track), Toast.LENGTH_LONG).show();
-            data = "";
+            data = null;
             duration = 0;
             distance = 0;
         }
@@ -275,7 +299,7 @@ public class UploadTrackActivity extends AppCompatActivity {
             mTLoadingOverlay.show();
             GetHttpTask getHttpTask = new GetHttpTask();
             getHttpTask.setType("upload");
-            getHttpTask.execute(lurl, data);
+            getHttpTask.execute(lurl, data.getJSONArray().toString());
         } else {
             Toast.makeText(
                     getApplicationContext(),
@@ -287,13 +311,22 @@ public class UploadTrackActivity extends AppCompatActivity {
 
     // Upload Track Later
     public void uploadTrackLater(View v) {
-        SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd_HH-mm-ss", Locale.ENGLISH);
-        String trackName = sdf.format(new Date());
+        String trackName = String.valueOf(System.currentTimeMillis());
         SharedPreferences sharedPrefs = getSharedPreferences(
                 getString(R.string.preference_file_key_upload_later), Context.MODE_PRIVATE);
         SharedPreferences.Editor sharedPrefsEditor = sharedPrefs.edit();
-        // save track to shared preferences
-        sharedPrefsEditor.putString(trackName, data);
+        // save track to file
+        String filename = trackName + ".track";
+        ObjectOutput out;
+        try {
+            out = new ObjectOutputStream(
+                    new FileOutputStream(new File(getFilesDir(),"") + File.separator + filename)
+            );
+            out.writeObject(data);
+            out.close();
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
         // append trackName to trackName list
         if (sharedPrefs.contains("trackNameList")) {
             String oldTrackNameList = sharedPrefs.getString("trackNameList", "");
@@ -521,6 +554,14 @@ public class UploadTrackActivity extends AppCompatActivity {
 
                             // getString(R.string.upload_track_success_trackid);
                             notification = "Track \"" + track_id + "\" mit " + nodes_s + " GPS-Koordinaten erstellt am " + created_s;
+
+                            // delete old track
+                            if (track_source == 0) {
+                                data.deleteData();
+                            }
+                            else {
+                                // TODO delete track track_source from files and shared preferences
+                            }
                         } else if (json.has("error")) {
                             notification = getString(R.string.error) + json.getString("error");
                         } else {
