@@ -11,14 +11,19 @@ import java.io.Serializable;
 import java.security.SecureRandom;
 import java.util.ArrayList;
 import java.util.ListIterator;
+import java.util.UUID;
 
 /**
  * IbisTrack class to store a track
  */
 public class IbisTrack implements Serializable {
+    private static final long PUBLIC_ID_INVALID = 0l;
+
     private ArrayList<IbisLocation> locations;
 
     private double totalDistance;
+    private UUID uuid;
+    private long publicId = PUBLIC_ID_INVALID;
 
     /**
      * default constructor
@@ -27,6 +32,7 @@ public class IbisTrack implements Serializable {
         // initial size of ArrayList: 128
         locations = new ArrayList<>(128);
         totalDistance = 0.0;
+        uuid = UUID.randomUUID();
     }
 
     /**
@@ -288,5 +294,17 @@ public class IbisTrack implements Serializable {
             return -1;
         }
         return locations.get(0).getTimestamp();
+    }
+
+    public UUID getUuid() {
+        return uuid;
+    }
+
+    public long getPublicId() {
+        return publicId;
+    }
+
+    public boolean hasPublicId() {
+        return (publicId != PUBLIC_ID_INVALID);
     }
 }
