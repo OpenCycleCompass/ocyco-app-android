@@ -79,9 +79,9 @@ public class TrackArchiveActivity extends AppCompatActivity {
                     IbisTrack track = (IbisTrack) input.readObject();
                     input.close();
                     tracks.add(track);
-                    arrayList.add(Utils.getDateTime(track.getStartTime())
+                    arrayList.add(Utils.getDateTime(track.metaData.getStartTime())
                             + " (" + getString(R.string.upload_track_duration) + ": "
-                            + Utils.formatTime(track.getDuration()) + ")");
+                            + Utils.formatTime(track.metaData.getDuration()) + ")");
                 } catch (Exception e) {
                     e.printStackTrace();
                     Toast.makeText(this, R.string.track_archive_corrupt, Toast.LENGTH_LONG).show();

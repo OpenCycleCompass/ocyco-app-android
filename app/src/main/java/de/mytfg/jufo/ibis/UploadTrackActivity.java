@@ -128,8 +128,8 @@ public class UploadTrackActivity extends AppCompatActivity {
             }
             else if (track_source == 0) {
                 data = IbisApplication.mGPSDB;
-                duration = IbisApplication.mGPSDB.getDuration();
-                distance = IbisApplication.mGPSDB.getTotalDistance();
+                duration = IbisApplication.mGPSDB.metaData.getDuration();
+                distance = IbisApplication.mGPSDB.metaData.getTotalDistance();
             } else {
                 ObjectInputStream input;
                 String filename = Long.toString(track_source) + ".track";
@@ -138,8 +138,8 @@ public class UploadTrackActivity extends AppCompatActivity {
                     input = new ObjectInputStream(new FileInputStream(new File(new File(getFilesDir(),"")+ File.separator+filename)));
                     data = (IbisTrack) input.readObject();
                     input.close();
-                    duration = data.getDuration();
-                    distance = data.getTotalDistance();
+                    duration = data.metaData.getDuration();
+                    distance = data.metaData.getTotalDistance();
                 } catch (Exception e) {
                     e.printStackTrace();
                     Toast.makeText(this,getString(R.string.upload_track_error_no_track),

@@ -17,23 +17,86 @@ import java.util.UUID;
  * IbisTrack class to store a track
  */
 public class IbisTrack implements Serializable {
-    private static final long PUBLIC_ID_INVALID = 0l;
 
     private ArrayList<IbisLocation> locations;
 
-    private double totalDistance;
-    private UUID uuid;
-    private long publicId = PUBLIC_ID_INVALID;
+    public MetaData metaData;
 
     /**
      * default constructor
      */
     public IbisTrack() {
+        metaData = new MetaData();
         // initial size of ArrayList: 128
         locations = new ArrayList<>(128);
-        totalDistance = 0.0;
-        uuid = UUID.randomUUID();
+        metaData.totalDistance = 0.0;
     }
+
+    public class MetaData implements Serializable {
+        public static final long PUBLIC_ID_INVALID = -1l;
+
+        private double totalDistance;
+        private long startTime;
+        private long duration;
+        private int numberOfLocations;
+
+        private UUID uuid;
+        private long publicId;
+
+        public MetaData() {
+            startTime = System.currentTimeMillis();
+            uuid = UUID.randomUUID();
+            publicId = PUBLIC_ID_INVALID;
+        }
+
+        public UUID getUuid() {
+            return uuid;
+        }
+
+        public long getPublicId() {
+            return publicId;
+        }
+
+        public boolean hasPublicId() {
+            return (publicId != PUBLIC_ID_INVALID);
+        }
+
+        /**
+         * @return timestamp of track start
+         */
+        public long getStartTime() {
+            return startTime;
+        }
+
+        /**
+         * Get total distance of track in meter
+         *
+         * You can to recalculate distances between locations using {@see recalculateDistances()}
+         * before using this method to get a more precise result.
+         *
+         * The total distance is calculated on each modification made to the location list
+         *
+         * @return total distance of track in meter
+         */
+        public double getTotalDistance() {
+            return totalDistance;
+        }
+
+        /**
+         * @return number of locations in track
+         */
+        public int getNumberOfLocations() {
+            return numberOfLocations;
+        }
+
+        /**
+         * @return duration of track in milliseconds or -1 if track is empty
+         */
+        public long getDuration() {
+            return duration;
+        }
+    }
+
 
     /**
      * append location
@@ -45,7 +108,9 @@ public class IbisTrack implements Serializable {
     public void appendLocation(IbisLocation loc) {
         if (!locations.isEmpty()) {
             loc.setDistanceTo(locations.get(locations.size() - 1));
-            totalDistance += loc.getDistance();
+            metaData.totalDistance += loc.getDistance();
+            calculateDuration();
+            calculatenumberOfLocations();
         }
         locations.add(loc);
     }
@@ -99,7 +164,7 @@ public class IbisTrack implements Serializable {
         }
         // Recalculate distances and total distance
         recalculateDistances();
-        calculateTotalDistance();
+        calculateMetaData();
     }
 
     // data manipulating methods
@@ -108,7 +173,7 @@ public class IbisTrack implements Serializable {
      */
     public void deleteData() {
         locations.clear();
-        totalDistance = 0.0;
+        calculateMetaData();
     }
 
     /**
@@ -128,7 +193,7 @@ public class IbisTrack implements Serializable {
         int cutIndexEnd = -1;
 
         // return false if track is too short
-        if (getTotalDistance() <= (cutDistBegin+cutDistEnd)) {
+        if (metaData.getTotalDistance() <= (cutDistBegin+cutDistEnd)) {
             return false;
         }
 
@@ -157,7 +222,7 @@ public class IbisTrack implements Serializable {
         // success
         // Recalculate distances and total distance
         recalculateDistances();
-        calculateTotalDistance();
+        calculateMetaData();
         return true;
     }
 
@@ -178,34 +243,52 @@ public class IbisTrack implements Serializable {
     }
 
 
-    // read methods
+    /**
+     * Calculate the total distance, duration and number of locations of the track
+     *
+     * requires {@link IbisLocation}s distances to be set,
+     *  maybe you should recalculate them using {@see recalculateDistances()}
+     */
+    private void calculateMetaData() {
+        calculateDistance();
+        calculateDuration();
+        calculatenumberOfLocations();
+    }
+
     /**
      * Calculate the total distance of the track
      *
      * requires {@link IbisLocation}s distances to be set,
      *  maybe you should recalculate them using {@see recalculateDistances()}
      */
-    private void calculateTotalDistance() {
-        totalDistance = 0.0;
+    private void calculateDistance() {
+        metaData.totalDistance = 0.0;
         for (IbisLocation location : locations) {
             if (location.getDistance() != IbisLocation.DISTANCE_INVALID) {
-                totalDistance += location.getDistance();
+                metaData.totalDistance += location.getDistance();
             }
         }
     }
 
     /**
-     * Get total distance of track in meter
-     *
-     * You can to recalculate distances between locations using {@see recalculateDistances()}
-     * before using this method to get a more precise result.
-     *
-     * The total distance is calculated on each modification made to the location list
-     *
-     * @return total distance of track in meter
+     * Calculate the duration of the track
      */
-    public double getTotalDistance() {
-        return totalDistance;
+    private void calculateDuration() {
+        if (locations.isEmpty()) {
+            metaData.duration = -1;
+        }
+        metaData.duration = (
+                locations.get(locations.size() - 1).getTimestamp() -
+                        locations.get(0).getTimestamp()
+        );
+    }
+
+
+    /**
+     * Calculate the number of locations of the track
+     */
+    private void calculatenumberOfLocations() {
+        metaData.numberOfLocations = locations.size();
     }
 
     /**
@@ -224,13 +307,6 @@ public class IbisTrack implements Serializable {
     }
 
     /**
-     * @return number of locations in track
-     */
-    public int getNumberOfLocations() {
-        return locations.size();
-    }
-
-    /**
      * @return {@link ArrayList} of {@link GeoPoint}s from all locations in the track
      */
     public ArrayList<GeoPoint> getGeoPointArrayList() {
@@ -245,16 +321,6 @@ public class IbisTrack implements Serializable {
             data.add(point);
         }
         return data;
-    }
-
-    /**
-     * @return duration of track in milliseconds or -1 if track is empty
-     */
-    public long getDuration() {
-        if (locations.isEmpty()) {
-            return -1;
-        }
-        return (locations.get(locations.size() - 1).getTimestamp() - locations.get(0).getTimestamp());
     }
 
     /**
@@ -284,27 +350,5 @@ public class IbisTrack implements Serializable {
             data.put(point);
         }
         return data;
-    }
-
-    /**
-     * @return timestamp of first track location, or -1 if track is empty
-     */
-    public long getStartTime() {
-        if (locations.isEmpty()) {
-            return -1;
-        }
-        return locations.get(0).getTimestamp();
-    }
-
-    public UUID getUuid() {
-        return uuid;
-    }
-
-    public long getPublicId() {
-        return publicId;
-    }
-
-    public boolean hasPublicId() {
-        return (publicId != PUBLIC_ID_INVALID);
     }
 }

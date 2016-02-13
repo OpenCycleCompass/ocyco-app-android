@@ -148,16 +148,16 @@ public class IbisTrackArchive {
      * @param track {@link IbisTrack} object to save
      */
     public void add(IbisTrack track) {
-        trackUuidList.add(track.getUuid());
+        trackUuidList.add(track.metaData.getUuid());
         saveTrackUuidList();
         // put public ID into map if it exists
-        if (track.hasPublicId()) {
-            publicIdUuidMap.put(track.getPublicId(), track.getUuid());
+        if (track.metaData.hasPublicId()) {
+            publicIdUuidMap.put(track.metaData.getPublicId(), track.metaData.getUuid());
         }
         // put track into cache
-        trackCache.put(track.getUuid(), track);
+        trackCache.put(track.metaData.getUuid(), track);
         // save track to file (from cache)
-        saveTrackToFile(track.getUuid());
+        saveTrackToFile(track.metaData.getUuid());
     }
 
     public void delete(long publicTrackId) {
