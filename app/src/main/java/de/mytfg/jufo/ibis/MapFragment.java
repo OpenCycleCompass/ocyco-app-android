@@ -137,8 +137,11 @@ public class MapFragment extends Fragment {
             mMapView.getOverlays().add(mScaleBarOverlay);
         }
         mMapView.getController().setZoom(18);
+        // TODO: rewrite this to use callbacks, IbisTrack class methods, ...
+        /*
         // add half-transparent blue polyline
         mMapView.getOverlays().add(this.createPolylineFromDB(IbisApplication.mRDB, 0x880040FF));
+        */
         startMapUpdates();
     }
 
@@ -170,6 +173,8 @@ public class MapFragment extends Fragment {
                 GeoPoint currentLocation = new GeoPoint(IbisApplication.getLocation().getLatitude(), IbisApplication.getLocation().getLongitude());
                 Log.i(TAG, "Geopoint" + currentLocation);
                 mMapView.getController().setCenter(currentLocation);
+                // TODO: rewrite this to use callbacks, IbisTrack class methods, ...
+                /*
                 // create polyline for driven route
                 Polyline drivenPolyline = this.createPolylineFromDB(IbisApplication.mGPSDB, 0x88E77E00); // half-transparent orange
                 // add polyline
@@ -179,6 +184,7 @@ public class MapFragment extends Fragment {
                     mMapView.getOverlays().remove(oldDrivenPolyline);
                 }
                 oldDrivenPolyline=drivenPolyline;
+                */
             }
             else {
                 Log.i(TAG, "Location is null");
