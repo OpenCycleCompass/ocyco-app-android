@@ -27,12 +27,15 @@ public class IbisTrackArchive {
     private static final String PREFS_TRACKLIST = "PREFS_TRACKLIST";
     private static final String PREFS_TRACKIDMAPPING = "PREFS_TRACKIDMAPPING";
     private static final String FILE_EXTENSION = ".track";
+    private static final String FILE_EXTENSION_META = ".metadata";
 
     private Context context;
     private SharedPreferences sharedPrefs;
 
     private ArrayList<UUID> trackUuidList;
     private HashMap<UUID, IbisTrack> trackCache;
+    private ArrayList<IbisTrack.MetaData> trackMetadataList;
+    private HashMap<UUID, IbisTrack.MetaData> trackMetadata;
     private HashMap<Long, UUID> publicIdUuidMap;
 
     /**
@@ -53,6 +56,27 @@ public class IbisTrackArchive {
         sharedPrefs = context.getSharedPreferences(PREFS, Context.MODE_PRIVATE);
         // create HashMap for track cache
         trackCache = new HashMap<>();
+
+        // read list of track from shared preferences
+        trackUuidList = new ArrayList<>();
+        trackMetadataList = new ArrayList<>();
+        trackMetadata = new HashMap<>();
+        if (sharedPrefs.contains(PREFS_TRACKLIST)) {
+            // read list of archived tracks from shard preferences
+            String trackNameList = sharedPrefs.getString(PREFS_TRACKLIST, "");
+            String[] trackUuidsAsStringArray = trackNameList.split(";");
+            trackUuidList.ensureCapacity(trackUuidsAsStringArray.length);
+            trackMetadataList.ensureCapacity(trackUuidsAsStringArray.length);
+            for (String aTrack_names_string : trackUuidsAsStringArray) {
+                // read track metadata from file for each track and put into trackMetadataList
+                UUID uuid = UUID.fromString(aTrack_names_string);
+                IbisTrack.MetaData metadata = readTrackMetadataFromFile(uuid);
+                trackUuidList.add(uuid);
+                trackMetadataList.add(metadata);
+                trackMetadata.put(uuid, metadata);
+            }
+        }
+
         // create and fill hash map of publicId to UUID mappings
         publicIdUuidMap = new HashMap<>();
         if (sharedPrefs.contains(PREFS_TRACKIDMAPPING)) {
@@ -61,22 +85,12 @@ public class IbisTrackArchive {
             String[] trackKeyValuesArray = trackIdMap.split(";");
             for (String trackKeyValue : trackKeyValuesArray) {
                 String[] trackKeyValueArray = trackKeyValue.split(":");
-                publicIdUuidMap.put(
-                        Long.parseLong(trackKeyValueArray[0]),
-                        UUID.fromString(trackKeyValueArray[1])
-                );
-            }
-        }
-
-        // read list of track from shared preferences
-        trackUuidList = new ArrayList<>();
-        if (sharedPrefs.contains(PREFS_TRACKLIST)) {
-            // read list of archived tracks from shard preferences
-            String trackNameList = sharedPrefs.getString(PREFS_TRACKLIST, "");
-            String[] trackUuidsAsStringArray = trackNameList.split(";");
-            trackUuidList.ensureCapacity(trackUuidsAsStringArray.length);
-            for (String aTrack_names_string : trackUuidsAsStringArray) {
-                trackUuidList.add(UUID.fromString(aTrack_names_string));
+                if(!trackKeyValueArray[0].isEmpty() && !trackKeyValueArray[1].isEmpty()) {
+                    publicIdUuidMap.put(
+                            Long.parseLong(trackKeyValueArray[0]),
+                            UUID.fromString(trackKeyValueArray[1])
+                    );
+                }
             }
         }
     }
@@ -86,6 +100,20 @@ public class IbisTrackArchive {
      */
     public List<UUID> getTrackUuidList() {
         return new ArrayList<>(trackUuidList);
+    }
+
+    /**
+     * @return a copy of the internal list of {@link UUID}s of the archived tracks
+     */
+    public List<IbisTrack.MetaData> getTrackMetadataList() {
+        return new ArrayList<>(trackMetadataList);
+    }
+
+    /**
+     * @return a copy of the internal list of {@link UUID}s of the archived tracks
+     */
+    public HashMap<UUID, IbisTrack.MetaData> getTrackMetadataMap() {
+        return new HashMap<>(trackMetadata);
     }
 
     /**
@@ -154,16 +182,13 @@ public class IbisTrackArchive {
         if (track.metaData.hasPublicId()) {
             publicIdUuidMap.put(track.metaData.getPublicId(), track.metaData.getUuid());
         }
+        // put track metadata into list and map
+        trackMetadataList.add(track.metaData);
+        trackMetadata.put(track.metaData.getUuid(), track.metaData);
         // put track into cache
         trackCache.put(track.metaData.getUuid(), track);
         // save track to file (from cache)
         saveTrackToFile(track.metaData.getUuid());
-    }
-
-    public void delete(long publicTrackId) {
-        if (publicIdUuidMap.containsKey(publicTrackId)) {
-            delete(publicIdUuidMap.get(Long.valueOf(publicTrackId)));
-        }
     }
 
     /**
@@ -174,12 +199,27 @@ public class IbisTrackArchive {
         // remove track from track list and save track list
         trackUuidList.remove(trackUuid);
         saveTrackUuidList();
+        // remove track metadata from list and map
+        trackMetadataList.remove(trackMetadata.get(trackUuid));
+        trackMetadata.remove(trackUuid);
         // remove IbisTrack object from trackCache
         trackCache.remove(trackUuid);
-        // delete track file
+        // delete track and metadata files
         String filename = trackUuid.toString() + FILE_EXTENSION;
+        String filenameMetadata = trackUuid.toString() + FILE_EXTENSION_META;
         File file = new File(new File(context.getFilesDir(), "") + File.separator + filename);
-        return file.delete();
+        File fileMetadata = new File(new File(context.getFilesDir(), "") + File.separator
+                + filenameMetadata);
+        return (file.delete() && fileMetadata.delete());
+    }
+
+    /**
+     * Delete all track from track archive
+     */
+    public void deleteAll() {
+        for (UUID uuid : trackUuidList) {
+            delete(uuid);
+        }
     }
 
     /**
@@ -189,6 +229,16 @@ public class IbisTrackArchive {
      * @return true on success, false if write failed or track with {@code trackUuid} does not exist
      */
     public boolean update(UUID trackUuid) {
+        return saveTrackToFile(trackUuid);
+    }
+
+    /**
+     * Saves changes on track to file.
+     *
+     * @param trackUuid the {@link UUID} of the track to save
+     * @return true on success, false if write failed or track with {@code trackUuid} does not exist
+     */
+    public boolean updateMetadata(UUID trackUuid) {
         return saveTrackToFile(trackUuid);
     }
 
@@ -221,6 +271,7 @@ public class IbisTrackArchive {
     @Nullable
     private IbisTrack readTrackFromFile(UUID trackUuid) {
         ObjectInputStream input;
+        ObjectInputStream inputMetadata;
         String filename = trackUuid.toString() + FILE_EXTENSION;
         try {
             input = new ObjectInputStream(
@@ -230,7 +281,45 @@ public class IbisTrackArchive {
             );
             IbisTrack track = (IbisTrack) input.readObject();
             input.close();
+
+            // read metadata file (could contain newer information thcn track file) and override
+            //  metadata field
+            inputMetadata = new ObjectInputStream(
+                    new FileInputStream(
+                            new File(new File(context.getFilesDir(),"")+ File.separator+filename)
+                    )
+            );
+            IbisTrack.MetaData metadata = (IbisTrack.MetaData) inputMetadata.readObject();
+            inputMetadata.close();
+            track.metaData = metadata;
+
             return track;
+        } catch (Exception e) {
+            e.printStackTrace();
+            ACRA.getErrorReporter().handleException(e);
+        }
+        return null;
+    }
+
+
+    /**
+     * Read track from file.
+     * @param trackUuid UUID of track to read, must not be {@code null}
+     * @return a new created {@link IbisTrack} object, or null if an error occurred.
+     */
+    @Nullable
+    private IbisTrack.MetaData readTrackMetadataFromFile(UUID trackUuid) {
+        ObjectInputStream input;
+        String filename = trackUuid.toString() + FILE_EXTENSION_META;
+        try {
+            input = new ObjectInputStream(
+                    new FileInputStream(
+                            new File(new File(context.getFilesDir(),"")+ File.separator+filename)
+                    )
+            );
+            IbisTrack.MetaData metadata = (IbisTrack.MetaData) input.readObject();
+            input.close();
+            return metadata;
         } catch (Exception e) {
             e.printStackTrace();
             ACRA.getErrorReporter().handleException(e);
@@ -241,6 +330,8 @@ public class IbisTrackArchive {
     /**
      * Saves track with {@code trackUuid} to file.
      * If track with same {@link UUID} already exists it will be overridden.
+     * Two files are written: a {@code .track} and a {@code .metadata} file. The metadata file is
+     *  redundant, but can be read independent from the main track file.
      *
      * @param trackUuid the {@link UUID} of the track to save
      * @return true on success, false if write failed or track with {@code trackUuid} does not exist
@@ -260,6 +351,40 @@ public class IbisTrackArchive {
             );
             out.writeObject(trackCache.get(trackUuid));
             out.close();
+            // write metadata by calling saveTrackMetadataToFile()
+            return saveTrackMetadataToFile(trackUuid);
+        } catch (IOException e) {
+            e.printStackTrace();
+            ACRA.getErrorReporter().handleException(e);
+        }
+        return false;
+    }
+
+    /**
+     * Saves track metadata from trach with {@code trackUuid} to file.
+     * Only one file is written: the {@code .metadata} file. The metadata file is
+     *  redundant, but can be read independent from the main track file.
+     * The track file will not contain valid metadata if this method is used to save updated track
+     *  metadata
+     *
+     * @param trackUuid the {@link UUID} of the track to save
+     * @return true on success, false if write failed or track with {@code trackUuid} does not exist
+     */
+    private boolean saveTrackMetadataToFile(UUID trackUuid) {
+        if(!trackUuidList.contains(trackUuid)) {
+            return false;
+        }
+        String filenameMeta = trackUuid.toString() + FILE_EXTENSION_META;
+        ObjectOutput outMeta;
+        try {
+            outMeta = new ObjectOutputStream(
+                    new FileOutputStream(
+                            new File(context.getFilesDir(),"") + File.separator + filenameMeta,
+                            false
+                    )
+            );
+            outMeta.writeObject(trackCache.get(trackUuid).metaData);
+            outMeta.close();
             return true;
         } catch (IOException e) {
             e.printStackTrace();
