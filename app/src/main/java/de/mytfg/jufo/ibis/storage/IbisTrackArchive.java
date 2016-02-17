@@ -217,7 +217,9 @@ public class IbisTrackArchive {
      * Delete all track from track archive
      */
     public void deleteAll() {
-        for (UUID uuid : trackUuidList) {
+        // copy trackUuidList, because delete() method modifies trackUuiDList
+        ArrayList<UUID> localTrackUuidList = new ArrayList<>(trackUuidList);
+        for (UUID uuid : localTrackUuidList) {
             delete(uuid);
         }
     }
