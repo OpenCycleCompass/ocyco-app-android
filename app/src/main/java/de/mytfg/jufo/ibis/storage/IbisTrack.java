@@ -42,6 +42,7 @@ public class IbisTrack implements Serializable {
 
         private UUID uuid;
         private long publicId;
+        private boolean uploaded;
 
         public MetaData() {
             startTime = System.currentTimeMillis();
@@ -94,6 +95,14 @@ public class IbisTrack implements Serializable {
          */
         public long getDuration() {
             return duration;
+        }
+
+        public boolean isUploaded() {
+            return uploaded;
+        }
+
+        public void setUploaded(boolean uploaded) {
+            this.uploaded = uploaded;
         }
     }
 
