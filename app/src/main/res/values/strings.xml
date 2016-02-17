@@ -46,6 +46,7 @@
     <string name="upload_track_later">Später Hochladen</string>
     <string name="upload_track_later_success">Der Track wurde zum späteren Hochladen archiviert.</string>
     <string name="upload_track_error_no_track">Fehler: Der Track konnte nicht verarbeitet werden</string>
+    <string name="upload_track_already_uploaded">Dieser Track wurde bereits hochgeladen.</string>
     <string name="api1_base_url">https://ibis.jufo.mytfg.de/api1/</string>
     <string name="api1_token_new">token.php?newtoken=newtoken</string>
     <string name="api1_pushtrack_new">pushtrack.php?newtrack=newtrack</string>
