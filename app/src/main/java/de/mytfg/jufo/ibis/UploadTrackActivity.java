@@ -16,7 +16,6 @@ import android.support.v4.app.NotificationCompat;
 import android.support.v7.app.AppCompatActivity;
 import android.text.InputFilter;
 import android.text.Spanned;
-import android.text.format.DateFormat;
 import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
@@ -37,16 +36,13 @@ import java.io.OutputStream;
 import java.io.OutputStreamWriter;
 import java.net.HttpURLConnection;
 import java.net.URL;
-import java.util.Calendar;
-import java.util.Locale;
+import java.util.UUID;
 
+import de.mytfg.jufo.ibis.storage.IbisTrack;
 import de.mytfg.jufo.ibis.util.TransparentLoadingOverlay;
 import de.mytfg.jufo.ibis.util.Utils;
 
 public class UploadTrackActivity extends AppCompatActivity {
-
-    public static final String data_empty = "[]"; // empty, but valid JSON
-    private String data = data_empty;
     // Log TAG
     protected static final String TAG = "UploadTrackAct-class";
     //shared preferences
@@ -64,12 +60,14 @@ public class UploadTrackActivity extends AppCompatActivity {
     private Button button_UploadTrack;
     private Button button_DeleteTrack;
     private Button button_UploadTrackTokenRegenerate;
+    private Button button_UploadTrackTLater;
     private String token = null;
-    private long startTst;
-    private long stopTst;
-    private double length;
     private boolean uploadPublic;
     private TransparentLoadingOverlay mTLoadingOverlay;
+
+    private IbisTrack track;
+
+    private UUID trackUuid;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -87,6 +85,7 @@ public class UploadTrackActivity extends AppCompatActivity {
         button_DeleteTrack = (Button) findViewById(R.id.button_DeleteTrack);
         button_UploadTrack = (Button) findViewById(R.id.button_UploadTrack);
         button_UploadTrackTokenRegenerate = (Button) findViewById(R.id.button_UploadTrackTokenRegenerate);
+        button_UploadTrackTLater = (Button) findViewById(R.id.button_UploadTrackLater);
         mTLoadingOverlay = new TransparentLoadingOverlay(this);
         prefs = getSharedPreferences(getString(R.string.preference_file_key), Context.MODE_PRIVATE);
         prefs_edit = prefs.edit();
@@ -110,12 +109,22 @@ public class UploadTrackActivity extends AppCompatActivity {
 
         //receiving intent
         Intent incomingIntent = getIntent();
-        if (incomingIntent.hasExtra("data")) {
-            data = incomingIntent.getStringExtra("data");
+        try {
+            trackUuid = UUID.fromString(incomingIntent.getStringExtra("track"));
+        } catch (NullPointerException|IllegalArgumentException e) {
+            Toast.makeText(this,getString(R.string.upload_track_error_no_track)
+                            + " (" + e.getMessage() + ")",
+                    Toast.LENGTH_LONG).show();
+            return;
         }
-        startTst = incomingIntent.getLongExtra("startTst", 0);
-        stopTst = incomingIntent.getLongExtra("stopTst", 0);
-        length = incomingIntent.getDoubleExtra("totalDist", 0) / 1000;
+
+        track = IbisApplication.trackArchive.get(trackUuid);
+
+        if (incomingIntent.hasExtra("fromArchive")
+                && incomingIntent.getBooleanExtra("fromArchive", false)) {
+            button_UploadTrackTLater.setVisibility(View.INVISIBLE);
+            button_DeleteTrack.setVisibility(View.INVISIBLE);
+        }
 
         initUI();
         updateUI();
@@ -124,8 +133,10 @@ public class UploadTrackActivity extends AppCompatActivity {
     // Initialize GUI
     private void initUI() {
 
-        editText_UploadTrackDuration.setText(Utils.formatTime(stopTst - startTst));
-        editText_UploadTrackLength.setText(Utils.roundDecimals(length) + " km");
+        editText_UploadTrackDuration.setText(
+              Utils.formatTime(track.metaData.getDuration()));
+        editText_UploadTrackLength.setText(
+              String.format("%s km", Utils.roundDecimals(track.metaData.getTotalDistance()/1000.0)));
         uploadPublic = prefs.getBoolean("upload_public", false);
         token = prefs.getString("upload_token", null);
         if (token == null) {
@@ -255,19 +266,39 @@ public class UploadTrackActivity extends AppCompatActivity {
             mTLoadingOverlay.show();
             GetHttpTask getHttpTask = new GetHttpTask();
             getHttpTask.setType("upload");
-            getHttpTask.execute(lurl, data);
+            getHttpTask.execute(lurl, track.getJSONArray().toString());
         } else {
-            Context context = getApplicationContext();
-            int duration = Toast.LENGTH_LONG;
-            Toast toast = Toast.makeText(context, getString(R.string.upload_error_no_network_try_again_later), duration);
-            toast.show();
+            Toast.makeText(
+                    getApplicationContext(),
+                    getString(R.string.upload_error_no_network_try_again_later),
+                    Toast.LENGTH_LONG
+            ).show();
         }
+    }
+
+    // Upload Track Later
+    public void uploadTrackLater(View v) {
+        // do nothing to the track, it already exists in IbisApplication.trackArchive
+        // show toast
+        Toast.makeText(
+                getApplicationContext(),
+                getString(R.string.upload_track_later_success),
+                Toast.LENGTH_LONG
+        ).show();
+        // disable buttons
+        button_UploadTrackTokenRegenerate.setEnabled(false);
+        button_UploadTrack.setEnabled(false);
+        button_UploadTrackTLater.setEnabled(false);
+        button_DeleteTrack.setEnabled(false);
+        //go back to MainActivity
+        Intent intent = new Intent(this, MainActivity.class);
+        startActivity(intent);
     }
 
     private String makeUrl() {
         String lurlstr;
         Uri.Builder lurl;
-        lurl = Uri.parse(this.getString(R.string.api1_base_url) + this.getString(R.string.api1_pushtrack_new)).buildUpon().appendQueryParameter("duration", Long.toString(stopTst - startTst)).appendQueryParameter("length", Double.toString(length * 1000)).appendQueryParameter("user_token", token);
+        lurl = Uri.parse(this.getString(R.string.api1_base_url) + this.getString(R.string.api1_pushtrack_new)).buildUpon().appendQueryParameter("duration", Long.toString(track.metaData.getDuration())).appendQueryParameter("length", Double.toString(track.metaData.getTotalDistance())).appendQueryParameter("user_token", token);
         if (uploadPublic) {
             lurl.appendQueryParameter("name", editText_UploadTrackName.getText().toString()).appendQueryParameter("comment", editText_UploadTrackCom.getText().toString()).appendQueryParameter("public", "true");
         } else {
@@ -301,9 +332,6 @@ public class UploadTrackActivity extends AppCompatActivity {
                 // Write POST Data:
                 conn.setDoOutput(true);
 
-                //List<NameValuePair> params = new ArrayList<>();
-                //params.add(new BasicNameValuePair("data", ldata));
-
                 OutputStream os = conn.getOutputStream();
                 BufferedWriter writer = new BufferedWriter(new OutputStreamWriter(os, "UTF-8"));
 
@@ -333,12 +361,6 @@ public class UploadTrackActivity extends AppCompatActivity {
                 stream.close();
             }
         }
-    }
-
-    private String getDate(long timestamp) {
-        Calendar calendar = Calendar.getInstance(Locale.ENGLISH);
-        calendar.setTimeInMillis(timestamp * 1000);
-        return DateFormat.format("dd. MM. yyyy, HH:mm", calendar).toString() + "h";
     }
 
     private void saveToken(String t) {
@@ -379,8 +401,8 @@ public class UploadTrackActivity extends AppCompatActivity {
     }
 
     public void deleteTrack() {
-        //delete track database data
-        IbisApplication.mGPSDB.deleteData();
+        //delete track from track Archive
+        IbisApplication.trackArchive.delete(trackUuid);
         //show Toast
         Toast toast = Toast.makeText(getApplicationContext(), getString(R.string.upload_track_deleted), Toast.LENGTH_LONG);
         toast.show();
@@ -446,6 +468,7 @@ public class UploadTrackActivity extends AppCompatActivity {
                             button_UploadTrack.setEnabled(false);
                             button_DeleteTrack.setEnabled(false);
                             button_UploadTrackTokenRegenerate.setEnabled(false);
+                            button_UploadTrackTLater.setEnabled(false);
 
                             // Get track_id
                             String track_id = json.getString("track_id");
@@ -456,8 +479,8 @@ public class UploadTrackActivity extends AppCompatActivity {
                             // Prepare notification string with track_id, date and nodes:
                             String created_s = "";
                             String nodes_s = "";
-                            if (json.has("created")) {
-                                created_s = getDate(json.getLong("created"));
+                            if (json.has("created")) { //created is seconds, not milliseconds (BUG!)
+                                created_s = Utils.getDateTime(json.getLong("created") * 1000);
                             }
                             if (json.has("nodes")) {
                                 nodes_s = Long.toString(json.getLong("nodes"));
@@ -465,6 +488,10 @@ public class UploadTrackActivity extends AppCompatActivity {
 
                             // getString(R.string.upload_track_success_trackid);
                             notification = "Track \"" + track_id + "\" mit " + nodes_s + " GPS-Koordinaten erstellt am " + created_s;
+
+                            // mark track in track archive as uploaded
+                            track.metaData.setUploaded(true);
+                            IbisApplication.trackArchive.update(trackUuid);
                         } else if (json.has("error")) {
                             notification = getString(R.string.error) + json.getString("error");
                         } else {

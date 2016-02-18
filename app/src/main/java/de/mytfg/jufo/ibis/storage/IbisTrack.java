@@ -7,26 +7,105 @@ import org.json.JSONException;
 import org.json.JSONObject;
 import org.osmdroid.util.GeoPoint;
 
+import java.io.Serializable;
 import java.security.SecureRandom;
 import java.util.ArrayList;
 import java.util.ListIterator;
+import java.util.UUID;
 
 /**
- * TrackDatabaseMemory class to store a track
+ * IbisTrack class to store a track
  */
-public class TrackDatabaseMemory {
+public class IbisTrack implements Serializable {
+
     private ArrayList<IbisLocation> locations;
 
-    private double totalDistance;
+    public MetaData metaData;
 
     /**
      * default constructor
      */
-    public TrackDatabaseMemory() {
+    public IbisTrack() {
+        metaData = new MetaData();
         // initial size of ArrayList: 128
         locations = new ArrayList<>(128);
-        totalDistance = 0.0;
+        metaData.totalDistance = 0.0;
     }
+
+    public class MetaData implements Serializable {
+        public static final long PUBLIC_ID_INVALID = -1l;
+
+        private double totalDistance;
+        private long startTime;
+        private long duration;
+        private int numberOfLocations;
+
+        private UUID uuid;
+        private long publicId;
+        private boolean uploaded;
+
+        public MetaData() {
+            startTime = System.currentTimeMillis();
+            uuid = UUID.randomUUID();
+            publicId = PUBLIC_ID_INVALID;
+        }
+
+        public UUID getUuid() {
+            return uuid;
+        }
+
+        public long getPublicId() {
+            return publicId;
+        }
+
+        public boolean hasPublicId() {
+            return (publicId != PUBLIC_ID_INVALID);
+        }
+
+        /**
+         * @return timestamp of track start
+         */
+        public long getStartTime() {
+            return startTime;
+        }
+
+        /**
+         * Get total distance of track in meter
+         *
+         * You can to recalculate distances between locations using {@see recalculateDistances()}
+         * before using this method to get a more precise result.
+         *
+         * The total distance is calculated on each modification made to the location list
+         *
+         * @return total distance of track in meter
+         */
+        public double getTotalDistance() {
+            return totalDistance;
+        }
+
+        /**
+         * @return number of locations in track
+         */
+        public int getNumberOfLocations() {
+            return numberOfLocations;
+        }
+
+        /**
+         * @return duration of track in milliseconds or -1 if track is empty
+         */
+        public long getDuration() {
+            return duration;
+        }
+
+        public boolean isUploaded() {
+            return uploaded;
+        }
+
+        public void setUploaded(boolean uploaded) {
+            this.uploaded = uploaded;
+        }
+    }
+
 
     /**
      * append location
@@ -38,7 +117,9 @@ public class TrackDatabaseMemory {
     public void appendLocation(IbisLocation loc) {
         if (!locations.isEmpty()) {
             loc.setDistanceTo(locations.get(locations.size() - 1));
-            totalDistance += loc.getDistance();
+            metaData.totalDistance += loc.getDistance();
+            calculateDuration();
+            calculatenumberOfLocations();
         }
         locations.add(loc);
     }
@@ -92,7 +173,7 @@ public class TrackDatabaseMemory {
         }
         // Recalculate distances and total distance
         recalculateDistances();
-        calculateTotalDistance();
+        calculateMetaData();
     }
 
     // data manipulating methods
@@ -101,7 +182,7 @@ public class TrackDatabaseMemory {
      */
     public void deleteData() {
         locations.clear();
-        totalDistance = 0.0;
+        calculateMetaData();
     }
 
     /**
@@ -113,15 +194,15 @@ public class TrackDatabaseMemory {
      */
     public boolean removeRandomStartEnd() {
         SecureRandom random = new SecureRandom();
-        double cutDistBegin = random.nextInt(80) + 20d;
-        double cutDistEnd = random.nextInt(80) + 20d;
+        double cutDistBegin = random.nextInt(80) + 20d; // meter
+        double cutDistEnd = random.nextInt(80) + 20d; // meter
         double distBegin = 0d;
         double distEnd = 0d;
         int cutIndexBegin = -1;
         int cutIndexEnd = -1;
 
         // return false if track is too short
-        if (getTotalDistance() <= (cutDistBegin+cutDistEnd)) {
+        if (metaData.getTotalDistance() <= (cutDistBegin+cutDistEnd)) {
             return false;
         }
 
@@ -150,7 +231,7 @@ public class TrackDatabaseMemory {
         // success
         // Recalculate distances and total distance
         recalculateDistances();
-        calculateTotalDistance();
+        calculateMetaData();
         return true;
     }
 
@@ -171,34 +252,52 @@ public class TrackDatabaseMemory {
     }
 
 
-    // read methods
     /**
-     * Get total distance of track
+     * Calculate the total distance, duration and number of locations of the track
      *
      * requires {@link IbisLocation}s distances to be set,
      *  maybe you should recalculate them using {@see recalculateDistances()}
      */
-    private void calculateTotalDistance() {
-        totalDistance = 0.0;
+    private void calculateMetaData() {
+        calculateDistance();
+        calculateDuration();
+        calculatenumberOfLocations();
+    }
+
+    /**
+     * Calculate the total distance of the track
+     *
+     * requires {@link IbisLocation}s distances to be set,
+     *  maybe you should recalculate them using {@see recalculateDistances()}
+     */
+    private void calculateDistance() {
+        metaData.totalDistance = 0.0;
         for (IbisLocation location : locations) {
             if (location.getDistance() != IbisLocation.DISTANCE_INVALID) {
-                totalDistance += location.getDistance();
+                metaData.totalDistance += location.getDistance();
             }
         }
     }
 
     /**
-     * Get total distance of track
-     *
-     * You can to recalculate distances between locations using {@see recalculateDistances()}
-     * before using this method to get a more precise result.
-     *
-     * The total distance is calculated on each modification made to the location list
-     *
-     * @return total distance of track
+     * Calculate the duration of the track
      */
-    public double getTotalDistance() {
-        return totalDistance;
+    private void calculateDuration() {
+        if (locations.isEmpty()) {
+            metaData.duration = -1;
+        }
+        metaData.duration = (
+                locations.get(locations.size() - 1).getTimestamp() -
+                        locations.get(0).getTimestamp()
+        );
+    }
+
+
+    /**
+     * Calculate the number of locations of the track
+     */
+    private void calculatenumberOfLocations() {
+        metaData.numberOfLocations = locations.size();
     }
 
     /**
@@ -214,13 +313,6 @@ public class TrackDatabaseMemory {
             }
         }
         return totalTime;
-    }
-
-    /**
-     * @return number of locations in track
-     */
-    public int getNumberOfLocations() {
-        return locations.size();
     }
 
     /**
@@ -258,7 +350,8 @@ public class TrackDatabaseMemory {
                 point.put("lon", location.getLongitude());
                 point.put("alt", location.getAltitude());
                 point.put("spe", location.getSpeed());
-                point.put("tst", (double) location.getTimestamp() / 1000);
+                point.put("tst", (double) location.getTimestamp() / 1000.0);
+                point.put("tst_ms", location.getTimestamp());
                 point.put("acc", location.getAccuracy());
             } catch (JSONException e) {
                 e.printStackTrace();

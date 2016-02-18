@@ -38,6 +38,7 @@ import java.net.URL;
 import java.util.Calendar;
 import java.util.Locale;
 
+import de.mytfg.jufo.ibis.storage.IbisTrack;
 import de.mytfg.jufo.ibis.util.TransparentLoadingOverlay;
 import de.mytfg.jufo.ibis.util.Utils;
 
@@ -76,6 +77,9 @@ public class RoutingActivity extends AppCompatActivity implements TimePickerFrag
     private boolean manuel_distance, routing_with_user_data, navigate_from_current_position = false;
     private String route_type;
     private Location startLocation;
+
+    private IbisTrack mRDB;
+
     //shared preferences
     private SharedPreferences settings;
     private TransparentLoadingOverlay mTLoadingOverlay;
@@ -97,8 +101,10 @@ public class RoutingActivity extends AppCompatActivity implements TimePickerFrag
         switch_userData = (Switch) findViewById(R.id.switch_userData);
         switch_timeFactor = (Switch) findViewById(R.id.switch_timeFactor);
         mTLoadingOverlay = new TransparentLoadingOverlay(this);
-        // delete old database
-        IbisApplication.mRDB.deleteData();
+
+        // create IbisTrack for routing
+        mRDB = new IbisTrack();
+
         // configure select_route_type spinner
         selectRouteType = (Spinner) findViewById(R.id.select_route_type);
         ArrayAdapter<CharSequence> adapter = ArrayAdapter.createFromResource(this, R.array.route_types, android.R.layout.simple_spinner_item);
@@ -293,7 +299,7 @@ public class RoutingActivity extends AppCompatActivity implements TimePickerFrag
         boolean distanceExc = false;
         boolean timeExc = false;
         if (!manuel_distance) {
-            IbisApplication.setsEingTimeFactor(IbisApplication.mRDB.getTotalTime());
+            IbisApplication.setsEingTimeFactor(mRDB.getTotalTime());
         }
         //read text from EditText and convert to String
         try {
@@ -466,11 +472,11 @@ public class RoutingActivity extends AppCompatActivity implements TimePickerFrag
                     //get JSON Array
                     JSONArray jArray = jObject.getJSONArray("points");
                     // delete old database
-                    IbisApplication.mRDB.deleteData();
+                    mRDB.deleteData();
                     //read and insert points from jArrray
-                    IbisApplication.mRDB.appendJsonLocationArray(jArray);
+                    mRDB.appendJsonLocationArray(jArray);
                     //get total dist, convert to km an round
-                    double totalDist = IbisApplication.mRDB.getTotalDistance() / 1000;
+                    double totalDist = mRDB.metaData.getTotalDistance() / 1000;
                     String totalDistRounded = roundDecimals(totalDist);
                     //show Toast
                     int duration = Toast.LENGTH_LONG;

@@ -2,10 +2,12 @@ package de.mytfg.jufo.ibis.storage;
 
 import android.location.Location;
 
+import java.io.Serializable;
+
 /**
  * IbisLocation class representing a location in a track
  */
-public class IbisLocation {
+public class IbisLocation implements Serializable {
     public static final double DISTANCE_INVALID = -1;
     public static final double TIMEINTERVAL_INVALID = -1;
     public static final double NO_TIMEFACTOR = 1.0;
@@ -15,9 +17,9 @@ public class IbisLocation {
     private double altitude;
     private double speed;
     private double accuracy;
-    private long timestamp;
+    private long timestamp; // milliseconds
 
-    private double distance; // to next/last IbisLocation
+    private double distance; // to next/last IbisLocation (in meter)
     private double timeInterval; // to next/last IbisLocation
 
     private double timeFactor; // correction factor for speed
@@ -123,6 +125,11 @@ public class IbisLocation {
         return location;
     }
 
+    /**
+     * Calculate distance to {@link IbisLocation} {@code to_location}
+     * @param to location to calculate distance to
+     * @return the calculated distance in meter
+     */
     public double distanceTo(IbisLocation to) {
         if (to == null) {
             return DISTANCE_INVALID;

@@ -72,7 +72,7 @@ public class Calculate {
 
     public void calculateSpeed() {
         if (newLoc.hasSpeed()) {
-            vAkt = (newLoc.getSpeed()) * 3.6;
+            vAkt = (newLoc.getSpeed()) * 3.6; // Location.getSpeed() is m/s; m/s * 3.6 = km/h
         } else {
             // time difference between last GPS points in hours
             double oldTime = oldLoc.getTime();

@@ -82,6 +82,11 @@ public class MainActivity extends AppCompatActivity {
         startService(intent);
     }
 
+    public void onClickTrackArchive(View view) {
+        Intent intent = new Intent(this, TrackArchiveActivity.class);
+        startActivity(intent);
+    }
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);

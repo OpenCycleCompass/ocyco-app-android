@@ -115,6 +115,13 @@
                 android:text="@string/upload_track" />
 
             <Button
+                android:id="@+id/button_UploadTrackLater"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:onClick="uploadTrackLater"
+                android:text="@string/upload_track_later" />
+
+            <Button
                 android:id="@+id/button_DeleteTrack"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
