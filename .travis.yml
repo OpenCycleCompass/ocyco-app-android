@@ -36,7 +36,8 @@ after_script:
   - ./gradlew signingReport
 
 before_deploy:
-  - cp app/build/outputs/apk/app-bintray.apk app/build/outputs/apk/ibis-app-$(date +%Y-%m-%d_%H-%M-%S)-$TRAVIS_BRANCH-$TRAVIS_COMMIT.apk
+  - TRAVIS_BRANCH_ESCAPED=$(echo "$TRAVIS_BRANCH" | sed -r 's/[/]+/-/g')
+  - cp app/build/outputs/apk/app-bintray.apk app/build/outputs/apk/ibis-app-$(date +%Y-%m-%d_%H-%M-%S)-$TRAVIS_BRANCH_ESCAPED-$TRAVIS_COMMIT.apk
 
 deploy:
   - provider: bintray
