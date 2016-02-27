@@ -69,6 +69,9 @@ public class IbisTrackArchive {
             trackUuidList.ensureCapacity(trackUuidsAsStringArray.length);
             trackMetadataList.ensureCapacity(trackUuidsAsStringArray.length);
             for (String aTrack_names_string : trackUuidsAsStringArray) {
+                if (aTrack_names_string.isEmpty()) {
+                    continue;
+                }
                 // read track metadata from file for each track and put into trackMetadataList
                 try {
                     UUID uuid = UUID.fromString(aTrack_names_string);
@@ -94,6 +97,9 @@ public class IbisTrackArchive {
             String trackIdMap = sharedPrefs.getString(PREFS_TRACKIDMAPPING, "");
             String[] trackKeyValuesArray = trackIdMap.split(";");
             for (String trackKeyValue : trackKeyValuesArray) {
+                if (trackKeyValue.isEmpty()) {
+                    continue;
+                }
                 String[] trackKeyValueArray = trackKeyValue.split(":");
                 if(!trackKeyValueArray[0].isEmpty() && !trackKeyValueArray[1].isEmpty()) {
                     try {
