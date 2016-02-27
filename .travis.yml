@@ -6,6 +6,7 @@ branches:
   only:
     - master
     - develop
+    - /^bugfix.*$/
 
 android:
   components:
@@ -48,3 +49,4 @@ deploy:
       branch:
         - master
         - develop
+        - /^bugfix.*$/
