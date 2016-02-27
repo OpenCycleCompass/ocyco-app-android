@@ -3,6 +3,7 @@ package de.mytfg.jufo.ibis.storage;
 import android.content.Context;
 import android.content.SharedPreferences;
 import android.support.annotation.Nullable;
+import android.widget.Toast;
 
 import org.acra.ACRA;
 
@@ -69,11 +70,20 @@ public class IbisTrackArchive {
             trackMetadataList.ensureCapacity(trackUuidsAsStringArray.length);
             for (String aTrack_names_string : trackUuidsAsStringArray) {
                 // read track metadata from file for each track and put into trackMetadataList
-                UUID uuid = UUID.fromString(aTrack_names_string);
-                IbisTrack.MetaData metadata = readTrackMetadataFromFile(uuid);
-                trackUuidList.add(uuid);
-                trackMetadataList.add(metadata);
-                trackMetadata.put(uuid, metadata);
+                try {
+                    UUID uuid = UUID.fromString(aTrack_names_string);
+                    IbisTrack.MetaData metadata = readTrackMetadataFromFile(uuid);
+                    trackUuidList.add(uuid);
+                    trackMetadataList.add(metadata);
+                    trackMetadata.put(uuid, metadata);
+                }
+                catch (IllegalArgumentException e) {
+                    Toast.makeText(context, "Invalid UUID: " + aTrack_names_string,
+                            Toast.LENGTH_LONG).show();
+                    ACRA.getErrorReporter().putCustomData("PREFS_TRACKLIST", trackNameList);
+                    ACRA.getErrorReporter().putCustomData("uuid", aTrack_names_string);
+                    ACRA.getErrorReporter().handleException(e);
+                }
             }
         }
 
@@ -86,10 +96,18 @@ public class IbisTrackArchive {
             for (String trackKeyValue : trackKeyValuesArray) {
                 String[] trackKeyValueArray = trackKeyValue.split(":");
                 if(!trackKeyValueArray[0].isEmpty() && !trackKeyValueArray[1].isEmpty()) {
-                    publicIdUuidMap.put(
-                            Long.parseLong(trackKeyValueArray[0]),
-                            UUID.fromString(trackKeyValueArray[1])
-                    );
+                    try {
+                        publicIdUuidMap.put(
+                                Long.parseLong(trackKeyValueArray[0]),
+                                UUID.fromString(trackKeyValueArray[1])
+                        );
+                    } catch (IllegalArgumentException e) {
+                        Toast.makeText(context, "Invalid UUID Public-ID mapping: " + trackKeyValue,
+                                Toast.LENGTH_LONG).show();
+                        ACRA.getErrorReporter().putCustomData("PREFS_TRACKIDMAPPING", trackIdMap);
+                        ACRA.getErrorReporter().putCustomData("uuid-id-mapping", trackKeyValue);
+                        ACRA.getErrorReporter().handleException(e);
+                    }
                 }
             }
         }
