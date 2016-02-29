@@ -3,7 +3,6 @@ package de.mytfg.jufo.ibis.storage;
 import android.content.Context;
 import android.content.SharedPreferences;
 import android.support.annotation.Nullable;
-import android.widget.Toast;
 
 import org.acra.ACRA;
 
@@ -81,9 +80,7 @@ public class IbisTrackArchive {
                     trackMetadata.put(uuid, metadata);
                 }
                 catch (IllegalArgumentException e) {
-                    Toast.makeText(context, "Invalid UUID: " + aTrack_names_string,
-                            Toast.LENGTH_LONG).show();
-                    ACRA.getErrorReporter().putCustomData("PREFS_TRACKLIST", trackNameList);
+                    ACRA.getErrorReporter().putCustomData(PREFS_TRACKLIST, trackNameList);
                     ACRA.getErrorReporter().putCustomData("uuid", aTrack_names_string);
                     ACRA.getErrorReporter().handleException(e);
                 }
@@ -108,9 +105,7 @@ public class IbisTrackArchive {
                                 UUID.fromString(trackKeyValueArray[1])
                         );
                     } catch (IllegalArgumentException e) {
-                        Toast.makeText(context, "Invalid UUID Public-ID mapping: " + trackKeyValue,
-                                Toast.LENGTH_LONG).show();
-                        ACRA.getErrorReporter().putCustomData("PREFS_TRACKIDMAPPING", trackIdMap);
+                        ACRA.getErrorReporter().putCustomData(PREFS_TRACKIDMAPPING, trackIdMap);
                         ACRA.getErrorReporter().putCustomData("uuid-id-mapping", trackKeyValue);
                         ACRA.getErrorReporter().handleException(e);
                     }
