@@ -68,12 +68,22 @@ public class IbisTrackArchive {
             trackUuidList.ensureCapacity(trackUuidsAsStringArray.length);
             trackMetadataList.ensureCapacity(trackUuidsAsStringArray.length);
             for (String aTrack_names_string : trackUuidsAsStringArray) {
+                if (aTrack_names_string.isEmpty()) {
+                    continue;
+                }
                 // read track metadata from file for each track and put into trackMetadataList
-                UUID uuid = UUID.fromString(aTrack_names_string);
-                IbisTrack.MetaData metadata = readTrackMetadataFromFile(uuid);
-                trackUuidList.add(uuid);
-                trackMetadataList.add(metadata);
-                trackMetadata.put(uuid, metadata);
+                try {
+                    UUID uuid = UUID.fromString(aTrack_names_string);
+                    IbisTrack.MetaData metadata = readTrackMetadataFromFile(uuid);
+                    trackUuidList.add(uuid);
+                    trackMetadataList.add(metadata);
+                    trackMetadata.put(uuid, metadata);
+                }
+                catch (IllegalArgumentException e) {
+                    ACRA.getErrorReporter().putCustomData(PREFS_TRACKLIST, trackNameList);
+                    ACRA.getErrorReporter().putCustomData("uuid", aTrack_names_string);
+                    ACRA.getErrorReporter().handleException(e);
+                }
             }
         }
 
@@ -84,12 +94,21 @@ public class IbisTrackArchive {
             String trackIdMap = sharedPrefs.getString(PREFS_TRACKIDMAPPING, "");
             String[] trackKeyValuesArray = trackIdMap.split(";");
             for (String trackKeyValue : trackKeyValuesArray) {
+                if (trackKeyValue.isEmpty()) {
+                    continue;
+                }
                 String[] trackKeyValueArray = trackKeyValue.split(":");
                 if(!trackKeyValueArray[0].isEmpty() && !trackKeyValueArray[1].isEmpty()) {
-                    publicIdUuidMap.put(
-                            Long.parseLong(trackKeyValueArray[0]),
-                            UUID.fromString(trackKeyValueArray[1])
-                    );
+                    try {
+                        publicIdUuidMap.put(
+                                Long.parseLong(trackKeyValueArray[0]),
+                                UUID.fromString(trackKeyValueArray[1])
+                        );
+                    } catch (IllegalArgumentException e) {
+                        ACRA.getErrorReporter().putCustomData(PREFS_TRACKIDMAPPING, trackIdMap);
+                        ACRA.getErrorReporter().putCustomData("uuid-id-mapping", trackKeyValue);
+                        ACRA.getErrorReporter().handleException(e);
+                    }
                 }
             }
         }
