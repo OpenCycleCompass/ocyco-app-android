@@ -1,8 +1,8 @@
-# iBis Android App
+# OpenCycleCompass Android App
 
-Android app for [iBis](https://ibis.jufo.mytfg.de/).
+Android app for [OpenCycleCompass](https://www.open-cycle-compass.de/).
 
-iBis (*intelligent bike information system*) is an android app for cyclists.
+OpenCycleCompass (*OCYCO*) is an android app for cyclists.
 
 
 ## Status

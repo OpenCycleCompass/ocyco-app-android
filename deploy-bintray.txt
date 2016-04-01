@@ -1,22 +1,22 @@
 {
     "package": {
-        "name": "iBis-Android-App", // Bintray package name
-        "repo": "iBis-Android-App", // Bintray repository name
-        "subject": "ibis", // Bintray subject (user or organization)
-        "desc": "iBis App latest automated build",
-        "website_url": "https://ibis.jufo.mytfg.de/",
+        "name": "OpenCycleCompass-app-android", // Bintray package name
+        "repo": "OpenCycleCompass-app-android", // Bintray repository name
+        "subject": "opencyclecompass", // Bintray subject (user or organization)
+        "desc": "OpenCycleCompass android app latest automated builds",
+        "website_url": "https://www.open-cycle-compass.de/",
         "issue_tracker_url": "https://github.com/iBis-project/iBis-Android-App/issues",
         "vcs_url": "https://github.com/iBis-project/iBis-Android-App",
         "licenses": ["GPL-3.0"]
     },
     "version": {
-        "name": "0.8-pre",
+        "name": "0.1-devel",
         "desc": "development version",
         "gpgSign": false
     },
     "files":
         [
-        {"includePattern": "app\/build\/outputs\/apk\/(ibis-app-.+\.apk)", "uploadPattern": "$1"}
+        {"includePattern": "app\/build\/outputs\/apk\/(ocyco-app-.+\.apk)", "uploadPattern": "$1"}
         ],
     "publish": true
 }

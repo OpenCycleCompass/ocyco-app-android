@@ -1,12 +1,12 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
 
-    <string name="app_name">iBis</string>
-    <string name="app_name_short">iBis</string>
-    <string name="crash_toast">Leider ist die iBis App abgestürzt, ein Absturzbericht wird gesendet</string>
+    <string name="app_name">OpenCycleCompass</string>
+    <string name="app_name_short">OCYCO</string>
+    <string name="crash_toast">Leider ist die OpenCycleCompass App abgestürzt, ein Absturzbericht wird gesendet</string>
     <string name="action_settings">Einstellungen</string>
-    <string name="welcome_headline">Willkommen bei iBis!</string>
-    <string name="welcome">iBis - intelligent bike information system ist ein Fahrrad Informations- und Navigationssystem.
+    <string name="welcome_headline">Willkommen bei OpenCycleCompass!</string>
+    <string name="welcome">OpenCycleCompass (OCYCO) ist ein Fahrrad Informations- und Navigationssystem.
         Das Ziel ist es, Ihnen eine möglichst für Fahrradfahrer geeignete, schnelle Route zu suchen und
         Ihnen möglichst hilfreiche und konkrete Informationen über Ihren Ankunftszeitpunkt zu geben.
         Sie können entweder Ihre Einstellungen überprüfen, oder direkt eine Route suchen.</string>
@@ -17,7 +17,7 @@
     <string name="specific_settings">Routenspezifische Einstellungen</string>
     <string name="distance">Wie lange ist die Strecke, die Sie fahren möchten?</string>
     <string name="save">Speichern</string>
-    <string name="title_activity_show_data">iBis</string>
+    <string name="title_activity_show_data">OpenCycleCompass</string>
     <string name="action_show_data_activity">Navigation</string>
     <string name="preference_file_key">pref_file_key</string>
     <string name="preference_file_key_upload_later">pref_file_key_upload_later</string>
@@ -111,24 +111,24 @@
     <string name="title_activity_info">Info</string>
     <string name="title_activity_archive">Track Liste</string>
     <string name="info_text_headline">Über das Projekt</string>
-    <string name="info_text">iBis - intelligent bike information system ist ein Fahrrad Informations- und Navigationssystem.
+    <string name="info_text">OpenCycleCompass (OCYCO) ist ein Fahrrad Informations- und Navigationssystem.
         Das Ziel ist es, Ihnen eine möglichst für Fahrradfahrer geeignete, schnelle Route zu suchen und
         Ihnen möglichst hilfreiche und konkrete Informationen über Ihren Ankunftszeitpunkt zu geben.</string>
     <string name="info_license_headline">Lizenzen</string>
     <string name="info_version_headline">Version</string>
     <string name="info_license">Open Streetmap Karten und Daten:
     <a href ="http://www.openstreetmap.org/copyright/">© OpenStreetMap contributors</a>
-    \niBis App: <a href="http://www.gnu.de/documents/gpl.de.html">GPL v3 Lizenz</a></string>
+    \nOpenCycleCompass App: <a href="http://www.gnu.de/documents/gpl.de.html">GPL v3 Lizenz</a></string>
     <string name="info_authors_headline">Autoren</string>
     <string name="info_authors">Leonard Rapp \nRaphael Lehmann</string>
     <string name="info_jufo_headline">Jugend forscht</string>
-    <string name="info_jufo">Das iBis - Projekt ist im Rahmen eines Jugend forscht Projekts von
+    <string name="info_jufo">Das OpenCycleCompass - Projekt ist im Rahmen eines Jugend forscht Projekts von
         Leonard Rapp und Raphael Lehmann am Theodor-Fliedner-Gymnasium Düsseldorf entstanden.
         \nEs hat im Rahmen des Regionalwettbewerbs 2015 den 1. Preis der Kategorie
         Mathematik / Informatik, sowie den Sonderpreis der Rheinbahn gewonnen.</string>
     <string name="action_info">Informationen</string>
     <string name="info_contact_headline">Kontakt</string>
-    <string name="info_contact">Homepage: <a href="https://ibis.jufo.mytfg.de">ibis.jufo.mytfg.de</a>
-    \nMail: ibis@mytfg.de</string>
+    <string name="info_contact">Homepage: <a href="https://www.open-cycle-compass.de">www.open-cycle-compass.de</a>
+    \nMail: support@open-cycle-compass.de</string>
     <string name="upload_track_error_too_short">Der Track ist zu kurz zum Hochladen.</string>
 </resources>

@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
 <manifest xmlns:android="http://schemas.android.com/apk/res/android"
-    package="de.mytfg.jufo.ibis" >
+    package="de.opencyclecompass.app.android" >
 
     <uses-permission android:name="android.permission.ACCESS_FINE_LOCATION" />
     <uses-permission android:name="android.permission.ACCESS_WIFI_STATE" />
@@ -10,14 +10,14 @@
     <uses-permission android:name="android.permission.WAKE_LOCK" />
 
     <application
-        android:name=".IbisApplication"
+        android:name=".OcycoApplication"
         android:allowBackup="true"
         android:icon="@mipmap/ic_launcher"
         android:label="@string/app_name"
         android:supportsRtl="false"
         android:theme="@style/AppTheme" >
         <activity
-            android:name=".MainActivity"
+            android:name="de.opencyclecompass.app.android.MainActivity"
             android:label="@string/app_name"
             android:screenOrientation="portrait" >
             <intent-filter>
@@ -27,25 +27,25 @@
             </intent-filter>
         </activity>
         <activity
-            android:name=".SettingsActivity"
+            android:name="de.opencyclecompass.app.android.SettingsActivity"
             android:label="@string/title_activity_settings"
             android:screenOrientation="portrait" >
         </activity>
         <activity
-            android:name=".ShowDataActivity"
+            android:name="de.opencyclecompass.app.android.ShowDataActivity"
             android:label="@string/title_activity_show_data"
             android:screenOrientation="portrait"
             android:showOnLockScreen="true">
         </activity>
         <activity
-            android:name=".UploadTrackActivity"
+            android:name="de.opencyclecompass.app.android.UploadTrackActivity"
             android:label="@string/title_activity_upload_track"
             android:screenOrientation="portrait" >
         </activity>
 
         <service
-            android:name=".Tracking"
-            android:label="iBis Tracking GPS" />
+            android:name="de.opencyclecompass.app.android.Tracking"
+            android:label="OpenCycleCompass Tracking GPS" />
 
         <meta-data
             android:name="com.google.android.gms.version"
@@ -55,14 +55,14 @@
          (https://developer.android.com/google/play-services/setup.html#ensure)
         -->
         <activity
-            android:name=".RoutingActivity"
+            android:name="de.opencyclecompass.app.android.RoutingActivity"
             android:label="@string/title_activity_routing" >
         </activity>
         <activity
-            android:name=".InfoActivity"
+            android:name="de.opencyclecompass.app.android.InfoActivity"
             android:label="@string/title_activity_info" >
         </activity>
-        <activity android:name=".TrackArchiveActivity"
+        <activity android:name="de.opencyclecompass.app.android.TrackArchiveActivity"
             android:label="@string/title_activity_archive">
         </activity>
     </application>
