@@ -1,9 +1,5 @@
 #!/bin/sh
 
-# abort on error
-set -e
-set -u
-
 BASE_URL="https://dl.ocyco.de/"
 FILE=$(find . | grep -P 'app/build/outputs/apk/ocyco-app-.+\.apk')
 FILE_NAME=$(echo ${FILE} | rev | cut -d/ -f1 | rev)
@@ -20,5 +16,3 @@ then
     echo "Branch is 'master': update $BASE_URL/ocyco-master.apk (updating redirect)"
     curl --verbose -X PUT -H 'Content-Type: text/text' -d "branches/${TRAVIS_BRANCH_ESCAPED}/${FILE_NAME}" --user ${OCYCO_UPLOAD_AUTH} https://dl.ocyco.de/branches/current-master
 fi
-
-exit 0
