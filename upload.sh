@@ -3,6 +3,7 @@
 BASE_URL="https://dl.ocyco.de/"
 FILE=$(find . | grep -P 'app/build/outputs/apk/ocyco-app-.+\.apk')
 FILE_NAME=$(echo ${FILE} | rev | cut -d/ -f1 | rev)
+TRAVIS_BRANCH_ESCAPED=$(echo "$TRAVIS_BRANCH" | sed -r 's/[/]+/-/g')
 
 curl --verbose --upload-file ${FILE} --user ${OCYCO_UPLOAD_AUTH} ${BASE_URL}branches/${TRAVIS_BRANCH_ESCAPED}/${FILE_NAME}
 
