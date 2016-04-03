@@ -7,6 +7,7 @@ branches:
     - master
     - develop
     - /^bugfix.*$/
+    - /^feature.*$/
 
 android:
   components:
@@ -24,9 +25,9 @@ android:
     ## Goodle Android Repository
     - extra-google-m2repository
 
-# decrypt ibis.keystore
+# decrypt ocyco.keystore
 before_install:
-- openssl aes-256-cbc -K $encrypted_ab14c45bfecf_key -iv $encrypted_ab14c45bfecf_iv -in ibis.keystore.enc -out ibis.keystore -d
+- openssl aes-256-cbc -K $encrypted_ab14c45bfecf_key -iv $encrypted_ab14c45bfecf_iv -in ocyco.keystore.enc -out ocyco.keystore -d
 
 script:
   - ./gradlew assembleBintray
@@ -37,7 +38,8 @@ after_script:
 
 before_deploy:
   - TRAVIS_BRANCH_ESCAPED=$(echo "$TRAVIS_BRANCH" | sed -r 's/[/]+/-/g')
-  - cp app/build/outputs/apk/app-bintray.apk app/build/outputs/apk/ibis-app-$(date +%Y-%m-%d_%H-%M-%S)-$TRAVIS_BRANCH_ESCAPED-$TRAVIS_COMMIT.apk
+  - cp app/build/outputs/apk/app-bintray.apk app/build/outputs/apk/ocyco-app-$(date +%Y-%m-%d_%H-%M-%S)-$TRAVIS_BRANCH_ESCAPED-$TRAVIS_COMMIT.apk
+  - ./upload.sh
 
 deploy:
   - provider: bintray

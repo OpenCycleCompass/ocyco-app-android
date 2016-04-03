@@ -7,7 +7,7 @@
     android:paddingLeft="@dimen/activity_horizontal_margin"
     android:paddingRight="@dimen/activity_horizontal_margin"
     android:paddingTop="@dimen/activity_vertical_margin"
-    tools:context="de.mytfg.jufo.ibis.TrackArchiveActivity">
+    tools:context="de.opencyclecompass.app.android.TrackArchiveActivity">
 
     <ListView
         android:layout_width="match_parent"
