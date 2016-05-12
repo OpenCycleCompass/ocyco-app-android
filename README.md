@@ -1,16 +1,11 @@
 # OpenCycleCompass Android App
+[![Build Status](https://travis-ci.org/OpenCycleCompass/ocyco-app-android.svg?branch=develop)](https://travis-ci.org/OpenCycleCompass/ocyco-app-android)
+
+- - - - -
 
 Android app for [OpenCycleCompass](https://www.open-cycle-compass.de/).
 
 OpenCycleCompass (*OCYCO*) is an android app for cyclists.
-
-
-## Status
-
-| branch | status |
-|--------|--------|
-| master | [![Build Status](https://travis-ci.org/iBis-project/iBis-Android-App.svg?branch=master)](https://travis-ci.org/iBis-project/iBis-Android-App) |
-| develop | [![Build Status](https://travis-ci.org/iBis-project/iBis-Android-App.svg?branch=develop)](https://travis-ci.org/iBis-project/iBis-Android-App) |
 
 
 ## Contributing

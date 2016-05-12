@@ -266,7 +266,14 @@ public class Tracking extends Service implements LocationListener, OnConnectionF
 
     protected void startLocationUpdates() {
         Log.i(TAG, "startLocationUpdates()");
-        LocationServices.FusedLocationApi.requestLocationUpdates(mGoogleApiClient, mLocationRequest, this);
+
+        try {
+            LocationServices.FusedLocationApi.requestLocationUpdates(mGoogleApiClient, mLocationRequest, this);
+        } catch(SecurityException se) {
+            // Missing permissions (e.g. PRIORITY_HIGH_ACCURACY for ACCESS_FINE_LOCATION)
+            // TODO: Actually inform the user that the permissions prevent OCYCO from working properly
+            Log.i(TAG, "startLocationUpdates(): SecurityException: " + se.getMessage());
+        }
     }
 
     @Override
