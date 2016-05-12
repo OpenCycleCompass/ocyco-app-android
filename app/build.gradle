@@ -1,5 +1,12 @@
 apply plugin: 'com.android.application'
 
+apply plugin: 'com.github.triplet.play'
+play {
+    track = 'alpha'
+    serviceAccountEmail = 'raphael+ocyco@rleh.de'
+    pk12File = file('google-play-credentials.p12')
+}
+
 android {
     compileSdkVersion 23
     buildToolsVersion "23.0.2"
@@ -17,6 +24,12 @@ android {
                 storePassword System.getenv("KEYSTORE_PASS")
                 keyAlias System.getenv("ALIAS_NAME")
                 keyPassword System.getenv("ALIAS_PASS")
+            }
+            googlePlaySigning {
+                storeFile rootProject.file('ocyco-google-play.keystore')
+                storePassword System.getenv("PLAY_KEYSTORE_PASS")
+                keyAlias System.getenv("PLAY_KEYSTORE_ALIAS")
+                keyPassword System.getenv("PLAY_KEYSTORE_PASS")
             }
         }
     }
@@ -36,6 +49,14 @@ android {
                 shrinkResources false
                 proguardFiles getDefaultProguardFile('proguard-android.txt'), 'proguard-rules.pro'
                 signingConfig signingConfigs.releaseSigning
+            }
+            playStore {
+                applicationIdSuffix ".googleplay"
+                versionNameSuffix "-googleplay-" + getDate() + "-" + getCommit()
+                minifyEnabled false
+                shrinkResources false
+                proguardFiles getDefaultProguardFile('proguard-android.txt'), 'proguard-rules.pro'
+                signingConfig signingConfigs.googlePlaySigning
             }
         } else {
             debug {

@@ -26,9 +26,10 @@ android:
     ## Goodle Android Repository
     - extra-google-m2repository
 
-# decrypt ocyco.keystore
+# decrypt keystores
 before_install:
 - openssl aes-256-cbc -K $encrypted_3743ad7241be_key -iv $encrypted_3743ad7241be_iv -in ocyco.keystore.enc -out ocyco.keystore -d
+- openssl aes-256-cbc -K $encrypted_3743ad7241be_key -iv $encrypted_3743ad7241be_iv -in ocyco-google-play.keystore.enc -out ocyco-google-play.keystore -d
 
 script:
   - ./gradlew assembleBintray
