@@ -28,7 +28,7 @@ android:
 
 # decrypt ocyco.keystore
 before_install:
-- openssl aes-256-cbc -K $encrypted_ab14c45bfecf_key -iv $encrypted_ab14c45bfecf_iv -in ocyco.keystore.enc -out ocyco.keystore -d
+- openssl aes-256-cbc -K $encrypted_3743ad7241be_key -iv $encrypted_3743ad7241be_iv -in ocyco.keystore.enc -out ocyco.keystore -d
 
 script:
   - ./gradlew assembleBintray
