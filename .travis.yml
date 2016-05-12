@@ -43,6 +43,9 @@ before_deploy:
   - TRAVIS_BRANCH_ESCAPED=$(echo "$TRAVIS_BRANCH" | sed -r 's/[/]+/-/g')
   - cp app/build/outputs/apk/app-bintray.apk app/build/outputs/apk/ocyco-app-$(date +%Y-%m-%d_%H-%M-%S)-$TRAVIS_BRANCH_ESCAPED-$TRAVIS_COMMIT.apk
   - ./upload.sh
+  # Publish master and develop builds on Google Play
+  - test "$TRAVIS_PULL_REQUEST" == "false" && test "$TRAVIS_BRANCH" == "develop" && ./gradlew publishApkPlayStore
+#  - test "$TRAVIS_PULL_REQUEST" == "false" && test "$TRAVIS_BRANCH" == "master" && ./gradlew publishApkPlayStore
 
 deploy:
   - provider: bintray
