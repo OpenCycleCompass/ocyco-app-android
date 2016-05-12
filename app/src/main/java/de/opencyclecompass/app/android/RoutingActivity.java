@@ -1,10 +1,12 @@
 package de.opencyclecompass.app.android;
 
+import android.Manifest;
 import android.app.AlertDialog;
 import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.SharedPreferences;
+import android.content.pm.PackageManager;
 import android.location.Location;
 import android.net.ConnectivityManager;
 import android.net.NetworkInfo;
@@ -12,6 +14,7 @@ import android.net.Uri;
 import android.os.AsyncTask;
 import android.os.Bundle;
 import android.os.Handler;
+import android.support.v4.app.ActivityCompat;
 import android.support.v4.app.DialogFragment;
 import android.support.v7.app.AppCompatActivity;
 import android.util.Log;
@@ -320,14 +323,29 @@ public class RoutingActivity extends AppCompatActivity implements TimePickerFrag
         } else if (timeExc) {
             openAlert("Uhrzeit");
         }
-        // only start ShowDataActivity and Tracking Service, if both excs are false
-        if (!timeExc && !distanceExc) {
-            //start ShowDataActivity
-            Intent intent = new Intent(this, ShowDataActivity.class);
-            startActivity(intent);
-            //start tracking service
-            Intent intent2 = new Intent(this, Tracking.class);
-            startService(intent2);
+
+        String permissionToGet = Manifest.permission.ACCESS_FINE_LOCATION;
+        boolean permissionGrantedFineLocation = ActivityCompat.checkSelfPermission(this, permissionToGet) == PackageManager.PERMISSION_GRANTED;
+
+        if(!permissionGrantedFineLocation) {
+            // Permission is not given, request it.
+            ActivityCompat.requestPermissions(this, new String[]{ permissionToGet }, 0);
+            /* TODO:
+             * Override onRequestPermissionsResult, catch result of request and start tracking.
+             * Currently, if the permission is not given initially (thus, the user is presented with
+             * the request alert) and the user allows access to GPS, the user needs to tap the
+             * "start routing" button again.
+             */
+        } else {
+            // only start ShowDataActivity and Tracking Service, if both excs are false
+            if (!timeExc && !distanceExc) {
+                //start ShowDataActivity
+                Intent intent = new Intent(this, ShowDataActivity.class);
+                startActivity(intent);
+                //start tracking service
+                Intent intent2 = new Intent(this, Tracking.class);
+                startService(intent2);
+            }
         }
     }
 
