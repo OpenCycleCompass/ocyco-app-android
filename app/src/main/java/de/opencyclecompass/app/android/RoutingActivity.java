@@ -322,38 +322,85 @@ public class RoutingActivity extends AppCompatActivity implements TimePickerFrag
             openAlert("Strecke");
         } else if (timeExc) {
             openAlert("Uhrzeit");
-        }
+        } else { // !timeExc && !distanceExc
+            String permissionToGet = Manifest.permission.ACCESS_FINE_LOCATION;
+            boolean permissionGrantedFineLocation = ActivityCompat.checkSelfPermission(this, permissionToGet) == PackageManager.PERMISSION_GRANTED;
 
-        String permissionToGet = Manifest.permission.ACCESS_FINE_LOCATION;
-        boolean permissionGrantedFineLocation = ActivityCompat.checkSelfPermission(this, permissionToGet) == PackageManager.PERMISSION_GRANTED;
-
-        if(!permissionGrantedFineLocation) {
-            // Permission is not given, request it.
-            ActivityCompat.requestPermissions(this, new String[]{ permissionToGet }, 0);
-            /* TODO:
-             * Override onRequestPermissionsResult, catch result of request and start tracking.
-             * Currently, if the permission is not given initially (thus, the user is presented with
-             * the request alert) and the user allows access to GPS, the user needs to tap the
-             * "start routing" button again.
-             */
-        } else {
-            // only start ShowDataActivity and Tracking Service, if both excs are false
-            if (!timeExc && !distanceExc) {
-                //start ShowDataActivity
-                Intent intent = new Intent(this, ShowDataActivity.class);
-                startActivity(intent);
-                //start tracking service
-                Intent intent2 = new Intent(this, Tracking.class);
-                startService(intent2);
+            if(!permissionGrantedFineLocation) {
+                // Permission is not given, request it.
+                ActivityCompat.requestPermissions(this, new String[]{permissionToGet}, 0);
+            } else {
+                // Got the permissions, start navigation
+                startNavigation();
             }
         }
     }
 
+    private void startNavigation() {
+        //start ShowDataActivity
+        Intent intent = new Intent(this, ShowDataActivity.class);
+        startActivity(intent);
+        //start tracking service
+        Intent intent2 = new Intent(this, Tracking.class);
+        startService(intent2);
+    }
+
+    /**
+     * Callback function, invoked on permission grant/denial
+     * See also http://goo.gl/fyJv43 (ActivityCompat.OnRequestPermissionsResultCallback)
+     * @param requestCode int value submitted with requestPermissions()
+     * @param permissions permission names
+     * @param grantResults their corresponding state (granted, denied)
+     */
+    public void onRequestPermissionResult(int requestCode, String[] permissions, int[] grantResults) {
+        String missingPermissionsList = "";
+        int missingPermissions = 0;
+
+        // Check if a permission was refused
+        for(int i = 0; i < permissions.length; i++) {
+            if(grantResults[i] == PackageManager.PERMISSION_DENIED) {
+                missingPermissions++;
+
+                if(missingPermissions > 1) {
+                    missingPermissionsList += ", ";
+                }
+
+                missingPermissionsList += permissions[i];
+            }
+        }
+
+        if(missingPermissions > 0) {
+            // Inform user that the permissions are necessary for the app to work properly
+            AlertDialog.Builder alertDialogBuilder = new AlertDialog.Builder(RoutingActivity.this);
+            String errorMessage = "Sie haben nicht alle erforderlichen Rechte der App zugewiesen. ";
+
+            if(missingPermissions > 1) {
+                errorMessage += "Es fehlen diese Berechtigungen: ";
+            } else {
+                errorMessage += "Es fehlt die Berechtigung ";
+            }
+
+            errorMessage += missingPermissionsList;
+            showDismissableErrorAlert(errorMessage);
+        } else {
+            // All your permissions are belong to us. (https://goo.gl/LU3KTM)
+            startNavigation();
+        }
+    }
+
     private void openAlert(String missing_value) {
+        showDismissableErrorAlert("Sie haben keine " + missing_value + " eingegeben!");
+    }
+
+    /**
+     * Show a simple error alert.
+     * @param message The message displayed
+     */
+    private void showDismissableErrorAlert(String message) {
         //set up a new alert dialog
         AlertDialog.Builder alertDialogBuilder = new AlertDialog.Builder(RoutingActivity.this);
         alertDialogBuilder.setTitle("Fehler!");
-        alertDialogBuilder.setMessage("Sie haben keine " + missing_value + " eingegeben!");
+        alertDialogBuilder.setMessage(message);
 
         //create the OK Button and onClickListener
         alertDialogBuilder.setPositiveButton("OK", new DialogInterface.OnClickListener() {
