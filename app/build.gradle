@@ -1,5 +1,11 @@
 apply plugin: 'com.android.application'
 
+apply plugin: 'com.github.triplet.play'
+play {
+    track = 'beta'
+    jsonFile = file('../play-keys.json')
+}
+
 android {
     compileSdkVersion 23
     buildToolsVersion "23.0.2"
@@ -7,7 +13,7 @@ android {
         applicationId 'de.opencyclecompass.app.android'
         minSdkVersion 15
         targetSdkVersion 23
-        versionCode 1
+        versionCode getUnixTimestamp() as int
         versionName "1.0"
     }
     signingConfigs {
@@ -17,6 +23,12 @@ android {
                 storePassword System.getenv("KEYSTORE_PASS")
                 keyAlias System.getenv("ALIAS_NAME")
                 keyPassword System.getenv("ALIAS_PASS")
+            }
+            googlePlaySigning {
+                storeFile rootProject.file('ocyco-google-play.keystore')
+                storePassword System.getenv("PLAY_KEYSTORE_PASS")
+                keyAlias System.getenv("PLAY_KEYSTORE_ALIAS")
+                keyPassword System.getenv("PLAY_KEYSTORE_PASS")
             }
         }
     }
@@ -37,6 +49,14 @@ android {
                 proguardFiles getDefaultProguardFile('proguard-android.txt'), 'proguard-rules.pro'
                 signingConfig signingConfigs.releaseSigning
             }
+            playStore {
+                applicationIdSuffix ".googleplay"
+                versionNameSuffix "-googleplay-" + getDate() + "-" + getCommit()
+                minifyEnabled false
+                shrinkResources false
+                proguardFiles getDefaultProguardFile('proguard-android.txt'), 'proguard-rules.pro'
+                signingConfig signingConfigs.googlePlaySigning
+            }
         } else {
             debug {
                 applicationIdSuffix ".debug"
@@ -54,6 +74,12 @@ def getDate() {
     def date = new Date()
     def formattedDate = date.format('yyyyMMddHHmmss')
     return formattedDate
+}
+
+def getUnixTimestamp() {
+    def date = new Date()
+    def timestamp = Math.round(date.getTime() / 1000.0 )
+    return timestamp
 }
 
 def getCommit() {
