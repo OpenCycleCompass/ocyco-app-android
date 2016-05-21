@@ -294,6 +294,7 @@ public class OcycoTrackArchive {
         ObjectInputStream input;
         ObjectInputStream inputMetadata;
         String filename = trackUuid.toString() + FILE_EXTENSION;
+        String filenameMetadata = trackUuid.toString() + FILE_EXTENSION_META;
         try {
             input = new ObjectInputStream(
                     new FileInputStream(
@@ -307,7 +308,7 @@ public class OcycoTrackArchive {
             //  metadata field
             inputMetadata = new ObjectInputStream(
                     new FileInputStream(
-                            new File(new File(context.getFilesDir(),"")+ File.separator+filename)
+                            new File(new File(context.getFilesDir(),"")+ File.separator+filenameMetadata)
                     )
             );
             OcycoTrack.MetaData metadata = (OcycoTrack.MetaData) inputMetadata.readObject();
