@@ -62,7 +62,12 @@ public class TrackArchiveActivity extends AppCompatActivity {
         arrayList.clear();
 
         for (OcycoTrack.MetaData metadata : OcycoApplication.trackArchive.getTrackMetadataList()) {
-            arrayList.add(Utils.getDateTime(metadata.getStartTime()));
+            if (metadata != null) {
+                arrayList.add(Utils.getDateTime(metadata.getStartTime()));
+            }
+            else {
+                arrayList.add("Fehler :-(");
+            }
         }
 
         adapter.notifyDataSetChanged();
