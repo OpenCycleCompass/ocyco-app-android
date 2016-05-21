@@ -15,7 +15,7 @@ import android.view.MenuItem;
 import android.view.WindowManager;
 import android.widget.TextView;
 
-import java.util.Locale;
+import de.opencyclecompass.app.android.util.Utils;
 
 public class ShowDataActivity extends AppCompatActivity {
     protected static final String TAG = "ShowDataActivity";
@@ -163,10 +163,10 @@ public class ShowDataActivity extends AppCompatActivity {
     private void showData() {
         Log.i(TAG, "showData()");
         //get variables from global class and round
-        String sGef = roundDecimals(OcycoApplication.getsGef()) + " km";
-        String sZuf = roundDecimals(OcycoApplication.getsZuf()) + " km";
-        String vAkt = roundDecimals(OcycoApplication.getvAkt()) + " km/h";
-        String vD = roundDecimals(OcycoApplication.getvD()) + " km/h";
+        String sGef = Utils.roundDecimals(OcycoApplication.getsGef()) + " km";
+        String sZuf = Utils.roundDecimals(OcycoApplication.getsZuf()) + " km";
+        String vAkt = Utils.roundDecimals(OcycoApplication.getvAkt()) + " km/h";
+        String vD = Utils.roundDecimals(OcycoApplication.getvD()) + " km/h";
         int tAnkDays = 0;
         //get the time and format it (tAnk)
         double tAnkD = OcycoApplication.gettAnk();
@@ -187,8 +187,8 @@ public class ShowDataActivity extends AppCompatActivity {
         int tAnkUntStd = (int) tAnkUntD;
         int tAnkUntMin = (int) Math.round(((tAnkUntD - tAnkUntStd) * 60));
         String tAnkUnt = tAnkUntStd + "h " + tAnkUntMin + "min";
-        String vDMuss = roundDecimals(OcycoApplication.getvDMuss()) + " km/h";
-        String vDunt = roundDecimals(OcycoApplication.getvDunt()) + " km/h";
+        String vDMuss = Utils.roundDecimals(OcycoApplication.getvDMuss()) + " km/h";
+        String vDunt = Utils.roundDecimals(OcycoApplication.getvDunt()) + " km/h";
         //show in info boxes
         sGefBox.setText(String.format("%s", sGef));
         sZufBox.setText(String.format("%s", sZuf));
@@ -221,10 +221,6 @@ public class ShowDataActivity extends AppCompatActivity {
             vDUntBox.setText("---");
             vDUntBox.setTextColor(ContextCompat.getColor(context, R.color.default_black));
         }
-    }
-
-    private String roundDecimals(double d) {
-        return String.format(Locale.GERMANY, "%.2f", d);
     }
 
     @Override
