@@ -34,7 +34,7 @@ public class Utils {
      * @return number rounded to tro decimal places as string
      */
     public static String roundDecimals(double d) {
-        return String.format("%.2f", d);
+        return String.format(Locale.getDefault(), "%.2f", d);
     }
 
     /**
@@ -46,6 +46,7 @@ public class Utils {
         if (ms < 60*1000) {
             // < 1 minute -> solely display seconds
             return String.format(
+                    Locale.getDefault(),
                     "%02ds",
                     TimeUnit.MILLISECONDS.toSeconds(ms)
             );
@@ -54,6 +55,7 @@ public class Utils {
             // < 1 hour -> solely display minutes and seconds
             long minutes = TimeUnit.MILLISECONDS.toMinutes(ms);
             return String.format(
+                    Locale.getDefault(),
                     "%02dmin %02ds",
                     minutes,
                     TimeUnit.MILLISECONDS.toSeconds(ms) - TimeUnit.MINUTES.toSeconds(minutes)
@@ -63,6 +65,7 @@ public class Utils {
             long hours = TimeUnit.MILLISECONDS.toHours(ms);
             long minutes = TimeUnit.MILLISECONDS.toMinutes(ms);
             return String.format(
+                    Locale.getDefault(),
                     "%02dh %02dmin %02ds",
                     hours,
                     minutes - TimeUnit.HOURS.toMinutes(hours),

@@ -15,9 +15,9 @@ import android.view.MenuItem;
 import android.view.WindowManager;
 import android.widget.TextView;
 
-public class ShowDataActivity extends AppCompatActivity {
+import de.opencyclecompass.app.android.util.Utils;
 
-    // Log TAG
+public class ShowDataActivity extends AppCompatActivity {
     protected static final String TAG = "ShowDataActivity";
 
     //alert dialog vars
@@ -36,13 +36,13 @@ public class ShowDataActivity extends AppCompatActivity {
     private TextView vDMussBox;
     private TextView vDUntBox;
     private Menu menu;
-    private String tAnkMinStr;
-    private boolean accuracyAlert, oldAccuracyAlert;
+    private boolean accuracyAlert;
+    private boolean dialogExists = false;
     Runnable timerRunnable = new Runnable() {
 
         @Override
         public void run() {
-            oldAccuracyAlert = accuracyAlert;
+            boolean oldAccuracyAlert = accuracyAlert;
             if (OcycoApplication.getLocation() != null) {
                 noGPSAlertOpen = false;
                 if (OcycoApplication.getLocation().getAccuracy() < 20) {
@@ -61,14 +61,15 @@ public class ShowDataActivity extends AppCompatActivity {
                     }
                 }
             } else {
-                if (!noGPSAlertOpen) openAccuracyAlert(false);
+                if (!noGPSAlertOpen) {
+                    openAccuracyAlert(false);
+                }
                 noGPSAlertOpen = true;
             }
-
+            // call timerRunnable.run() again in 500ms
             timerHandler.postDelayed(this, 500);
         }
     };
-    private boolean dialogExists = false;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -92,10 +93,25 @@ public class ShowDataActivity extends AppCompatActivity {
         vDUntBox = (TextView) findViewById(R.id.vDUntBox);
 
         setTextSize();
-        updateUI();
         //start tracking
         Intent intent = new Intent(this, Tracking.class);
         startService(intent);
+    }
+
+    @Override
+    protected void onResume() {
+        Log.i(TAG, "onResume()");
+        super.onResume();
+        // start timerRunnable
+        timerHandler.postDelayed(timerRunnable, 0);
+    }
+
+    @Override
+    protected void onPause() {
+        Log.i(TAG, "onPause()");
+        // stop timerHandler to execute timerRunnable
+        timerHandler.removeCallbacks(timerRunnable);
+        super.onPause();
     }
 
     private void setTextSize() {
@@ -110,11 +126,6 @@ public class ShowDataActivity extends AppCompatActivity {
             vDMussBox.setTextSize(TypedValue.TYPE_STRING, textSize);
             vDUntBox.setTextSize(TypedValue.TYPE_STRING, textSize);
         }
-    }
-
-    private void updateUI() {
-        Log.i(TAG, "updateUI()");
-        timerHandler.postDelayed(timerRunnable, 0);
     }
 
     private void openAccuracyAlert(boolean confirm) {
@@ -152,16 +163,16 @@ public class ShowDataActivity extends AppCompatActivity {
     private void showData() {
         Log.i(TAG, "showData()");
         //get variables from global class and round
-        String sGef = roundDecimals(OcycoApplication.getsGef()) + " km";
-        String sZuf = roundDecimals(OcycoApplication.getsZuf()) + " km";
-        String vAkt = roundDecimals(OcycoApplication.getvAkt()) + " km/h";
-        String vD = roundDecimals(OcycoApplication.getvD()) + " km/h";
+        String sGef = Utils.roundDecimals(OcycoApplication.getsGef()) + " km";
+        String sZuf = Utils.roundDecimals(OcycoApplication.getsZuf()) + " km";
+        String vAkt = Utils.roundDecimals(OcycoApplication.getvAkt()) + " km/h";
+        String vD = Utils.roundDecimals(OcycoApplication.getvD()) + " km/h";
         int tAnkDays = 0;
         //get the time and format it (tAnk)
         double tAnkD = OcycoApplication.gettAnk();
         int tAnkStd = (int) tAnkD;
         int tAnkMin = (int) Math.round(((tAnkD - tAnkStd) * 60));
-        tAnkMinStr = Integer.toString(tAnkMin);
+        String tAnkMinStr = Integer.toString(tAnkMin);
         if (tAnkMin < 10) {
             tAnkMinStr = "0" + tAnkMin;
         }
@@ -176,17 +187,17 @@ public class ShowDataActivity extends AppCompatActivity {
         int tAnkUntStd = (int) tAnkUntD;
         int tAnkUntMin = (int) Math.round(((tAnkUntD - tAnkUntStd) * 60));
         String tAnkUnt = tAnkUntStd + "h " + tAnkUntMin + "min";
-        String vDMuss = roundDecimals(OcycoApplication.getvDMuss()) + " km/h";
-        String vDunt = roundDecimals(OcycoApplication.getvDunt()) + " km/h";
+        String vDMuss = Utils.roundDecimals(OcycoApplication.getvDMuss()) + " km/h";
+        String vDunt = Utils.roundDecimals(OcycoApplication.getvDunt()) + " km/h";
         //show in info boxes
-        sGefBox.setText(sGef + "");
-        sZufBox.setText(sZuf + "");
-        vAktBox.setText(vAkt + "");
-        vDBox.setText(vD + "");
-        tAnkBox.setText(tAnk + "");
-        tAnkUntBox.setText(tAnkUnt + "");
-        vDMussBox.setText(vDMuss + "");
-        vDUntBox.setText(vDunt + "");
+        sGefBox.setText(String.format("%s", sGef));
+        sZufBox.setText(String.format("%s", sZuf));
+        vAktBox.setText(String.format("%s", vAkt));
+        vDBox.setText(String.format("%s", vD));
+        tAnkBox.setText(String.format("%s", tAnk));
+        tAnkUntBox.setText(String.format("%s", tAnkUnt));
+        vDMussBox.setText(String.format("%s", vDMuss));
+        vDUntBox.setText(String.format("%s", vDunt));
         //do not show unrealistic high values
         if (tAnkDays > 2) {
             tAnkBox.setText("--:--");
@@ -210,10 +221,6 @@ public class ShowDataActivity extends AppCompatActivity {
             vDUntBox.setText("---");
             vDUntBox.setTextColor(ContextCompat.getColor(context, R.color.default_black));
         }
-    }
-
-    private String roundDecimals(double d) {
-        return String.format("%.2f", d);
     }
 
     @Override
