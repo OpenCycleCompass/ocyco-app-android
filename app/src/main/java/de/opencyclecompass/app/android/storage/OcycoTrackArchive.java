@@ -2,6 +2,9 @@ package de.opencyclecompass.app.android.storage;
 
 import android.content.Context;
 import android.content.SharedPreferences;
+import android.database.sqlite.SQLiteDatabase;
+import android.database.sqlite.SQLiteOpenHelper;
+import android.provider.BaseColumns;
 import android.support.annotation.Nullable;
 
 import org.acra.ACRA;
@@ -23,20 +26,11 @@ import java.util.UUID;
  * Warning: not thread save
  */
 public class OcycoTrackArchive {
-    private static final String PREFS = "OcycoTrackArchive-Prefs";
-    private static final String PREFS_TRACKLIST = "PREFS_TRACKLIST";
-    private static final String PREFS_TRACKIDMAPPING = "PREFS_TRACKIDMAPPING";
     private static final String FILE_EXTENSION = ".track";
-    private static final String FILE_EXTENSION_META = ".metadata";
 
     private Context context;
-    private SharedPreferences sharedPrefs;
 
-    private ArrayList<UUID> trackUuidList;
     private HashMap<UUID, OcycoTrack> trackCache;
-    private ArrayList<OcycoTrack.MetaData> trackMetadataList;
-    private HashMap<UUID, OcycoTrack.MetaData> trackMetadata;
-    private HashMap<Long, UUID> publicIdUuidMap;
 
     /**
      * Forbidden. Use {@code OcycoTrackArchive(Context context)} instead.
@@ -52,94 +46,68 @@ public class OcycoTrackArchive {
     public OcycoTrackArchive(Context context) {
         // save context from constructor
         this.context = context;
-        // open shared preferences
-        sharedPrefs = context.getSharedPreferences(PREFS, Context.MODE_PRIVATE);
         // create HashMap for track cache
         trackCache = new HashMap<>();
+    }
 
-        // read list of track from shared preferences
-        trackUuidList = new ArrayList<>();
-        trackMetadataList = new ArrayList<>();
-        trackMetadata = new HashMap<>();
-        if (sharedPrefs.contains(PREFS_TRACKLIST)) {
-            // read list of archived tracks from shard preferences
-            String trackNameList = sharedPrefs.getString(PREFS_TRACKLIST, "");
-            String[] trackUuidsAsStringArray = trackNameList.split(";");
-            trackUuidList.ensureCapacity(trackUuidsAsStringArray.length);
-            trackMetadataList.ensureCapacity(trackUuidsAsStringArray.length);
-            for (String aTrack_names_string : trackUuidsAsStringArray) {
-                if (aTrack_names_string.isEmpty()) {
-                    continue;
-                }
-                // read track metadata from file for each track and put into trackMetadataList
-                try {
-                    UUID uuid = UUID.fromString(aTrack_names_string);
-                    OcycoTrack.MetaData metadata = readTrackMetadataFromFile(uuid);
-                    trackUuidList.add(uuid);
-                    trackMetadataList.add(metadata);
-                    trackMetadata.put(uuid, metadata);
-                }
-                catch (IllegalArgumentException e) {
-                    ACRA.getErrorReporter().putCustomData(PREFS_TRACKLIST, trackNameList);
-                    ACRA.getErrorReporter().putCustomData("uuid", aTrack_names_string);
-                    ACRA.getErrorReporter().handleException(e);
-                }
-            }
+    /**
+     * Metadata helper table containing table definitions, structure and SQL statements.
+     */
+    public class MetadataDbHelper extends SQLiteOpenHelper {
+        // If you change the database schema, you must increment the database version.
+        public static final int DATABASE_VERSION = 1;
+
+        public static final String DATABASE_NAME = "OcycoTrackMetadata.sqlite";
+
+        public static final String TABLE_NAME = "MetadataTable";
+        public static final String ID = "id";
+        public static final String COL_TOTAL_DISTANCE = "totalDistance";
+        public static final String COL_START_TIME = "startTime";
+        public static final String COL_DURATION = "duration";
+        public static final String COL_NUMBER_OF_LOCATIONS = "numberOfLocations";
+        public static final String COL_UUID = "uuid";
+        public static final String COL_PUBLIC_ID = "publicId";
+        public static final String COL_UPLOADED = "uploaded";
+
+        private static final String SQL_CREATE_ENTRIES =
+                "CREATE TABLE " + TABLE_NAME + " (" +
+                        ID + " INTEGER PRIMARY KEY," +
+                        COL_TOTAL_DISTANCE + " TEXT, " +
+                        COL_START_TIME + " TEXT, " +
+                        COL_DURATION + " TEXT, " +
+                        COL_NUMBER_OF_LOCATIONS + " TEXT, " +
+                        COL_UUID + " TEXT, " +
+                        COL_PUBLIC_ID + " TEXT, " +
+                        COL_UPLOADED + " TEXT)";
+        private static final String SQL_DELETE_ENTRIES = "DROP TABLE IF EXISTS " + TABLE_NAME;
+
+        public MetadataDbHelper(Context context) {
+            super(context, DATABASE_NAME, null, DATABASE_VERSION);
         }
-
-        // create and fill hash map of publicId to UUID mappings
-        publicIdUuidMap = new HashMap<>();
-        if (sharedPrefs.contains(PREFS_TRACKIDMAPPING)) {
-            // read list of archived tracks from shard preferences
-            String trackIdMap = sharedPrefs.getString(PREFS_TRACKIDMAPPING, "");
-            String[] trackKeyValuesArray = trackIdMap.split(";");
-            for (String trackKeyValue : trackKeyValuesArray) {
-                if (trackKeyValue.isEmpty()) {
-                    continue;
-                }
-                String[] trackKeyValueArray = trackKeyValue.split(":");
-                if(!trackKeyValueArray[0].isEmpty() && !trackKeyValueArray[1].isEmpty()) {
-                    try {
-                        publicIdUuidMap.put(
-                                Long.parseLong(trackKeyValueArray[0]),
-                                UUID.fromString(trackKeyValueArray[1])
-                        );
-                    } catch (IllegalArgumentException e) {
-                        ACRA.getErrorReporter().putCustomData(PREFS_TRACKIDMAPPING, trackIdMap);
-                        ACRA.getErrorReporter().putCustomData("uuid-id-mapping", trackKeyValue);
-                        ACRA.getErrorReporter().handleException(e);
-                    }
-                }
-            }
+        public void onCreate(SQLiteDatabase db) {
+            db.execSQL(SQL_CREATE_ENTRIES);
+        }
+        public void onUpgrade(SQLiteDatabase db, int oldVersion, int newVersion) {
+            // Upgrade database if necessary
         }
     }
+
 
     /**
      * @return a copy of the internal list of {@link UUID}s of the archived tracks
      */
     public List<UUID> getTrackUuidList() {
-        return new ArrayList<>(trackUuidList);
-    }
-
-    /**
-     * @return a copy of the internal list of {@link UUID}s of the archived tracks
-     */
-    public List<OcycoTrack.MetaData> getTrackMetadataList() {
-        return new ArrayList<>(trackMetadataList);
-    }
-
-    /**
-     * @return a copy of the internal list of {@link UUID}s of the archived tracks
-     */
-    public HashMap<UUID, OcycoTrack.MetaData> getTrackMetadataMap() {
-        return new HashMap<>(trackMetadata);
+        // TODO: generate list from database
+        // BETTER: provide list interface methods
+        return new ArrayList<>();
     }
 
     /**
      * @return the number of archived tracks
      */
     public int getNumberOfTracks() {
-        return trackUuidList.size();
+        // TODO
+        return 42;
     }
 
     /**
@@ -149,12 +117,8 @@ public class OcycoTrackArchive {
      */
     @Nullable
     public UUID getTrackUuid(long publicId) {
-        if (!publicIdUuidMap.containsKey(publicId)) {
-            return null;
-        }
-        else {
-            return publicIdUuidMap.get(publicId);
-        }
+        // TODO
+        return new UUID(42, 42);
     }
 
     /**
@@ -165,12 +129,7 @@ public class OcycoTrackArchive {
      */
     @Nullable
     public OcycoTrack get(long publicTrackId) {
-        if (!publicIdUuidMap.containsKey(publicTrackId)) {
-            return null;
-        }
-        else {
-            return get(publicIdUuidMap.get(Long.valueOf(publicTrackId)));
-        }
+        return get(getTrackUuid(publicTrackId));
     }
 
     /**
@@ -180,13 +139,8 @@ public class OcycoTrackArchive {
      */
     @Nullable
     public OcycoTrack get(UUID trackUuid) {
-        if (!trackUuidList.contains(trackUuid)) {
-            return null;
-        } else if (trackCache.containsKey(trackUuid)) {
-            return trackCache.get(trackUuid);
-        } else {
-            return readTrackFromFile(trackUuid);
-        }
+        // TODO: return track from cache or read track from file if it exists
+        return null;
     }
 
     /**
@@ -195,15 +149,9 @@ public class OcycoTrackArchive {
      * @param track {@link OcycoTrack} object to save
      */
     public void add(OcycoTrack track) {
-        trackUuidList.add(track.metaData.getUuid());
-        saveTrackUuidList();
-        // put public ID into map if it exists
-        if (track.metaData.hasPublicId()) {
-            publicIdUuidMap.put(track.metaData.getPublicId(), track.metaData.getUuid());
-        }
-        // put track metadata into list and map
-        trackMetadataList.add(track.metaData);
-        trackMetadata.put(track.metaData.getUuid(), track.metaData);
+        // TODO: store metadata
+
+
         // put track into cache
         trackCache.put(track.metaData.getUuid(), track);
         // save track to file (from cache)
@@ -215,32 +163,22 @@ public class OcycoTrackArchive {
      * @param trackUuid the {@link UUID} of the track
      */
     public boolean delete(UUID trackUuid) {
-        // remove track from track list and save track list
-        trackUuidList.remove(trackUuid);
-        saveTrackUuidList();
-        // remove track metadata from list and map
-        trackMetadataList.remove(trackMetadata.get(trackUuid));
-        trackMetadata.remove(trackUuid);
+        // TODO: remove track from track list and save track list
+
+
         // remove OcycoTrack object from trackCache
         trackCache.remove(trackUuid);
         // delete track and metadata files
         String filename = trackUuid.toString() + FILE_EXTENSION;
-        String filenameMetadata = trackUuid.toString() + FILE_EXTENSION_META;
         File file = new File(new File(context.getFilesDir(), "") + File.separator + filename);
-        File fileMetadata = new File(new File(context.getFilesDir(), "") + File.separator
-                + filenameMetadata);
-        return (file.delete() && fileMetadata.delete());
+        return file.delete();
     }
 
     /**
      * Delete all track from track archive
      */
     public void deleteAll() {
-        // copy trackUuidList, because delete() method modifies trackUuiDList
-        ArrayList<UUID> localTrackUuidList = new ArrayList<>(trackUuidList);
-        for (UUID uuid : localTrackUuidList) {
-            delete(uuid);
-        }
+        // TODO: delete all files in dir, delete database
     }
 
     /**
@@ -254,37 +192,6 @@ public class OcycoTrackArchive {
     }
 
     /**
-     * Saves changes on track to file.
-     *
-     * @param trackUuid the {@link UUID} of the track to save
-     * @return true on success, false if write failed or track with {@code trackUuid} does not exist
-     */
-    public boolean updateMetadata(UUID trackUuid) {
-        return saveTrackToFile(trackUuid);
-    }
-
-    /**
-     * Persistent save {@code trackUuidList} to shared preferences.
-     */
-    private void saveTrackUuidList() {
-        StringBuilder stringBuilder1 = new StringBuilder();
-        for (UUID uuid: trackUuidList) {
-            stringBuilder1.append(uuid.toString());
-            stringBuilder1.append(";");
-        }
-        StringBuilder stringBuilder2 = new StringBuilder();
-        for(HashMap.Entry<Long, UUID> entry : publicIdUuidMap.entrySet()){
-            stringBuilder2.append(entry.getKey().toString());
-            stringBuilder2.append(":");
-            stringBuilder2.append(entry.getValue().toString());
-        }
-        SharedPreferences.Editor sharedPrefsEditor = sharedPrefs.edit();
-        sharedPrefsEditor.putString(PREFS_TRACKLIST, stringBuilder1.toString());
-        sharedPrefsEditor.putString(PREFS_TRACKIDMAPPING, stringBuilder2.toString());
-        sharedPrefsEditor.apply();
-    }
-
-    /**
      * Read track from file.
      * @param trackUuid UUID of track to read, must not be {@code null}
      * @return a new created {@link OcycoTrack} object, or null if an error occurred.
@@ -292,9 +199,7 @@ public class OcycoTrackArchive {
     @Nullable
     private OcycoTrack readTrackFromFile(UUID trackUuid) {
         ObjectInputStream input;
-        ObjectInputStream inputMetadata;
         String filename = trackUuid.toString() + FILE_EXTENSION;
-        String filenameMetadata = trackUuid.toString() + FILE_EXTENSION_META;
         try {
             input = new ObjectInputStream(
                     new FileInputStream(
@@ -304,44 +209,7 @@ public class OcycoTrackArchive {
             OcycoTrack track = (OcycoTrack) input.readObject();
             input.close();
 
-            // read metadata file (could contain newer information thcn track file) and override
-            //  metadata field
-            inputMetadata = new ObjectInputStream(
-                    new FileInputStream(
-                            new File(new File(context.getFilesDir(),"")+ File.separator+filenameMetadata)
-                    )
-            );
-            OcycoTrack.MetaData metadata = (OcycoTrack.MetaData) inputMetadata.readObject();
-            inputMetadata.close();
-            track.metaData = metadata;
-
             return track;
-        } catch (Exception e) {
-            e.printStackTrace();
-            ACRA.getErrorReporter().handleException(e);
-        }
-        return null;
-    }
-
-
-    /**
-     * Read track from file.
-     * @param trackUuid UUID of track to read, must not be {@code null}
-     * @return a new created {@link OcycoTrack} object, or null if an error occurred.
-     */
-    @Nullable
-    private OcycoTrack.MetaData readTrackMetadataFromFile(UUID trackUuid) {
-        ObjectInputStream input;
-        String filename = trackUuid.toString() + FILE_EXTENSION_META;
-        try {
-            input = new ObjectInputStream(
-                    new FileInputStream(
-                            new File(new File(context.getFilesDir(),"")+ File.separator+filename)
-                    )
-            );
-            OcycoTrack.MetaData metadata = (OcycoTrack.MetaData) input.readObject();
-            input.close();
-            return metadata;
         } catch (Exception e) {
             e.printStackTrace();
             ACRA.getErrorReporter().handleException(e);
@@ -359,9 +227,7 @@ public class OcycoTrackArchive {
      * @return true on success, false if write failed or track with {@code trackUuid} does not exist
      */
     private boolean saveTrackToFile(UUID trackUuid) {
-        if(!trackUuidList.contains(trackUuid)) {
-            return false;
-        }
+        // TODO check if track exists
         String filename = trackUuid.toString() + FILE_EXTENSION;
         ObjectOutput out;
         try {
@@ -373,40 +239,6 @@ public class OcycoTrackArchive {
             );
             out.writeObject(trackCache.get(trackUuid));
             out.close();
-            // write metadata by calling saveTrackMetadataToFile()
-            return saveTrackMetadataToFile(trackUuid);
-        } catch (IOException e) {
-            e.printStackTrace();
-            ACRA.getErrorReporter().handleException(e);
-        }
-        return false;
-    }
-
-    /**
-     * Saves track metadata from trach with {@code trackUuid} to file.
-     * Only one file is written: the {@code .metadata} file. The metadata file is
-     *  redundant, but can be read independent from the main track file.
-     * The track file will not contain valid metadata if this method is used to save updated track
-     *  metadata
-     *
-     * @param trackUuid the {@link UUID} of the track to save
-     * @return true on success, false if write failed or track with {@code trackUuid} does not exist
-     */
-    private boolean saveTrackMetadataToFile(UUID trackUuid) {
-        if(!trackUuidList.contains(trackUuid)) {
-            return false;
-        }
-        String filenameMeta = trackUuid.toString() + FILE_EXTENSION_META;
-        ObjectOutput outMeta;
-        try {
-            outMeta = new ObjectOutputStream(
-                    new FileOutputStream(
-                            new File(context.getFilesDir(),"") + File.separator + filenameMeta,
-                            false
-                    )
-            );
-            outMeta.writeObject(trackCache.get(trackUuid).metaData);
-            outMeta.close();
             return true;
         } catch (IOException e) {
             e.printStackTrace();
