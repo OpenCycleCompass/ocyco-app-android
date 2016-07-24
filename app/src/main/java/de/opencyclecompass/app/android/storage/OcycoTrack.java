@@ -7,106 +7,40 @@ import org.json.JSONException;
 import org.json.JSONObject;
 import org.osmdroid.util.GeoPoint;
 
-import java.io.Serializable;
 import java.security.SecureRandom;
 import java.util.ArrayList;
 import java.util.ListIterator;
-import java.util.UUID;
 
 /**
  * OcycoTrack class to store a track
  */
-public class OcycoTrack implements Serializable {
+public class OcycoTrack {
 
     private ArrayList<OcycoLocation> locations;
 
-    public MetaData metaData;
+    public OcycoTrackMetadata metadata;
 
     /**
      * default constructor
      */
     public OcycoTrack() {
-        metaData = new MetaData();
+        metadata = new OcycoTrackMetadata();
         // initial size of ArrayList: 128
         locations = new ArrayList<>(128);
-        metaData.totalDistance = 0.0;
     }
 
-    public class MetaData implements Serializable {
-        public static final long PUBLIC_ID_INVALID = -1l;
-
-        private double totalDistance;
-        private long startTime;
-        private long duration;
-        private int numberOfLocations;
-
-        private UUID uuid;
-        private long publicId;
-        private boolean uploaded;
-
-        public MetaData() {
-            startTime = System.currentTimeMillis();
-            uuid = UUID.randomUUID();
-            publicId = PUBLIC_ID_INVALID;
-        }
-
-        public UUID getUuid() {
-            return uuid;
-        }
-
-        public long getPublicId() {
-            return publicId;
-        }
-
-        public boolean hasPublicId() {
-            return (publicId != PUBLIC_ID_INVALID);
-        }
-
-        /**
-         * @return timestamp of track start
-         */
-        public long getStartTime() {
-            return startTime;
-        }
-
-        /**
-         * Get total distance of track in meter
-         *
-         * You can to recalculate distances between locations using {@see recalculateDistances()}
-         * before using this method to get a more precise result.
-         *
-         * The total distance is calculated on each modification made to the location list
-         *
-         * @return total distance of track in meter
-         */
-        public double getTotalDistance() {
-            return totalDistance;
-        }
-
-        /**
-         * @return number of locations in track
-         */
-        public int getNumberOfLocations() {
-            return numberOfLocations;
-        }
-
-        /**
-         * @return duration of track in milliseconds or -1 if track is empty
-         */
-        public long getDuration() {
-            return duration;
-        }
-
-        public boolean isUploaded() {
-            return uploaded;
-        }
-
-        public void setUploaded(boolean uploaded) {
-            this.uploaded = uploaded;
-        }
+    /**
+     * constructor for restoring track from file
+     *
+     * @param locations {@link ArrayList} of {@link OcycoLocation} object to use
+     * @param metadata {@link OcycoTrackMetadata} object to use
+     */
+    public OcycoTrack(ArrayList<OcycoLocation> locations, OcycoTrackMetadata metadata) {
+        this.locations = locations;
+        this.metadata = metadata;
     }
 
-
+    // append methods
     /**
      * append location
      *
@@ -117,7 +51,7 @@ public class OcycoTrack implements Serializable {
     public void appendLocation(OcycoLocation loc) {
         if (!locations.isEmpty()) {
             loc.setDistanceTo(locations.get(locations.size() - 1));
-            metaData.totalDistance += loc.getDistance();
+            metadata.totalDistance += loc.getDistance();
             calculateDuration();
             calculatenumberOfLocations();
         }
@@ -136,7 +70,6 @@ public class OcycoTrack implements Serializable {
         appendLocation(new OcycoLocation(loc));
     }
 
-    // append methods
     /**
      * append multiple {@link OcycoLocation}s to track
      * {@link OcycoLocation} are created from jsonLocationArray
@@ -202,7 +135,7 @@ public class OcycoTrack implements Serializable {
         int cutIndexEnd = -1;
 
         // return false if track is too short
-        if (metaData.getTotalDistance() <= (cutDistBegin+cutDistEnd)) {
+        if (metadata.getTotalDistance() <= (cutDistBegin+cutDistEnd)) {
             return false;
         }
 
@@ -256,7 +189,7 @@ public class OcycoTrack implements Serializable {
      * Calculate the total distance, duration and number of locations of the track
      *
      * requires {@link OcycoLocation}s distances to be set,
-     *  maybe you should recalculate them using {@see recalculateDistances()}
+     *  maybe you should recalculate them using {@link #recalculateDistances()}
      */
     private void calculateMetaData() {
         calculateDistance();
@@ -268,13 +201,13 @@ public class OcycoTrack implements Serializable {
      * Calculate the total distance of the track
      *
      * requires {@link OcycoLocation}s distances to be set,
-     *  maybe you should recalculate them using {@see recalculateDistances()}
+     *  maybe you should recalculate them using {@link #recalculateDistances()}
      */
     private void calculateDistance() {
-        metaData.totalDistance = 0.0;
+        metadata.totalDistance = 0.0;
         for (OcycoLocation location : locations) {
             if (location.getDistance() != OcycoLocation.DISTANCE_INVALID) {
-                metaData.totalDistance += location.getDistance();
+                metadata.totalDistance += location.getDistance();
             }
         }
     }
@@ -284,10 +217,10 @@ public class OcycoTrack implements Serializable {
      */
     private void calculateDuration() {
         if (locations.isEmpty()) {
-            metaData.duration = -1;
+            metadata.duration = -1;
         }
         else {
-            metaData.duration = (
+            metadata.duration = (
                     locations.get(locations.size() - 1).getTimestamp() -
                             locations.get(0).getTimestamp()
             );
@@ -299,7 +232,7 @@ public class OcycoTrack implements Serializable {
      * Calculate the number of locations of the track
      */
     private void calculatenumberOfLocations() {
-        metaData.numberOfLocations = locations.size();
+        metadata.numberOfLocations = locations.size();
     }
 
     /**
@@ -361,5 +294,12 @@ public class OcycoTrack implements Serializable {
             data.put(point);
         }
         return data;
+    }
+
+    /**
+     * @return {@link ArrayList} of {@link OcycoLocation}s: the internal locations member
+     */
+    public ArrayList<OcycoLocation> getLocations() {
+        return locations;
     }
 }

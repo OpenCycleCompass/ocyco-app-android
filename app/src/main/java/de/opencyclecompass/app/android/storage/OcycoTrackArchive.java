@@ -1,11 +1,13 @@
 package de.opencyclecompass.app.android.storage;
 
+import android.content.ContentValues;
 import android.content.Context;
-import android.content.SharedPreferences;
+import android.database.Cursor;
+import android.database.DatabaseUtils;
 import android.database.sqlite.SQLiteDatabase;
 import android.database.sqlite.SQLiteOpenHelper;
-import android.provider.BaseColumns;
 import android.support.annotation.Nullable;
+import android.widget.Toast;
 
 import org.acra.ACRA;
 
@@ -21,19 +23,23 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.UUID;
 
+import de.opencyclecompass.app.android.R;
+
 /**
  * OcycoTrackArchive archives multiple {@link OcycoTrack}s persistent.
  * Warning: not thread save
  */
 public class OcycoTrackArchive {
-    private static final String FILE_EXTENSION = ".track";
+    private static final String FILE_EXTENSION = ".ocycotrack";
 
     private Context context;
 
     private HashMap<UUID, OcycoTrack> trackCache;
 
+    private SQLiteDatabase db;
+
     /**
-     * Forbidden. Use {@code OcycoTrackArchive(Context context)} instead.
+     * Forbidden. Use {@link #OcycoTrackArchive(Context)} instead.
      */
     private OcycoTrackArchive() {
         // forbidden constructor
@@ -48,6 +54,9 @@ public class OcycoTrackArchive {
         this.context = context;
         // create HashMap for track cache
         trackCache = new HashMap<>();
+        // instantiate MetadataDbHelper class and get database
+        MetadataDbHelper dbHelper = new MetadataDbHelper(this.context);
+        db = dbHelper.getWritableDatabase();
     }
 
     /**
@@ -97,17 +106,92 @@ public class OcycoTrackArchive {
      * @return a copy of the internal list of {@link UUID}s of the archived tracks
      */
     public List<UUID> getTrackUuidList() {
-        // TODO: generate list from database
-        // BETTER: provide list interface methods
-        return new ArrayList<>();
+        Cursor cursor = db.query(
+                MetadataDbHelper.TABLE_NAME,
+                new String[]{MetadataDbHelper.COL_UUID},
+                null,
+                null,
+                null,
+                null,
+                MetadataDbHelper.COL_START_TIME
+        );
+        ArrayList<UUID> list = new ArrayList<>();
+        if (cursor.moveToFirst()) {
+            do {
+                String uuidString = cursor.getString(
+                        cursor.getColumnIndex(MetadataDbHelper.COL_UUID)
+                );
+                list.add(UUID.fromString(uuidString));
+            } while (cursor.moveToNext());
+        }
+        cursor.close();
+        return list;
+    }
+
+    /**
+     * @return A list of OcycoTrackMetadata object for each track in track archive
+     *
+     * This wraps {@code getTrackMetadataList(null, null)}.
+     * See {@link #getTrackMetadataList(String, String[])} for more details.
+     */
+    public List<OcycoTrackMetadata> getTrackMetadataList() {
+        return getTrackMetadataList(null, null);
+    }
+
+    /**
+     * @param selection A filter declaring which track matadata to return,
+     *                  formatted as an SQL WHERE clause (excluding the WHERE itself).
+     *                  Passing null will return all rows for the given table.
+     *                  E.g.: {@code MetadataDbHelper.COL_UUID + "=?"}
+     *
+     * @param selectionArgs You may include ?s in selection,
+     *                      which will be replaced by the values from selectionArgs,
+     *                      in order that they appear in the selection.
+     *                      The values will be bound as Strings.
+     *
+     * @return A list of OcycoTrackMetadata object for each track in track archive
+     */
+    private List<OcycoTrackMetadata> getTrackMetadataList(String selection, String[] selectionArgs) {
+        Cursor cursor = db.query(
+                MetadataDbHelper.TABLE_NAME,
+                new String[]{
+                        MetadataDbHelper.COL_TOTAL_DISTANCE,
+                        MetadataDbHelper.COL_START_TIME,
+                        MetadataDbHelper.COL_DURATION,
+                        MetadataDbHelper.COL_NUMBER_OF_LOCATIONS,
+                        MetadataDbHelper.COL_UUID,
+                        MetadataDbHelper.COL_PUBLIC_ID,
+                        MetadataDbHelper.COL_UPLOADED
+                },
+                selection,
+                selectionArgs,
+                null,
+                null,
+                MetadataDbHelper.COL_START_TIME
+        );
+        ArrayList<OcycoTrackMetadata> list = new ArrayList<>();
+        if (cursor.moveToFirst()) {
+            do {
+                double totalDistance = cursor.getDouble(cursor.getColumnIndex(MetadataDbHelper.COL_TOTAL_DISTANCE));
+                long startTime = cursor.getLong(cursor.getColumnIndex(MetadataDbHelper.COL_START_TIME));
+                long duration = cursor.getLong(cursor.getColumnIndex(MetadataDbHelper.COL_DURATION));
+                int numberOfLocations = cursor.getInt(cursor.getColumnIndex(MetadataDbHelper.COL_NUMBER_OF_LOCATIONS));
+                String uuidString = cursor.getString(cursor.getColumnIndex(MetadataDbHelper.COL_UUID));
+                int publicId = cursor.getInt(cursor.getColumnIndex(MetadataDbHelper.COL_PUBLIC_ID));
+                boolean uploaded = (cursor.getInt(cursor.getColumnIndex(MetadataDbHelper.COL_UPLOADED)) != 0);
+                OcycoTrackMetadata metadata = new OcycoTrackMetadata(totalDistance, startTime, duration,numberOfLocations, UUID.fromString(uuidString), publicId, uploaded);
+                list.add(metadata);
+            } while (cursor.moveToNext());
+        }
+        cursor.close();
+        return list;
     }
 
     /**
      * @return the number of archived tracks
      */
-    public int getNumberOfTracks() {
-        // TODO
-        return 42;
+    public long getNumberOfTracks() {
+        return DatabaseUtils.queryNumEntries(db, MetadataDbHelper.TABLE_NAME);
     }
 
     /**
@@ -117,8 +201,21 @@ public class OcycoTrackArchive {
      */
     @Nullable
     public UUID getTrackUuid(long publicId) {
-        // TODO
-        return new UUID(42, 42);
+        Cursor cursor = db.query(
+                MetadataDbHelper.TABLE_NAME,
+                new String[]{MetadataDbHelper.COL_UUID},
+                MetadataDbHelper.COL_PUBLIC_ID + "=?",
+                new String[]{String.valueOf(publicId)},
+                null,
+                null,
+                MetadataDbHelper.COL_START_TIME
+        );
+        String uuidString = cursor.getString(cursor.getColumnIndex(MetadataDbHelper.COL_UUID));
+        cursor.close();
+        if (cursor.moveToFirst()) {
+            return UUID.fromString(uuidString);
+        }
+        return null;
     }
 
     /**
@@ -139,8 +236,15 @@ public class OcycoTrackArchive {
      */
     @Nullable
     public OcycoTrack get(UUID trackUuid) {
-        // TODO: return track from cache or read track from file if it exists
-        return null;
+        if (trackUuid == null) {
+            return null;
+        }
+        if (trackCache.containsKey(trackUuid)) {
+            return trackCache.get(trackUuid);
+        }
+        else {
+            return readTrackFromFile(trackUuid);
+        }
     }
 
     /**
@@ -149,36 +253,61 @@ public class OcycoTrackArchive {
      * @param track {@link OcycoTrack} object to save
      */
     public void add(OcycoTrack track) {
-        // TODO: store metadata
-
-
         // put track into cache
-        trackCache.put(track.metaData.getUuid(), track);
+        trackCache.put(track.metadata.getUuid(), track);
+
+        // Create a new map of values, where column names are the keys
+        ContentValues values = new ContentValues();
+        values.put(MetadataDbHelper.COL_TOTAL_DISTANCE, track.metadata.getTotalDistance());
+        values.put(MetadataDbHelper.COL_START_TIME, track.metadata.getStartTime());
+        values.put(MetadataDbHelper.COL_DURATION, track.metadata.getDuration());
+        values.put(MetadataDbHelper.COL_NUMBER_OF_LOCATIONS, track.metadata.getNumberOfLocations());
+        values.put(MetadataDbHelper.COL_UUID, track.metadata.getUuid().toString());
+        values.put(MetadataDbHelper.COL_PUBLIC_ID, track.metadata.getPublicId());
+        values.put(MetadataDbHelper.COL_UPLOADED, track.metadata.isUploaded() ? 1 : 0);
+        // Insert the new row
+        db.insert(MetadataDbHelper.TABLE_NAME, null, values);
+
         // save track to file (from cache)
-        saveTrackToFile(track.metaData.getUuid());
+        saveTrackToFile(track.metadata.getUuid());
     }
 
     /**
      * Delete track of given {@link UUID}
      * @param trackUuid the {@link UUID} of the track
      */
-    public boolean delete(UUID trackUuid) {
-        // TODO: remove track from track list and save track list
-
-
-        // remove OcycoTrack object from trackCache
+    public void delete(UUID trackUuid) {
+        // remove track object from trackCache
         trackCache.remove(trackUuid);
-        // delete track and metadata files
+
+        // delete track file
         String filename = trackUuid.toString() + FILE_EXTENSION;
         File file = new File(new File(context.getFilesDir(), "") + File.separator + filename);
-        return file.delete();
+        file.delete();
+
+        // remove track from metadata db
+        db.delete(MetadataDbHelper.TABLE_NAME,
+                MetadataDbHelper.COL_UUID + "=?",
+                new String[]{trackUuid.toString()}
+        );
     }
 
     /**
      * Delete all track from track archive
      */
     public void deleteAll() {
-        // TODO: delete all files in dir, delete database
+        // clear trackCache entries
+        trackCache.clear();
+
+        // delete all track files
+        List<UUID> list = getTrackUuidList();
+        for (UUID trackUuid : list) {
+            String filename = trackUuid.toString() + FILE_EXTENSION;
+            File file = new File(new File(context.getFilesDir(), "") + File.separator + filename);
+            file.delete();
+        }
+        // delete all track metadata database entries
+        db.delete(MetadataDbHelper.TABLE_NAME, null, null);
     }
 
     /**
@@ -188,6 +317,29 @@ public class OcycoTrackArchive {
      * @return true on success, false if write failed or track with {@code trackUuid} does not exist
      */
     public boolean update(UUID trackUuid) {
+        OcycoTrack track = get(trackUuid);
+        if (track == null) {
+            return false;
+        }
+        // Update metadata:
+        // Create a new map of values, where column names are the keys
+        ContentValues values = new ContentValues();
+        values.put(MetadataDbHelper.COL_TOTAL_DISTANCE, track.metadata.getTotalDistance());
+        values.put(MetadataDbHelper.COL_START_TIME, track.metadata.getStartTime());
+        values.put(MetadataDbHelper.COL_DURATION, track.metadata.getDuration());
+        values.put(MetadataDbHelper.COL_NUMBER_OF_LOCATIONS, track.metadata.getNumberOfLocations());
+        values.put(MetadataDbHelper.COL_UUID, track.metadata.getUuid().toString());
+        values.put(MetadataDbHelper.COL_PUBLIC_ID, track.metadata.getPublicId());
+        values.put(MetadataDbHelper.COL_UPLOADED, track.metadata.isUploaded() ? 1 : 0);
+        // Update the row
+        db.update(
+                MetadataDbHelper.TABLE_NAME,
+                values,
+                MetadataDbHelper.COL_UUID + "=?",
+                new String[]{trackUuid.toString()}
+        );
+
+        // Update track data:
         return saveTrackToFile(trackUuid);
     }
 
@@ -198,6 +350,21 @@ public class OcycoTrackArchive {
      */
     @Nullable
     private OcycoTrack readTrackFromFile(UUID trackUuid) {
+        // Load metadata from database
+        List<OcycoTrackMetadata> metadataList = getTrackMetadataList(
+                MetadataDbHelper.COL_UUID + "=?",
+                new String[]{trackUuid.toString()}
+        );
+        if (metadataList.isEmpty()) {
+            Toast.makeText(
+                    this.context,
+                    R.string.track_archive_error_reading_file,
+                    Toast.LENGTH_LONG
+            ).show();
+            return null;
+        }
+
+        // Read track location list from file
         ObjectInputStream input;
         String filename = trackUuid.toString() + FILE_EXTENSION;
         try {
@@ -206,9 +373,48 @@ public class OcycoTrackArchive {
                             new File(new File(context.getFilesDir(),"")+ File.separator+filename)
                     )
             );
-            OcycoTrack track = (OcycoTrack) input.readObject();
-            input.close();
 
+            // Read ArrayList of OcycoLocation objects and check for consistency
+            Object object = input.readObject();
+            input.close();
+            ArrayList<OcycoLocation> locations;
+            // Check it's an ArrayList
+            if (object instanceof ArrayList<?>) {
+                // Get the List
+                ArrayList<?> arrayList = (ArrayList<?>) object;
+                locations = new ArrayList<>(arrayList.size());
+                if (arrayList.size() > 0) {
+                    for (int i = 0; i < arrayList.size(); i++) {
+                        // Still not enough for a type
+                        Object o = arrayList.get(i);
+                        if (o instanceof OcycoLocation) {
+                            OcycoLocation location = (OcycoLocation) o;
+                            locations.add(location);
+                        }
+                        else {
+                            Toast.makeText(
+                                    this.context,
+                                    R.string.track_archive_error_reading_array,
+                                    Toast.LENGTH_LONG
+                            ).show();
+                            return null;
+                        }
+                    }
+                }
+            }
+            else {
+                Toast.makeText(
+                        this.context,
+                        R.string.track_archive_error_reading_array,
+                        Toast.LENGTH_LONG
+                ).show();
+                return null;
+            }
+
+            // Create and return OcycoTrack object:
+            OcycoTrack track = new OcycoTrack(locations, metadataList.get(0));
+            // put track into cache
+            trackCache.put(track.metadata.getUuid(), track);
             return track;
         } catch (Exception e) {
             e.printStackTrace();
@@ -220,14 +426,17 @@ public class OcycoTrackArchive {
     /**
      * Saves track with {@code trackUuid} to file.
      * If track with same {@link UUID} already exists it will be overridden.
-     * Two files are written: a {@code .track} and a {@code .metadata} file. The metadata file is
-     *  redundant, but can be read independent from the main track file.
+     * Only one files is written: The {@code .ocycotrack}-file contains the list of OcycoLocation
+     * objects.
+     * Metadata is stored in the SQLite database.
      *
      * @param trackUuid the {@link UUID} of the track to save
      * @return true on success, false if write failed or track with {@code trackUuid} does not exist
      */
     private boolean saveTrackToFile(UUID trackUuid) {
-        // TODO check if track exists
+        if (!trackCache.containsKey(trackUuid)) {
+            return false;
+        }
         String filename = trackUuid.toString() + FILE_EXTENSION;
         ObjectOutput out;
         try {
@@ -237,13 +446,13 @@ public class OcycoTrackArchive {
                             false
                     )
             );
-            out.writeObject(trackCache.get(trackUuid));
+            out.writeObject(trackCache.get(trackUuid).getLocations());
             out.close();
             return true;
         } catch (IOException e) {
             e.printStackTrace();
             ACRA.getErrorReporter().handleException(e);
+            return false;
         }
-        return false;
     }
 }

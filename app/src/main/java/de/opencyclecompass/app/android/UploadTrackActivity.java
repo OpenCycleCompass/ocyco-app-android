@@ -134,9 +134,9 @@ public class UploadTrackActivity extends AppCompatActivity {
     private void initUI() {
 
         editText_UploadTrackDuration.setText(
-              Utils.formatTime(track.metaData.getDuration()));
+              Utils.formatTime(track.metadata.getDuration()));
         editText_UploadTrackLength.setText(
-              String.format("%s km", Utils.roundDecimals(track.metaData.getTotalDistance()/1000.0)));
+              String.format("%s km", Utils.roundDecimals(track.metadata.getTotalDistance()/1000.0)));
         uploadPublic = prefs.getBoolean("upload_public", false);
         token = prefs.getString("upload_token", null);
         if (token == null) {
@@ -298,7 +298,7 @@ public class UploadTrackActivity extends AppCompatActivity {
     private String makeUrl() {
         String lurlstr;
         Uri.Builder lurl;
-        lurl = Uri.parse(this.getString(R.string.api1_base_url) + this.getString(R.string.api1_pushtrack_new)).buildUpon().appendQueryParameter("duration", Long.toString(track.metaData.getDuration())).appendQueryParameter("length", Double.toString(track.metaData.getTotalDistance())).appendQueryParameter("user_token", token);
+        lurl = Uri.parse(this.getString(R.string.api1_base_url) + this.getString(R.string.api1_pushtrack_new)).buildUpon().appendQueryParameter("duration", Long.toString(track.metadata.getDuration())).appendQueryParameter("length", Double.toString(track.metadata.getTotalDistance())).appendQueryParameter("user_token", token);
         if (uploadPublic) {
             lurl.appendQueryParameter("name", editText_UploadTrackName.getText().toString()).appendQueryParameter("comment", editText_UploadTrackCom.getText().toString()).appendQueryParameter("public", "true");
         } else {
@@ -490,7 +490,7 @@ public class UploadTrackActivity extends AppCompatActivity {
                             notification = "Track \"" + track_id + "\" mit " + nodes_s + " GPS-Koordinaten erstellt am " + created_s;
 
                             // mark track in track archive as uploaded
-                            track.metaData.setUploaded(true);
+                            track.metadata.setUploaded(true);
                             OcycoApplication.trackArchive.update(trackUuid);
                         } else if (json.has("error")) {
                             notification = getString(R.string.error) + json.getString("error");
