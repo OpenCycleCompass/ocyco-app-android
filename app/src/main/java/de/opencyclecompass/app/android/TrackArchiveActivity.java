@@ -11,7 +11,7 @@ import android.widget.Toast;
 
 import java.util.ArrayList;
 
-import de.opencyclecompass.app.android.storage.OcycoTrack;
+import de.opencyclecompass.app.android.storage.OcycoTrackMetadata;
 import de.opencyclecompass.app.android.util.Utils;
 
 /**
@@ -39,9 +39,8 @@ public class TrackArchiveActivity extends AppCompatActivity {
                     Toast.makeText(getApplicationContext(), "Upload Track ...",
                             Toast.LENGTH_LONG).show();
                     Intent intent = new Intent(getApplicationContext(), UploadTrackActivity.class);
-                    intent.putExtra("track", OcycoApplication.trackArchive.getTrackMetadataMap().get(
-                            OcycoApplication.trackArchive.getTrackUuidList().get(position)
-                    ).getUuid().toString());
+                    intent.putExtra("track", OcycoApplication.trackArchive.getTrackUuidList()
+                            .get(position).toString());
                     intent.putExtra("fromArchive", true);
                     intent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
                     startActivity(intent);
@@ -61,8 +60,13 @@ public class TrackArchiveActivity extends AppCompatActivity {
     private void updateUI() {
         arrayList.clear();
 
-        for (OcycoTrack.MetaData metadata : OcycoApplication.trackArchive.getTrackMetadataList()) {
-            arrayList.add(Utils.getDateTime(metadata.getStartTime()));
+        for (OcycoTrackMetadata metadata : OcycoApplication.trackArchive.getTrackMetadataList()) {
+            if (metadata != null) {
+                arrayList.add(Utils.getDateTime(metadata.getStartTime()));
+            }
+            else {
+                arrayList.add("Fehler :-(");
+            }
         }
 
         adapter.notifyDataSetChanged();
@@ -74,5 +78,6 @@ public class TrackArchiveActivity extends AppCompatActivity {
      */
     public void onClickTrackArchiveDeleteAll(View view) {
         OcycoApplication.trackArchive.deleteAll();
+        updateUI();
     }
 }

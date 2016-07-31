@@ -148,7 +148,7 @@ public class MapFragment extends Fragment {
     private Polyline createPolylineFromDB(OcycoTrack lTDB, int color) {
         Log.i(TAG, "createDrivenPolyline()");
         //create waypoints Array
-        Log.i(TAG, "database size: " + lTDB.metaData.getNumberOfLocations() + " rows");
+        Log.i(TAG, "database size: " + lTDB.metadata.getNumberOfLocations() + " rows");
         Polyline polyline = new Polyline(getActivity().getApplicationContext());
         polyline.setColor(color);
         ArrayList<GeoPoint> waypoints = lTDB.getGeoPointArrayList();

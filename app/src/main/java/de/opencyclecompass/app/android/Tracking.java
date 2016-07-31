@@ -56,8 +56,8 @@ public class Tracking extends Service implements LocationListener, OnConnectionF
         if (checkAccuracy(location.getAccuracy())) {
             updateDatabase();
             //update Notification
-            int num_rows = track.metaData.getNumberOfLocations();
-            double total_dist = track.metaData.getTotalDistance();
+            int num_rows = track.metadata.getNumberOfLocations();
+            double total_dist = track.metadata.getTotalDistance();
             String s_total_dist = Utils.roundDecimals(total_dist / 1000d);
             // Update notification, if online tracking ist running
             if (OcycoApplication.isOnline_tracking_running()) {
@@ -94,8 +94,8 @@ public class Tracking extends Service implements LocationListener, OnConnectionF
         //only call mathematical methods, if this is not the first location - else there will be a NPE
         if (!mCalculate.checkFirstLoc()) {
             mCalculate.calculateTimeVars(OcycoApplication.gettAnkEingTime());
-            mCalculate.calculateDrivenDistance(track.metaData.getTotalDistance());
-            Log.i(TAG, "sEing tf callCalc " + (track.metaData.getTotalDistance()));
+            mCalculate.calculateDrivenDistance(track.metadata.getTotalDistance());
+            Log.i(TAG, "sEing tf callCalc " + (track.metadata.getTotalDistance()));
             mCalculate.calculateDrivenTime();
             mCalculate.calculateSpeed();
             mCalculate.math(OcycoApplication.isUseTimeFactor(), OcycoApplication.getsEingTimeFactor() / 1000d);
@@ -154,8 +154,9 @@ public class Tracking extends Service implements LocationListener, OnConnectionF
     }
 
     /**
-     * Builds a GoogleApiClient. Uses the {@code #addApi} method to request the
-     * LocationServices API.
+     * Builds a {@link GoogleApiClient}.
+     * Uses the {@link GoogleApiClient.Builder#addApi(com.google.android.gms.common.api.Api)} method to request
+     * the {@link LocationServices} API.
      */
     protected void buildGoogleApiClient() {
         Log.i(TAG, "buildGoogleApiClient()");
@@ -201,7 +202,7 @@ public class Tracking extends Service implements LocationListener, OnConnectionF
         int mNotificationId = 42;
         NotificationManager mNotifyMgr = (NotificationManager) getSystemService(NOTIFICATION_SERVICE);
         mNotifyMgr.cancel(mNotificationId);
-        if ((track.metaData.getNumberOfLocations() < 10)
+        if ((track.metadata.getNumberOfLocations() < 10)
                 || !track.removeRandomStartEnd()) {
             // don't upload empty or too short track
             Toast.makeText(this, getString(R.string.upload_track_error_too_short),
@@ -211,7 +212,7 @@ public class Tracking extends Service implements LocationListener, OnConnectionF
         else {
             OcycoApplication.trackArchive.add(track);
             Intent intent = new Intent(this, UploadTrackActivity.class);
-            intent.putExtra("track", track.metaData.getUuid().toString());
+            intent.putExtra("track", track.metadata.getUuid().toString());
             intent.putExtra("fromArchive", false);
             intent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
             startActivity(intent);

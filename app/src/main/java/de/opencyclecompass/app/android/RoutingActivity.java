@@ -541,7 +541,7 @@ public class RoutingActivity extends AppCompatActivity implements TimePickerFrag
                     //read and insert points from jArrray
                     mRDB.appendJsonLocationArray(jArray);
                     //get total dist, convert to km an round
-                    double totalDist = mRDB.metaData.getTotalDistance() / 1000;
+                    double totalDist = mRDB.metadata.getTotalDistance() / 1000;
                     String totalDistRounded = roundDecimals(totalDist);
                     //show Toast
                     int duration = Toast.LENGTH_LONG;
