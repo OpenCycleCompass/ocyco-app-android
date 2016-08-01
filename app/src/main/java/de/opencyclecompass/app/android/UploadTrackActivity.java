@@ -14,8 +14,6 @@ import android.os.AsyncTask;
 import android.os.Bundle;
 import android.support.v4.app.NotificationCompat;
 import android.support.v7.app.AppCompatActivity;
-import android.text.InputFilter;
-import android.text.Spanned;
 import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
@@ -93,19 +91,6 @@ public class UploadTrackActivity extends AppCompatActivity {
         uploadPublic = prefs.getBoolean("upload_public", false);
 
         switch_UploadTrackPublic.setChecked(uploadPublic);
-
-        // Only accept a-z, A-Z, "-" and "_" as name
-        editText_UploadTrackName.setFilters(new InputFilter[]{new InputFilter() {
-            public CharSequence filter(CharSequence src, int start, int end, Spanned dst, int dstart, int dend) {
-                if (src.equals("")) { // for backspace
-                    return src;
-                }
-                if (src.toString().matches("[a-zA-Z_-]+")) {
-                    return src;
-                }
-                return "";
-            }
-        }});
 
         //receiving intent
         Intent incomingIntent = getIntent();
