@@ -99,5 +99,5 @@ dependencies {
     compile 'com.google.code.gson:gson:2.7'
     compile 'org.apache.commons:commons-lang3:3.4'
     compile files('libs/osmbonuspack_v5.1.jar')
-    compile 'ch.acra:acra:4.9.0'
+    compile 'ch.acra:acra:4.6.2'
 }
