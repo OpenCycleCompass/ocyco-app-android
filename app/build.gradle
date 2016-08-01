@@ -7,12 +7,12 @@ play {
 }
 
 android {
-    compileSdkVersion 23
-    buildToolsVersion "23.0.2"
+    compileSdkVersion 24
+    buildToolsVersion "24.0.1"
     defaultConfig {
         applicationId 'de.opencyclecompass.app.android'
         minSdkVersion 15
-        targetSdkVersion 23
+        targetSdkVersion 24
         versionCode getUnixTimestamp() as int
         versionName "1.0"
     }
@@ -92,12 +92,12 @@ def getCommit() {
 }
 
 dependencies {
-    compile 'com.android.support:appcompat-v7:23.2.1'
-    compile 'com.google.android.gms:play-services-location:8.4.0'
-    compile 'org.slf4j:slf4j-android:1.7.7'
+    compile 'com.android.support:appcompat-v7:24.1.1'
+    compile 'com.google.android.gms:play-services-location:9.2.1'
+    compile 'org.slf4j:slf4j-android:1.7.21'
     compile 'org.osmdroid:osmdroid-android:4.3'
-    compile 'com.google.code.gson:gson:2.4'
-    compile 'org.apache.commons:commons-lang3:3.3.2'
+    compile 'com.google.code.gson:gson:2.7'
+    compile 'org.apache.commons:commons-lang3:3.4'
     compile files('libs/osmbonuspack_v5.1.jar')
     compile 'ch.acra:acra:4.6.2'
 }
